@@ -36,7 +36,7 @@ should be committing your changes at least once a day.
 
 If you're working on a new feature,
 please create a separate branch and give it a name that describes the feature you're working on.
-The recommended naming format is `week-XX_feature-XXX`.
+The recommended naming format is `feature/xxx` or `bugfix/xxx`.
 
 ### 4. Write helpful and descriptive commit messages
 
