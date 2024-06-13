@@ -1,6 +1,9 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.res.painterResource
@@ -8,55 +11,90 @@ import androidx.compose.ui.window.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import screen.main.MainScreen
+import screen.cull.CullScreen
+import screen.cull.CullViewModel
+import screen.importing.ImportScreen
+import screen.overview.OverviewScreen
 import screen.select.SelectScreen
-import java.io.File
 
-sealed class Screen(val route: String) {
-	data object Select : Screen("select")
-	data object Main : Screen("main")
+enum class Screen {
+	Select,
+	Import,
+	Overview,
+	Cull,
 }
 
 @Composable
 @Preview
 fun App(window: ComposeWindow) {
+	val model = remember { MainModel() }
 	val navController = rememberNavController()
-	var selectedDir by remember { mutableStateOf<File?>(null) }
+	val state by model.stateFlow.collectAsState()
+
+	fun backToSelect() {
+		model.reset()
+		navController.popBackStack(Screen.Select.name, false)
+	}
 
 	NavHost(
 		modifier = Modifier.fillMaxSize(),
 		navController = navController,
-		startDestination = Screen.Select.route,
+		startDestination = Screen.Select.name,
 	) {
-		composable(
-			route = Screen.Select.route,
-		) {
+		composable(Screen.Select.name) {
 			SelectScreen(
 				window = window,
 				onDirectorySelected = { dir ->
-					selectedDir = dir
-					navController.navigate(Screen.Main.route)
-				}
+					if (dir == null) {
+						TODO("Report error and recover")
+					} else {
+						model.selected(dir)
+						navController.navigate(Screen.Import.name)
+					}
+				},
 			)
 		}
 
-		composable(
-			route = Screen.Main.route,
-		) {
-			fun back() {
-				selectedDir = null
-				navController.popBackStack(Screen.Select.route, false)
+		composable(Screen.Import.name) {
+			val dir = state.dir
+			if (dir == null) {
+				backToSelect()
+				return@composable
 			}
 
-			val dir = selectedDir
-			if (dir != null && dir.isDirectory) {
-				MainScreen(
-					dir = dir
-				)
-			} else {
-				// TODO: alert!
-				back()
-			}
+			ImportScreen(
+				dir = dir,
+				onImported = { collection ->
+					model.overview(collection)
+					navController.navigate(Screen.Overview.name) {
+						popUpTo(Screen.Select.name) { inclusive = false }
+					}
+				},
+				onClose = {
+					backToSelect()
+				},
+			)
+		}
+
+		composable(Screen.Overview.name) {
+			OverviewScreen(
+				collection = state.shots,
+				onGroupSelected = { group ->
+					model.cull(group)
+					navController.navigate(Screen.Cull.name)
+				},
+				onClose = {
+					backToSelect()
+				},
+			)
+		}
+
+		composable(Screen.Cull.name) {
+			val groups = state.shots.grouped
+			val currentGroup = state.currentGroup
+			val viewModel = remember(groups) { CullViewModel(groups, currentGroup) }
+
+			CullScreen(viewModel)
 		}
 	}
 }
