@@ -21,7 +21,7 @@ sealed class Page(val route: String) {
 @Preview
 fun App(window: ComposeWindow) {
 	val navController = rememberNavController()
-	var selectedPath by remember { mutableStateOf<String?>(null) }
+	var selectedDir by remember { mutableStateOf<File?>(null) }
 
 	NavHost(
 		modifier = Modifier.fillMaxSize(),
@@ -31,11 +31,10 @@ fun App(window: ComposeWindow) {
 		composable(
 			route = Page.Select.route,
 		) {
-			selectedPath = null
 			SelectPage(
 				window = window,
-				onDirectoriesSelected = { path ->
-					selectedPath = "/home/a"
+				onDirectorySelected = { dir ->
+					selectedDir = dir
 					navController.navigate(Page.View.route)
 				}
 			)
@@ -44,14 +43,20 @@ fun App(window: ComposeWindow) {
 		composable(
 			route = Page.View.route,
 		) {
-			val dir = selectedPath?.let { path -> File(path) }
+			fun back() {
+				selectedDir = null
+				navController.popBackStack(Page.Select.route, false)
+			}
+
+			val dir = selectedDir
 			if (dir != null && dir.isDirectory) {
 				ViewPage(
 					groups = emptySet(),
-					onBack = { navController.popBackStack() },
+					onBack = { back() },
 				)
 			} else {
 				// TODO: alert!
+				back()
 			}
 		}
 	}
