@@ -1,3 +1,5 @@
+package page
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +18,8 @@ import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import getBitmapsFromSelectedSubGroup
+import toImageBitmap
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -86,9 +90,11 @@ fun ViewPage(groups: Set<File>, onBack: () -> Unit) {
                     .weight(7.0f)
             ) {
 
-                ImageGrid(imageBitmapList = getBitmapsFromSelectedSubGroup(
-                    subGroups, selectedSubGroupIndex),onImageSelected = onImageSelected
-                )
+				ImageGrid(
+					imageBitmapList = getBitmapsFromSelectedSubGroup(
+						subGroups, selectedSubGroupIndex
+					), onImageSelected = onImageSelected
+				)
             }
 
             // Bottom Row
