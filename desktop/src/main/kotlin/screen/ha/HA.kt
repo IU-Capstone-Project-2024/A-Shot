@@ -1,4 +1,4 @@
-package page
+package screen.ha
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -19,12 +19,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import getBitmapsFromSelectedSubGroup
+import screen.ImageGrid
 import toImageBitmap
 import java.io.File
 import javax.imageio.ImageIO
 
 @Composable
-fun ViewPage(groups: Set<File>, onBack: () -> Unit) {
+fun HA(groups: Set<File>, onBack: () -> Unit) {
 
     val folderImage: ImageBitmap = useResource("folder.png") { loadImageBitmap(it) }
     var selectedGroupIndex by remember { mutableStateOf(0) }

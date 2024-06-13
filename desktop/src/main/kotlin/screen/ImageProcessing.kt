@@ -1,4 +1,4 @@
-package page
+package screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures

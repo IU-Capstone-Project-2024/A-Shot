@@ -12,4 +12,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "Test"
+rootProject.name = "desktop"

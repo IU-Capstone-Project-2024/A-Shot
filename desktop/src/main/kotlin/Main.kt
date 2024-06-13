@@ -8,13 +8,13 @@ import androidx.compose.ui.window.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import page.SelectPage
-import page.ViewPage
+import screen.main.MainScreen
+import screen.select.SelectScreen
 import java.io.File
 
-sealed class Page(val route: String) {
-	data object Select : Page("select")
-	data object View : Page("view")
+sealed class Screen(val route: String) {
+	data object Select : Screen("select")
+	data object Main : Screen("main")
 }
 
 @Composable
@@ -26,33 +26,32 @@ fun App(window: ComposeWindow) {
 	NavHost(
 		modifier = Modifier.fillMaxSize(),
 		navController = navController,
-		startDestination = Page.Select.route,
+		startDestination = Screen.Select.route,
 	) {
 		composable(
-			route = Page.Select.route,
+			route = Screen.Select.route,
 		) {
-			SelectPage(
+			SelectScreen(
 				window = window,
 				onDirectorySelected = { dir ->
 					selectedDir = dir
-					navController.navigate(Page.View.route)
+					navController.navigate(Screen.Main.route)
 				}
 			)
 		}
 
 		composable(
-			route = Page.View.route,
+			route = Screen.Main.route,
 		) {
 			fun back() {
 				selectedDir = null
-				navController.popBackStack(Page.Select.route, false)
+				navController.popBackStack(Screen.Select.route, false)
 			}
 
 			val dir = selectedDir
 			if (dir != null && dir.isDirectory) {
-				ViewPage(
-					groups = emptySet(),
-					onBack = { back() },
+				MainScreen(
+					dir = dir
 				)
 			} else {
 				// TODO: alert!
