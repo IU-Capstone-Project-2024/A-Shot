@@ -1,8 +1,9 @@
 package util
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 import java.awt.Dimension
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
@@ -12,15 +13,10 @@ import kotlin.math.min
 
 
 object ImageLoader {
-	private const val MAX_JOBS = 8
+	private const val MAX_JOBS = 4
 
 	private val cache = File(System.getProperty("java.io.tmpdir"), "images")
 	private val semaphore = Semaphore(MAX_JOBS)
-	private val scope = CoroutineScope(
-		Dispatchers.IO +
-				Job() +
-				CoroutineExceptionHandler { _, throwable -> println(throwable.message) }
-	)
 
 	init {
 		if (!cache.exists()) {
@@ -28,19 +24,14 @@ object ImageLoader {
 		}
 	}
 
-	suspend fun load(file: File, size: Dimension): Deferred<BufferedImage?> {
-		return scope.async {
-			try {
-				semaphore.withPermit {
-					loadCached(file).getOrElse {
-						loadUncached(file, size).getOrNull()
-					}
+	suspend fun load(file: File, size: Dimension): BufferedImage? =
+		withContext(Dispatchers.IO) {
+			semaphore.withPermit {
+				loadCached(file).getOrElse {
+					loadUncached(file, size).getOrNull()
 				}
-			} catch (e: CancellationException) {
-				null
 			}
 		}
-	}
 
 	private fun key(file: File): String {
 		// TODO: proper key calculation
