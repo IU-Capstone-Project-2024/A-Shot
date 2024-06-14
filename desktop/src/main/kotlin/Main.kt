@@ -76,8 +76,6 @@ fun App(window: ComposeWindow) {
 			)
 		}
 
-
-
 		composable(Screen.Cull.name) {
 			val groups = state.shots.grouped
 			val currentGroup = state.currentGroup

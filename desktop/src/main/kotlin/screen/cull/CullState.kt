@@ -7,7 +7,6 @@ class CullState(
 	var group: Int = 0,
 	var subgroup: Int = 0,
 	var image: Int = 0,
-
 ) {
 
 	var subgroups: List<ShotGroup>
@@ -25,6 +24,4 @@ class CullState(
 
 		image = image.coerceIn(0, maxImage)
 	}
-
 }
-

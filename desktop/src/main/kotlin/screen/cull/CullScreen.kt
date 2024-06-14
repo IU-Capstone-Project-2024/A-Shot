@@ -19,7 +19,6 @@ fun CullScreen(viewModel: CullViewModel) {
 	val state by viewModel.stateFlow.collectAsState()
 	var count by remember { mutableStateOf(0) }
     val imageCache = remember { mutableMapOf<File, ImageBitmap?>() }
-
 	Row(modifier = Modifier.fillMaxSize()) {
 		// Left LazyColumn
 		GroupsList(

@@ -24,6 +24,5 @@ fun OverviewPage(
 		Spacer(modifier = Modifier.width(8.dp))
 		Button(onClick = onTailpondClick) {
 			Text("Bad")
-		}
 	}
 }

@@ -61,8 +61,7 @@ fun GroupItem(
 			// TODO: handle the result
 			value = group.thumbnail().getOrNull()
 		}
-    	val folderImage: ImageBitmap = useResource("folder.png") { loadImageBitmap(it) }
-
+    val folderImage: ImageBitmap = useResource("folder.png") { loadImageBitmap(it) }
 		val currentImage = image
 		if (currentImage == null) {
 			CircularProgressIndicator(

@@ -23,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 
 //TODO: need to fully rewrite this
-
 @Composable
 fun GroupsPage(
 	groups: List<ShotGroup>,
@@ -32,7 +31,6 @@ fun GroupsPage(
 	LazyVerticalGrid(
 		modifier = Modifier.fillMaxSize().background(Color.Gray),
 		columns = GridCells.Adaptive(120.dp),
-
 	) {
 		itemsIndexed(groups) { index, group ->
 			GroupedItem(
