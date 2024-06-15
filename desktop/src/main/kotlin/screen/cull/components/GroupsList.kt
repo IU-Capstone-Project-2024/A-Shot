@@ -12,11 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.ResourceLoader
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import shot.ShotGroup
 import util.AsyncImage
 import java.awt.Dimension
+import java.nio.file.Paths
 
 @Composable
 fun GroupsList(
@@ -53,7 +56,7 @@ fun GroupItem(
 		// Display the folder image for each group
 		AsyncImage(
 			modifier = Modifier.fillMaxSize(),
-			file = group.shots[0].file,
+			file = Paths.get("src/main/resources/drawable/folder.png").toAbsolutePath().toFile(),
 			dimension = Dimension(300, 300),
 		)
 
@@ -64,7 +67,7 @@ fun GroupItem(
 			textAlign = TextAlign.Center,
 			modifier = Modifier
 				.fillMaxWidth()
-				.align(Alignment.BottomCenter)
+				.align(Alignment.Center)
 		)
 	}
 }
