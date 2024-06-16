@@ -25,11 +25,11 @@ val ContentColor = Color(0xFF7E57C2)
 
 @Composable
 fun TopAppBar(title: String) {
-    TopAppBar(
-        title = { Text(title) },
-        backgroundColor = PrimaryColor,
-        contentColor = ContentColor
-    )
+	TopAppBar(
+		title = { Text(title) },
+		backgroundColor = PrimaryColor,
+		contentColor = ContentColor
+	)
 }
 
 object Screen {
@@ -41,9 +41,9 @@ object Screen {
 @Composable
 @Preview
 fun App(window: ComposeWindow) {
-    val model = remember { MainModel() }
-    val navController = rememberNavController()
-    val state by model.stateFlow.collectAsState()
+	val model = remember { MainModel() }
+	val navController = rememberNavController()
+	val state by model.stateFlow.collectAsState()
 
 	fun backToSelect() {
 		model.reset()
@@ -102,7 +102,7 @@ fun main() = application {
 		state = windowState,
 		title = "A-Shot",
 		icon = painterResource("icons/icon.png"),
-        undecorated = false //Should be true for custom Title Bar
+		undecorated = false //Should be true for custom Title Bar
 	) {
 		App(window = window)
 	}
