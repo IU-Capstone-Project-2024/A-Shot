@@ -1,8 +1,6 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,17 +17,23 @@ import screen.cull.CullViewModel
 import screen.import_.ImportScreen
 import screen.overview.OverviewScreen
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 val PrimaryColor = Color(0xFFEDE7F6)
 val ContentColor = Color(0xFF7E57C2)
 
+
 @Composable
-fun TopAppBar(title: String) {
-	TopAppBar(
-		title = { Text(title) },
-		backgroundColor = PrimaryColor,
-		contentColor = ContentColor
-	)
+fun MyTopAppBar(
+    title: String,
+    navigationIcon: @Composable (() -> Unit)? = null
+) {
+    TopAppBar(
+        title = { Text(title) },
+        backgroundColor = PrimaryColor,
+        contentColor = ContentColor,
+        navigationIcon = navigationIcon
+    )
 }
 
 object Screen {
@@ -38,57 +42,90 @@ object Screen {
 	const val CULL = "cull"
 }
 
+
 @Composable
 @Preview
 fun App(window: ComposeWindow) {
-	val model = remember { MainModel() }
-	val navController = rememberNavController()
-	val state by model.stateFlow.collectAsState()
+    val model = remember { MainModel() }
+    val navController = rememberNavController()
+    val state by model.stateFlow.collectAsState()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
-	fun backToSelect() {
-		model.reset()
-		navController.popBackStack(Screen.IMPORT, false)
-	}
+    fun backToSelect() {
+        model.reset()
+        navController.popBackStack(Screen.IMPORT, false)
+    }
 
-	Scaffold(
-		topBar = { TopAppBar(title = "A-Shot") }
-	) { padding ->
-		NavHost(
-			modifier = Modifier.fillMaxSize(),
-			navController = navController,
-			startDestination = Screen.IMPORT,
-		) {
-			composable(Screen.IMPORT) {
-				ImportScreen(
-					onImported = { dir, collection ->
-						model.imported(dir, collection)
-						navController.navigate(Screen.OVERVIEW)
-					}
-				)
-			}
+    Scaffold(
+        topBar = {
+            MyTopAppBar(
+                title = "A-Shot",
+                navigationIcon = when (currentRoute) {
+                    Screen.IMPORT -> {
+                        {
+                            IconButton(onClick = { /*for later development, maybe not needed*/ }) {
+                                Icon(
+                                    painter = painterResource("icons/custom_icon.png"),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        if (navController.previousBackStackEntry != null) {
+                            {
+                                IconButton(onClick = { navController.popBackStack() }) {
+                                    Icon(
+                                        painter = painterResource("icons/back_icon.png"), // replace with your back icon
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        } else {
+                            null
+                        }
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        NavHost(
+            modifier = Modifier.fillMaxSize(),
+            navController = navController,
+            startDestination = Screen.IMPORT,
+        ) {
+            composable(Screen.IMPORT) {
+                ImportScreen(
+                    onImported = { dir, collection ->
+                        model.imported(dir, collection)
+                        navController.navigate(Screen.OVERVIEW)
+                    }
+                )
+            }
 
-			composable(Screen.OVERVIEW) {
-				OverviewScreen(
-					collection = state.shots,
-					onGroupSelected = { group ->
-						model.cull(group)
-						navController.navigate(Screen.CULL)
-					},
-					onClose = {
-						backToSelect()
-					},
-				)
-			}
+            composable(Screen.OVERVIEW) {
+                OverviewScreen(
+                    collection = state.shots,
+                    onGroupSelected = { group ->
+                        model.cull(group)
+                        navController.navigate(Screen.CULL)
+                    },
+                    onClose = {
+                        backToSelect()
+                    },
+                )
+            }
 
-			composable(Screen.CULL) {
-				val groups = state.shots.grouped
-				val currentGroup = state.currentGroup
-				val viewModel = remember(groups) { CullViewModel(groups, currentGroup) }
+            composable(Screen.CULL) {
+                val groups = state.shots.grouped
+                val currentGroup = state.currentGroup
+                val viewModel = remember(groups) { CullViewModel(groups, currentGroup) }
 
-				CullScreen(viewModel)
-			}
-		}
-	}
+                CullScreen(viewModel)
+            }
+        }
+    }
 }
 
 fun main() = application {
