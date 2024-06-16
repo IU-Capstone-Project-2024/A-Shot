@@ -5,26 +5,20 @@ import shot.ShotCollection
 import java.io.File
 
 class MainModel {
-	private val stateFlow_ = MutableStateFlow(MainState())
-	var stateFlow = stateFlow_.asStateFlow()
+	private val _stateFlow = MutableStateFlow(MainState())
+	var stateFlow = _stateFlow.asStateFlow()
 		private set
 
 	fun reset() {
-		stateFlow_.update { MainState() }
+		_stateFlow.update { MainState() }
 	}
 
-	fun selected(dir: File) {
-		stateFlow_.update { state -> state.copy(dir = dir) }
-	}
-
-	fun overview(shots: ShotCollection) {
-		stateFlow_.update { state ->
-			state.copy(shots = shots)
-		}
+	fun imported(dir: File, collection: ShotCollection) {
+		_stateFlow.update { state -> state.copy(dir = dir, shots = collection) }
 	}
 
 	fun cull(group: Int) {
-		stateFlow_.update { state ->
+		_stateFlow.update { state ->
 			state.copy(currentGroup = group.coerceIn(0, state.shots.grouped.size - 1))
 		}
 	}

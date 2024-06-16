@@ -1,4 +1,4 @@
-package screen.importing
+package screen.import_
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,20 +13,24 @@ import shot.ShotGroup
 import java.io.File
 import kotlin.random.Random
 
-class ImportModel(private val dir: File) {
+class ImportModel(private val onSuccess: (File, ShotCollection) -> Unit) {
 
 	private val scope = CoroutineScope(Dispatchers.IO)
-	private val stateFlow_ = MutableStateFlow<ImportState>(ImportState.Loading())
-	val stateFlow = stateFlow_.asStateFlow()
+	private val _stateFlow = MutableStateFlow<ImportState>(ImportState.SelectDir)
+	val stateFlow = _stateFlow.asStateFlow()
 
-	fun import(onSuccess: (ShotCollection) -> Unit) =
+	fun reset() {
+		_stateFlow.value = ImportState.SelectDir
+	}
+
+	fun import(dir: File) =
 		scope.launch(Dispatchers.IO) {
 			val n = 4
 			val step = 1.0f / n
 			repeat(n) { i ->
 				// TODO: remove, just imitation of work
 				delay(100)
-				stateFlow_.update { ImportState.Loading(step * i) }
+				_stateFlow.update { ImportState.Loading(dir, step * i) }
 			}
 
 			val files = dir.listFiles { file ->
@@ -34,7 +38,7 @@ class ImportModel(private val dir: File) {
 			}
 
 			if (files.isNullOrEmpty()) {
-				stateFlow_.update { ImportState.Failure("No images found in the folder") }
+				_stateFlow.update { ImportState.Failure("No images found in the folder") }
 			} else {
 				val i = Random.nextInt(0, files.size)
 				val shots = files.map { file -> Shot(file) }.toList()
@@ -48,8 +52,7 @@ class ImportModel(private val dir: File) {
 					grouped,
 					tailpond,
 				)
-				onSuccess(result)
+				onSuccess(dir, result)
 			}
 		}
-
 }

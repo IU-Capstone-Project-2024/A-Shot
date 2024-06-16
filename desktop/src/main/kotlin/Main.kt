@@ -13,15 +13,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import screen.cull.CullScreen
 import screen.cull.CullViewModel
-import screen.importing.ImportScreen
+import screen.import_.ImportScreen
 import screen.overview.OverviewScreen
-import screen.select.SelectScreen
 
-enum class Screen {
-	Select,
-	Import,
-	Overview,
-	Cull,
+object Screen {
+	const val IMPORT = "import"
+	const val OVERVIEW = "overview"
+	const val CULL = "cull"
 }
 
 @Composable
@@ -33,55 +31,29 @@ fun App(window: ComposeWindow) {
 
 	fun backToSelect() {
 		model.reset()
-		navController.popBackStack(Screen.Select.name, false)
+		navController.popBackStack(Screen.IMPORT, false)
 	}
 
 	NavHost(
 		modifier = Modifier.fillMaxSize(),
 		navController = navController,
-		startDestination = Screen.Select.name,
+		startDestination = Screen.IMPORT,
 	) {
-		composable(Screen.Select.name) {
-			SelectScreen(
-				window = window,
-				onDirectorySelected = { dir ->
-					if (dir == null) {
-						TODO("Report error and recover")
-					} else {
-						model.selected(dir)
-						navController.navigate(Screen.Import.name)
-					}
-				},
-			)
-		}
-
-		composable(Screen.Import.name) {
-			val dir = state.dir
-			if (dir == null) {
-				backToSelect()
-				return@composable
-			}
-
+		composable(Screen.IMPORT) {
 			ImportScreen(
-				dir = dir,
-				onImported = { collection ->
-					model.overview(collection)
-					navController.navigate(Screen.Overview.name) {
-						popUpTo(Screen.Select.name) { inclusive = false }
-					}
-				},
-				onClose = {
-					backToSelect()
-				},
+				onImported = { dir, collection ->
+					model.imported(dir, collection)
+					navController.navigate(Screen.OVERVIEW)
+				}
 			)
 		}
 
-		composable(Screen.Overview.name) {
+		composable(Screen.OVERVIEW) {
 			OverviewScreen(
 				collection = state.shots,
 				onGroupSelected = { group ->
 					model.cull(group)
-					navController.navigate(Screen.Cull.name)
+					navController.navigate(Screen.CULL)
 				},
 				onClose = {
 					backToSelect()
@@ -89,7 +61,7 @@ fun App(window: ComposeWindow) {
 			)
 		}
 
-		composable(Screen.Cull.name) {
+		composable(Screen.CULL) {
 			val groups = state.shots.grouped
 			val currentGroup = state.currentGroup
 			val viewModel = remember(groups) { CullViewModel(groups, currentGroup) }
