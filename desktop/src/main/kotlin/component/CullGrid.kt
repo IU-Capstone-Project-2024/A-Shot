@@ -12,6 +12,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
+import androidx.compose.ui.unit.dp
 import util.Size
 import util.area
 import util.inscribe
@@ -107,13 +108,13 @@ private fun ImageRow(
 		horizontalArrangement = Arrangement.Center,
 	) {
 		Image(
-			modifier = Modifier.weight(1f, false),
+			modifier = Modifier.weight(1f, false).padding(8.dp),
 			bitmap = a,
 			contentDescription = null,
 		)
 
 		Image(
-			modifier = Modifier.weight(1f, false),
+			modifier = Modifier.weight(1f, false).padding(8.dp),
 			bitmap = b,
 			contentDescription = null,
 		)
@@ -132,13 +133,13 @@ fun CullGrid4(
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			ImageRow(
-				modifier = Modifier.weight(1f, false),
+				modifier = Modifier.weight(1f, false).padding(8.dp),
 				a = images[0],
 				b = images[1],
 			)
 
 			ImageRow(
-				modifier = Modifier.weight(1f, false),
+				modifier = Modifier.weight(1f, false).padding(8.dp),
 				a = images[2],
 				b = images[3],
 			)
@@ -175,6 +176,6 @@ fun CullGrid2Preview() {
 @Composable
 @Preview
 fun CullGrid4Preview() {
-	val images = List(4) { "stubs/shaurma.jpg" }
+	val images = List(4) { "stubs/putin.jpg" }
 	CullGridPreview(images)
 }
