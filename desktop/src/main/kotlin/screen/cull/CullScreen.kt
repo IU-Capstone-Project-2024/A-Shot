@@ -75,6 +75,7 @@ fun CullScreen(viewModel: CullViewModel) {
                 val images = convertShotGroupToImageBitmapList(state.groups[index])
                 Burst(
 					// TODO: move the click logic to the Burst.kt itself, when it will be ready for deployment
+					//  Also, the LazyColumn should be moved to the Burst.kt
 					modifier = Modifier.clickable { viewModel.onGroupSelected(index) },
                     shots = images,
                     caption = "Group: $index"
