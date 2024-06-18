@@ -12,6 +12,7 @@ import screen.cull.components.GroupsList
 import screen.cull.components.SubgroupsList
 import screen.cull.components.fileToImageBitmap
 import androidx.compose.ui.graphics.ImageBitmap
+import component.CullGrid2Preview
 import java.io.File
 
 @Composable
@@ -36,23 +37,7 @@ fun CullScreen(viewModel: CullViewModel) {
 					.weight(7.0f)
 					.fillMaxWidth()
 			) {
-				Button(
-					onClick = { count++ },
-					modifier = Modifier.padding(end = 8.dp) // Increment count when button is clicked
-				) {
-					Text("next img")
-				}
-
-				if (count >= state.subgroups[state.subgroup].shots.size) {
-					count = 0 // Reset count if it exceeds list size
-				}
-				fileToImageBitmap(state.subgroups[state.subgroup].shots[count].file, imageCache)?.let {
-					Image(
-						bitmap = it,
-						contentDescription = null,
-						modifier = Modifier.fillMaxSize()
-					)
-				}
+				CullGrid2Preview()
 			}
 
 			// Bottom Row
