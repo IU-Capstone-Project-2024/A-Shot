@@ -2,6 +2,7 @@ package screen.cull
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -53,20 +54,37 @@ fun CullScreen(viewModel: CullViewModel) {
 			onGroupSelected = viewModel::onGroupSelected
 		)
 
-		// Center Column
-		Column(modifier = Modifier.weight(4.0f).fillMaxHeight()) {
+        // Center Column
+        Column(modifier = Modifier.weight(4.0f).fillMaxHeight()) {
 			Box(
 				modifier = Modifier
 					.weight(7.0f)
 					.fillMaxWidth()
 			) {
 				currentGroup?.let {
-                    val imageBitmaps = convertShotGroupToImageBitmapList(it.currentSubgroup)
-                    CullGrid(modifier = Modifier.align(Alignment.Center), images = imageBitmaps)
-                }
+					val imageBitmaps = convertShotGroupToImageBitmapList(it.currentSubgroup)
+					CullGrid(modifier = Modifier.align(Alignment.Center), images = imageBitmaps)
+				}
+			}
+			// Navigation buttons (Just for simple clicking and debug)
+			Row(
+				modifier = Modifier.fillMaxWidth().padding(8.dp),
+				horizontalArrangement = Arrangement.SpaceBetween
+			) {
+				Button(onClick = { viewModel.prevGroup() }) {
+					Text("Previous Group")
+				}
+				Button(onClick = { viewModel.nextGroup() }) {
+					Text("Next Group")
+				}
+				Button(onClick = { viewModel.prevSubgroup() }) {
+					Text("Previous Subgroup")
+				}
+				Button(onClick = { viewModel.nextSubgroup() }) {
+					Text("Next Subgroup")
+				}
 			}
 		}
-
 		// Right Box
 		Box(modifier = Modifier.weight(1.0f).fillMaxHeight().background(BoxesColor)) {
 			Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
@@ -86,7 +104,7 @@ fun CullScreen(viewModel: CullViewModel) {
 						.fillMaxWidth()
 						.weight(1.0f)
 						.align(Alignment.CenterHorizontally),
-					text = "Image path: ${state.subgroups[state.subgroup].shots[count].file} Image Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${count + 1}",
+					text = "Image path: ${state.subgroups[state.subgroup].shots[count].file} Image Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${count + 1}\n size of the group: ${state.groups[state.group].shots.size}",
 				)
 			}
 
