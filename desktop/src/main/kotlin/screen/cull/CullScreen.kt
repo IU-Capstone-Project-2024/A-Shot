@@ -1,7 +1,9 @@
 package screen.cull
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -14,6 +16,7 @@ import screen.cull.components.GroupsList
 import screen.cull.components.SubgroupsList
 import component.CullGrid
 import androidx.compose.ui.graphics.asImageBitmap
+import component.Burst
 import org.jetbrains.skia.Image
 import shot.ShotGroup
 import java.io.File
@@ -46,14 +49,30 @@ fun CullScreen(viewModel: CullViewModel) {
     //val imageCache = remember { mutableMapOf<File, ImageBitmap?>() }
 
 	Row(modifier = Modifier.fillMaxSize()) {
+
 		// Left LazyColumn
-		GroupsList(
+		/*GroupsList(
 			modifier = Modifier.weight(1f).fillMaxHeight().background(BoxesColor),
 			current = state.group,
 			groups = state.groups,
 			onGroupSelected = viewModel::onGroupSelected
-		)
+		)*/
 
+		// With the Burst the app seems to be lagging a bit, just comment it and use GroupList if you want
+		// Left LazyColumn with multiple Burst components
+        LazyColumn(
+            modifier = Modifier.weight(1f).fillMaxHeight().background(BoxesColor)
+        ) {
+            items(state.groups.size) { index ->
+                val images = convertShotGroupToImageBitmapList(state.groups[index])
+                Burst(
+					// TODO: move the click logic to the Burst.kt itself, when it will be ready for deployment
+					modifier = Modifier.clickable { viewModel.onGroupSelected(index) },
+                    shots = images,
+                    caption = "Group: $index"
+                )
+            }
+        }
         // Center Column
         Column(modifier = Modifier.weight(4.0f).fillMaxHeight()) {
 			Box(
