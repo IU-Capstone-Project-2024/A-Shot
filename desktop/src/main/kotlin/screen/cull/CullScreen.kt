@@ -48,8 +48,16 @@ fun CullScreen(viewModel: CullViewModel) {
 	val currentGroup by viewModel.currentGroup
     //val imageCache = remember { mutableMapOf<File, ImageBitmap?>() }
 
-	Row(modifier = Modifier.fillMaxSize()) {
 
+    val imageBitmaps by remember {
+        derivedStateOf {
+            currentGroup?.let {
+                convertShotGroupToImageBitmapList(it.currentSubgroup)
+            }
+        }
+    }
+
+	Row(modifier = Modifier.fillMaxSize()) {
 		// Left LazyColumn
 		/*GroupsList(
 			modifier = Modifier.weight(1f).fillMaxHeight().background(BoxesColor),
@@ -80,10 +88,9 @@ fun CullScreen(viewModel: CullViewModel) {
 					.weight(7.0f)
 					.fillMaxWidth()
 			) {
-				currentGroup?.let {
-					val imageBitmaps = convertShotGroupToImageBitmapList(it.currentSubgroup)
-					CullGrid(modifier = Modifier.align(Alignment.Center), images = imageBitmaps)
-				}
+				imageBitmaps?.let {
+                    CullGrid(modifier = Modifier.align(Alignment.Center), images = it)
+                }
 			}
 			// Navigation buttons (Just for simple clicking and debug)
 			Row(
