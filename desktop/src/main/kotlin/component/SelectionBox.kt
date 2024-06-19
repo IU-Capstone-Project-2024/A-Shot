@@ -12,16 +12,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+
 @Composable
 fun SelectionBox(
 	modifier: Modifier = Modifier,
 	selected: Boolean = false,
 
-	width: Dp = 4.dp,
-	color: Color = Color.Green,
-	cornerRadius: Dp = 8.dp,
+	width: Dp = 6.dp,
+	color: Color = Color(0xFF6750A4),
+	cornerRadius: Dp = 12.dp,
 
-	contentPadding: Dp = 12.dp,
+	contentPadding: Dp = 30.dp,
 	content: @Composable BoxScope.() -> Unit,
 ) {
 	Box(
@@ -37,6 +38,7 @@ fun SelectionBox(
 	}
 }
 
+
 @Composable
 @Preview
 fun SelectionBoxPreview() {
@@ -44,6 +46,6 @@ fun SelectionBoxPreview() {
 		modifier = Modifier.wrapContentSize(),
 		selected = true,
 	) {
-		ShotPreview()
+		BurstPreview()
 	}
 }
