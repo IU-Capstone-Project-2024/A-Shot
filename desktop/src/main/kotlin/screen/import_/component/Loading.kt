@@ -36,7 +36,17 @@ fun BoxScope.Loading(
 @Composable
 @Preview
 private fun LoadingPreview() {
-	Container(Unit) {
+	Container(
+		state = Unit,
+		importButtonWidth = 1000.dp,
+		importButtonHeight = 430.dp
+	) {
+		Box(
+			modifier = Modifier.fillMaxSize(),
+			contentAlignment = Alignment.Center)
+		{
+			// todo
+		}
 		Loading(
 			dirName = "SomeDir",
 			progress = 0.75f,

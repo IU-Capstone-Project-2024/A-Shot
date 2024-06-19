@@ -1,13 +1,16 @@
 package screen.import_.component
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.swing.JFileChooser
@@ -50,7 +53,17 @@ fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
 @Composable
 @Preview
 private fun SelectDirPreview() {
-	Container(Unit) {
+	Container(
+		state = Unit,
+		importButtonWidth = 1000.dp,
+		importButtonHeight = 430.dp
+	) {
+		Box(
+			modifier = Modifier.fillMaxSize(),
+			contentAlignment = Alignment.Center)
+		{
+			// todo
+		}
 		SelectDir {}
 	}
 }
