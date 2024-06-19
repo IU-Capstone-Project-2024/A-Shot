@@ -1,5 +1,6 @@
 package screen.import_.component
 
+import style.Roboto
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -18,87 +19,95 @@ fun BoxScope.Loading(
     progress: Float,
     onCancel: () -> Unit,
 ) {
+    Box(modifier = Modifier.align(Alignment.TopCenter)) {
+        Text(
+        text = "Importing ${dirName}",
+        style = MaterialTheme.typography.body1.copy(
+                letterSpacing = 0.5.sp,
+                fontSize = 32.sp,
+                fontFamily = Roboto,
+                fontWeight = FontWeight.Medium,
+                color = mainColor
+        ),
+        modifier = Modifier
+            .align(Alignment.TopCenter)
+            .padding(top = 108.dp)
+    )
+    }
     Box(
         modifier = Modifier
-            .fillMaxSize()
             .align(Alignment.Center)
     ) {
-        Text(
-            text = "Importing ${dirName}",
-            style = MaterialTheme.typography.button.copy(
-                fontSize = 32.sp
-            ),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 75.dp)
+        CircularProgressIndicator(
+            progress = progress,
+            strokeWidth = 4.dp,
+            modifier = Modifier.size(50.dp),
+            color = Color(0xFF21005D),
         )
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-        ) {
-            CircularProgressIndicator(
+    }
+    Box(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(110.dp),
+    ) {
+        Column {
+            LinearProgressIndicator(
                 progress = progress,
-                strokeWidth = 4.dp,
-                modifier = Modifier.size(50.dp),
                 color = Color(0xFF21005D),
+                modifier = Modifier.size(404.dp, 4.dp)
             )
-        }
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(100.dp),
-        ) {
-            Column {
-                LinearProgressIndicator(
-                    progress = progress,
-                    color = Color(0xFF21005D),
-                    modifier = Modifier.size(404.dp, 4.dp)
-                )
-                Row {
-                    Spacer(modifier = Modifier.size(50.dp, 10.dp))
-                    Text(
-                        //todo: set how much left
-                        text ="text1",
-                        style = MaterialTheme.typography.button.copy(
-                            fontSize = 13.sp
-                        )
-                    )
-                    Spacer(modifier = Modifier.size(250.dp, 10.dp))
-                    Text(
-                        //todo: set how much time left
-                        text = "text2",
-                        style = MaterialTheme.typography.button.copy(
-                            fontSize = 13.sp
-                        ))
-                    Spacer(modifier = Modifier.size(50.dp, 10.dp))
-                }
-            }
-        }
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(30.dp)
-        ) {
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(0xFFEADDFF),
-                ),
-                onClick = onCancel,
-                modifier = Modifier.size(100.dp, 32.dp),
-                elevation = ButtonDefaults.elevation(0.dp),
-                border = BorderStroke(3.dp, Color(0xFF21005D)),
-                shape = RoundedCornerShape(30.dp),
-            ) {
+            Row {
+                Spacer(modifier = Modifier.size(45.dp, 16.dp))
                 Text(
-                    text = "Cancel",
-                    style = MaterialTheme.typography.button.copy(
-                        fontSize = 13.sp
+                    //todo: set how much left
+                    text ="text1",
+                    style = MaterialTheme.typography.body1.copy(
+                        fontSize = 16.sp,
+                        fontFamily = Roboto,
+                        fontWeight = FontWeight.Medium,
+                        color = mainColor
                     )
-                    //todo: fix font
+                )
+                Spacer(modifier = Modifier.size(235.dp, 16.dp))
+                Text(
+                    //todo: set how much time left
+                    text = "text2",
+                    style = MaterialTheme.typography.body1.copy(
+                        fontSize = 16.sp,
+                        fontFamily = Roboto,
+                        fontWeight = FontWeight.Medium,
+                        color = mainColor
+                    )
                 )
             }
         }
     }
+    Box(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(50.dp)
+    ) {
+        Button(
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(0xFFEADDFF),
+            ),
+            onClick = onCancel,
+            modifier = Modifier.size(150.dp, 32.dp),
+            elevation = ButtonDefaults.elevation(0.dp),
+            border = BorderStroke(3.dp, Color(0xFF21005D)),
+            shape = RoundedCornerShape(30.dp),
+        ) {
+            Text(
+                text = "Cancel",
+                MaterialTheme.typography.body2.copy(
+                    fontSize = 16.sp,
+                    fontFamily = Roboto,
+                    fontWeight = FontWeight.Medium,
+                    color = mainColor
+                )
+            )
+        }
+    }    
 }
 
 @Composable
