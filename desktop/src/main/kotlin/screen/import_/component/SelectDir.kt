@@ -1,5 +1,6 @@
 package screen.import_.component
 
+import style.Roboto
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -15,9 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -62,12 +63,15 @@ fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
         Box(modifier = Modifier.fillMaxSize()) {
             Text(
                 "Import directory",
-                style = MaterialTheme.typography.button.copy(
-                    fontSize = 32.sp
+                style = MaterialTheme.typography.body1.copy(
+                    fontSize = 32.sp,
+                    fontFamily = Roboto,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF21005D)
                 ),
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 75.dp)
+                    .padding(top = 100.dp)
             )
             Box(
                 modifier = Modifier
