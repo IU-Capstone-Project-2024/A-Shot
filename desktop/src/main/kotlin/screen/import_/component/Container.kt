@@ -28,7 +28,7 @@ fun <T> Container(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.LightGray),
+            .background(Color(0xFFFEF7FF)),
     ) {
         Card(
             modifier = Modifier
