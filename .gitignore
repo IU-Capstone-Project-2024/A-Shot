@@ -1,4 +1,6 @@
 .*
+!.gitattributes
 !.gitignore
 !.gitkeep
 !.github
+*build*/
