@@ -35,6 +35,13 @@ fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
     val scope = rememberCoroutineScope()
 
     Button(
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Transparent,
+            contentColor = Color.Black
+        ),
+        elevation = ButtonDefaults.elevation(0.dp),
+        border = BorderStroke(0.dp, Color.Transparent),
+        shape = RoundedCornerShape(40.dp),
         modifier = Modifier
             .align(Alignment.Center),
         onClick = {
@@ -46,7 +53,29 @@ fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
 //			}
         }
     ) {
-        Text("Select Directory")
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text(
+                "Import directory",
+                style = MaterialTheme.typography.button.copy(
+                    fontSize = 32.sp
+                ),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 75.dp)
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(100.dp)
+            ) {
+                Image(
+                    painter = painterResource("drawable/download_icon_v1.0.png"),
+                    contentDescription = "Icon",
+                    modifier = Modifier
+                        .size(100.dp)
+                )
+            }
+        }
     }
 }
 
