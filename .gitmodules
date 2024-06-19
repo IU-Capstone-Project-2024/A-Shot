@@ -1,3 +1,0 @@
-[submodule "utils/src/blur_filtering/D-DFFNet"]
-	path = utils/src/blur_filtering/D-DFFNet
-	url = git@github.com:ATMI/D-DFFNet.git
