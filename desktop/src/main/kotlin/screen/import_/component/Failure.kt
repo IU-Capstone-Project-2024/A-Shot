@@ -1,5 +1,6 @@
 package screen.import_.component
 
+import style.Roboto
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -41,12 +42,15 @@ fun BoxScope.Failure(
             Text(
                 text = reason,
                 maxLines = 2,
-                style = MaterialTheme.typography.button.copy(
-                    fontSize = 32.sp
+                style = MaterialTheme.typography.body1.copy(
+                    fontSize = 32.sp,
+                    fontFamily = Roboto,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF21005D)
                 ),
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 75.dp)
+                    .padding(top = 100.dp)
                 overflow = TextOverflow.Ellipsis
             )
             Box(
