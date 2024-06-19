@@ -13,22 +13,46 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun BoxScope.Failure(
     reason: String,
-    onOk: () -> Unit
+    onOk: () -> Unit,
+    failureButtonColor: Color = Color(0xFFFFD8E4),
+    // todo: add font and fix paddings
 ) {
-    Column(
+    Button(
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = failureButtonColor,
+            contentColor = Color.Black
+        ),
+        elevation = ButtonDefaults.elevation(0.dp),
+        border = BorderStroke(0.dp, failureButtonColor),
+        shape = RoundedCornerShape(40.dp),
         modifier = Modifier
-            .fillMaxSize()
-            .align(Alignment.Center),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize(),
+        onClick = onOk
     ) {
-        Text(
-            text = reason,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-        Button(onClick = onOk) {
-            Text("Ok")
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text(
+                text = reason,
+                maxLines = 2,
+                style = MaterialTheme.typography.button.copy(
+                    fontSize = 32.sp
+                ),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 75.dp)
+                overflow = TextOverflow.Ellipsis
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(100.dp)
+            ) {
+                Image(
+                    painter = painterResource("drawable/error_icon_v1.0.png"),
+                    contentDescription = "Icon",
+                    modifier = Modifier
+                        .size(100.dp)
+                )
+            }
         }
     }
 }
