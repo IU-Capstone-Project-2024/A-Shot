@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,8 +20,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun <T> Container(
     state: T,
-    importButtonWidth: Dp? = null,
-    importButtonHeight: Dp? = null,
+    importButtonWidth: Dp? = 1000.dp,
+    importButtonHeight: Dp? = 430.dp,
+    importButtonColor: Color = Color(0xFFEADDFF),
     content: @Composable BoxScope.(T) -> Unit
 ) {
     Box(
@@ -28,21 +31,22 @@ fun <T> Container(
             .background(Color.LightGray),
     ) {
         Card(
-            // TODO: determine the size in a normal way
             modifier = Modifier
-            .let {
-                if (importButtonWidth != null && importButtonHeight != null) {
-                    it.size(importButtonWidth, importButtonHeight)
-                } else {
-                    it.fillMaxSize()
+                .let {
+                    if (importButtonWidth != null && importButtonHeight != null) {
+                        it.size(importButtonWidth, importButtonHeight)
+                    } else {
+                        it.fillMaxSize()
+                    }
                 }
-            }
-            .align(Alignment.Center)
+                .align(Alignment.Center),
+            shape = RoundedCornerShape(40.dp),
+            backgroundColor = importButtonColor
         ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            content(state)
+            Box(modifier = Modifier.fillMaxSize()) {
+                content(state)
+            }
         }
-    }
     }
 }
 
@@ -50,15 +54,8 @@ fun <T> Container(
 @Preview
 fun ContainerPreview() {
     Container(
-        state = Unit,
-        importButtonWidth = 1000.dp,
-        importButtonHeight = 430.dp
+        state = Unit
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center)
-        {
-            // todo
-        }
+
     }
 }

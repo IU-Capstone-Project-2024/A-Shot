@@ -12,45 +12,37 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BoxScope.Failure(
-	reason: String,
-	onOk: () -> Unit
+    reason: String,
+    onOk: () -> Unit
 ) {
-	Column(
-		modifier = Modifier
-			.fillMaxSize()
-			.align(Alignment.Center),
-		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
-	) {
-		Text(
-			text = reason,
-			maxLines = 2,
-			overflow = TextOverflow.Ellipsis
-		)
-		Button(onClick = onOk) {
-			Text("Ok")
-		}
-	}
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .align(Alignment.Center),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = reason,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Button(onClick = onOk) {
+            Text("Ok")
+        }
+    }
 }
 
 
 @Composable
 @Preview
 private fun FailurePreview() {
-	Container(
-		state = Unit,
-		importButtonWidth = 1000.dp,
-		importButtonHeight = 430.dp
-	) {
-		Box(
-			modifier = Modifier.fillMaxSize(),
-			contentAlignment = Alignment.Center)
-		{
-			// todo
-		}
-		Failure(
-			reason = "No images found in the folder",
-			onOk = { }
-		)
-	}
+    Container(
+        state = Unit
+    ) {
+        Failure(
+            reason = "No images found in the folder",
+            onOk = { }
+        )
+    }
 }

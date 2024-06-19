@@ -12,45 +12,37 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BoxScope.Loading(
-	dirName: String,
-	progress: Float,
-	onCancel: () -> Unit,
+    dirName: String,
+    progress: Float,
+    onCancel: () -> Unit,
 ) {
-	Column(
-		modifier = Modifier
-			.fillMaxSize()
-			.align(Alignment.Center),
-		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
-	) {
-		Text(text = "Importing ${dirName}")
-		Spacer(modifier = Modifier.height(40.dp))
-		LinearProgressIndicator(progress = progress)
-		Spacer(modifier = Modifier.height(40.dp))
-		Button(onClick = onCancel) {
-			Text(text = "Cancel")
-		}
-	}
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .align(Alignment.Center),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Importing ${dirName}")
+        Spacer(modifier = Modifier.height(40.dp))
+        LinearProgressIndicator(progress = progress)
+        Spacer(modifier = Modifier.height(40.dp))
+        Button(onClick = onCancel) {
+            Text(text = "Cancel")
+        }
+    }
 }
 
 @Composable
 @Preview
 private fun LoadingPreview() {
-	Container(
-		state = Unit,
-		importButtonWidth = 1000.dp,
-		importButtonHeight = 430.dp
-	) {
-		Box(
-			modifier = Modifier.fillMaxSize(),
-			contentAlignment = Alignment.Center)
-		{
-			// todo
-		}
-		Loading(
-			dirName = "SomeDir",
-			progress = 0.75f,
-			onCancel = {},
-		)
-	}
+    Container(
+        state = Unit
+    ) {
+        Loading(
+            dirName = "SomeDir",
+            progress = 0.75f,
+            onCancel = {},
+        )
+    }
 }
