@@ -7,3 +7,6 @@
 [submodule "contrib/onnxruntime"]
 	path = contrib/onnxruntime
 	url = git@github.com:ATMI/onnxruntime.git
+[submodule "contrib/ImageMagick"]
+	path = contrib/ImageMagick
+	url = git@github.com:ATMI/ImageMagick.git
