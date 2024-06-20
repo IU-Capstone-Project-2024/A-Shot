@@ -2,18 +2,19 @@
 #include <jni.h>
 /* Header for class Native */
 
-#ifndef _Included_Native
-#define _Included_Native
+#ifndef CORE
+#define CORE
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * Class:     Native
+ * Class:     core_src_jni_Core
  * Method:    hello
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_Native_hello
+JNIEXPORT jint JNICALL Java_core_src_jni_Core_hello
   (JNIEnv *, jclass);
+
 
 #ifdef __cplusplus
 }

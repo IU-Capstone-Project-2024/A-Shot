@@ -19,7 +19,7 @@ import screen.cull.CullViewModel
 import screen.import_.ImportScreen
 import screen.overview.OverviewScreen
 import androidx.compose.ui.graphics.Color
-import Native
+import core.src.jni.Core
 
 val PrimaryColor = Color(0xFFEDE7F6)
 val ContentColor = Color(0xFF7E57C2)
@@ -105,6 +105,8 @@ fun main() = application {
 		icon = painterResource("icons/icon.png"),
 		undecorated = false //Should be true for custom Title Bar
 	) {
-		App(window = window)
+//		App(window = window)
+		val result = runCatching { Core.hello() }
+		Text(text = "$result")
 	}
 }
