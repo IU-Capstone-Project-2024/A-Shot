@@ -2,12 +2,16 @@ import argparse
 import math
 import os
 import numpy as np
+import onnx
+import onnxruntime
 from matplotlib import image as mpimg
 import torch
 from tqdm import tqdm
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
+import torchvision.transforms as transforms
 
+from PIL import Image
 from SuperGlobal.modules.reranking.MDescAug import MDescAug
 from SuperGlobal.modules.reranking.RerankwMDA import RerankwMDA
 
@@ -187,12 +191,8 @@ def custom_test_model(model: CVNet_Rerank, data_dir, dataset, qimg: str):
 
 def setup_model():
 	print("=> creating CVNet_Rerank model")
-	model = CVNet_Rerank(cfg.MODEL.DEPTH, cfg.MODEL.HEADS.REDUCTION_DIM, cfg.SupG.relup)
-	if torch.cuda.is_available():
-		print("Launch on CUDA")
-		return model.cuda()
-	print("Launch on CPU")
-	return model.cpu()
+	model = onnx.load("./checkpoints/CVNet_Rerank.onnx")
+	return model
 
 
 def tester(qimg: str):
@@ -205,8 +205,37 @@ def tester(qimg: str):
 	custom_test_model(model, data_dir, "custom", qimg)
 
 
+def f():
+	images_dir = os.path.join(os.getcwd(), "datasets", "custom", "jpg")
+
+	imgs = np.array([os.path.join(images_dir, file) for file in os.listdir(images_dir)])
+
+
+	input_img = os.path.join(images_dir, "A1.jpg")
+	key_img = os.path.join(images_dir, "A1.jpg")
+
+	input_img = Image.open(input_img)
+	key_img = Image.open(key_img)
+
+	t = transforms.Compose([
+		transforms.Resize((224, 224)),
+		transforms.ToTensor(),
+		transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+	])
+
+	input_img = t(input_img).unsqueeze(0).numpy()
+	key_img = t(key_img).unsqueeze(0).numpy()
+
+
+	session = onnxruntime.InferenceSession("./checkpoints/CVNet_Rerank.onnx")
+	out = session.run(None, {"input": input_img, "key_img":key_img})
+	print(out)
+
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description='Find Similar Images')
-	parser.add_argument('qimg', type=str, help='Query Image')
-	args = parser.parse_args()
-	tester(args.qimg)
+	f()
+
+
+	# parser = argparse.ArgumentParser(description='Find Similar Images')
+	# parser.add_argument('qimg', type=str, help='Query Image')
+	# args = parser.parse_args()
+	# tester(args.qimg)
