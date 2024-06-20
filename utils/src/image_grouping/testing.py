@@ -72,7 +72,7 @@ def calculate_embs(model, data_dir, dataset, imgs: list[str]):
 	rgem = cfg.SupG.rgem
 	sgem = cfg.SupG.sgem
 
-	emb_dir = os.path.join(data_dir, dataset, "embeddings.pt")
+	emb_dir = os.path.join(data_dir, dataset, "embeddings50.pt")
 	if os.path.exists(emb_dir):
 		print("Loading embeddings...")
 		return torch.load(emb_dir)
@@ -197,7 +197,7 @@ def setup_model():
 
 def tester(qimg: str):
 	model = setup_model()
-	weights = "CVPR2022_CVNet_R101.pyth"
+	weights = "CVPR2022_CVNet_R50.pyth"
 	checkp = os.path.join(os.getcwd(), "SuperGlobal", cfg.TEST.WEIGHTS, weights)
 	checkpoint.load_checkpoint(checkp, model)
 
