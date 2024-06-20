@@ -14,5 +14,9 @@ find_library(ONNX_RUNTIME NAMES onnxruntime PATHS "${ONNX_RUNTIME_BINARY}")
 target_link_libraries(core PRIVATE "${ONNX_RUNTIME}")
 target_include_directories(core PRIVATE "${ONNX_RUNTIME_HEADER}")
 
+find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
+include_directories(${ImageMagick_INCLUDE_DIRS})
+target_link_libraries(core PRIVATE "${ImageMagick_LIBRARIES}")
+
 add_dependencies(exec core)
 target_link_libraries(exec PRIVATE core)
