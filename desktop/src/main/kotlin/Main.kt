@@ -106,7 +106,7 @@ fun main() = application {
 		undecorated = false //Should be true for custom Title Bar
 	) {
 //		App(window = window)
-		val result = runCatching { Core.hello() }
+		val result = runCatching { Core.hello("/home/a/Pictures/China/Beijing/06_06_13_Campus/100NCD90/DSC_0019.NEF") }
 		Text(text = "$result")
 	}
 }

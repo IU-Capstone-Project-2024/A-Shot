@@ -13,7 +13,7 @@ extern "C" {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL Java_core_src_jni_Core_hello
-  (JNIEnv *, jclass);
+  (JNIEnv *, jclass, jstring);
 
 
 #ifdef __cplusplus

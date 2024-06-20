@@ -13,5 +13,5 @@ object Core {
 		return 42
 	}
 
-	external fun hello(): Int
+	external fun hello(image: String): Int
 }
