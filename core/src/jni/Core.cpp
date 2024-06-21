@@ -1,5 +1,5 @@
 #include "Core.h"
-#include "../core.h"
+#include "../BlurDetector.hh"
 
 JNIEXPORT jint JNICALL Java_core_src_jni_Core_hello(
 		JNIEnv *env,
@@ -9,7 +9,13 @@ JNIEXPORT jint JNICALL Java_core_src_jni_Core_hello(
 	jboolean copy;
 	const char *path = env->GetStringUTFChars(jpath, &copy);
 
-	hello(path);
+	/*Magick::Image image;
+	image.read(path);
+
+	BlurDetector detector;
+	detector.Run(image);
+
+	image.write("AAA.jpg");*/
 
 	if (copy) {
 		env->ReleaseStringUTFChars(jpath, path);
