@@ -15,10 +15,20 @@ add_library(
 
 		src/core.cc
 		src/jni/Core.cpp
+		src/ImageLoader.cc
 		src/BlurDetector.cc
+		src/PipelineStep.cc
+		src/Pipe.cc
 		src/Util.cc
 )
 add_executable(exec src/main.cc)
+
+set(SQLITE_HEADER "${CMAKE_CURRENT_LIST_DIR}/sqlite/include")
+set(SQLITE_BINARY "${CMAKE_CURRENT_LIST_DIR}/sqlite/lib")
+
+find_library(SQLITE NAMES sqlite3 PATHS "${SQLITE_BINARY}")
+target_link_libraries(core PUBLIC "${SQLITE}")
+target_include_directories(core PUBLIC "${SQLITE_HEADER}")
 
 set(ONNX_RUNTIME_HEADER "${CMAKE_CURRENT_LIST_DIR}/onnxruntime/include")
 set(ONNX_RUNTIME_BINARY "${CMAKE_CURRENT_LIST_DIR}/onnxruntime/lib")
