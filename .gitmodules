@@ -10,3 +10,6 @@
 [submodule "contrib/ImageMagick"]
 	path = contrib/ImageMagick
 	url = git@github.com:ATMI/ImageMagick.git
+[submodule "contrib/sqlite"]
+	path = contrib/sqlite
+	url = git@github.com:ATMI/sqlite.git
