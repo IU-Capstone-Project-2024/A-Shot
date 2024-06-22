@@ -1,0 +1,37 @@
+name: CMake Setup
+
+on:
+  push:
+    branches: [ "master", "automation/ci-cd-setup" ]
+  pull_request:
+    branches: [ "master", "automation/ci-cd-setup" ]
+  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+    - name: Get Java Home Directory
+      id: java-home
+      run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "core-dir=${{ github.workspace }}/core" >> "$GITHUB_OUTPUT"
+    - name: Execute commands
+      run: |
+        cd ${{ steps.strings.outputs.core-dir }}
+        mkdir cmake-build-debug
+        cd cmake-build-debug
+        cmake -DBLUR_MODEL_PATH=${{ github.workspace }}/core/checkpoints/D-DFFNet.ort -DJAVA_ROOT=${{ env.JAVA_HOME }}
+        cmake --build .
+        cp ../imagemagick/lib/* .
+        cp ../onnxruntime/lib/* .
