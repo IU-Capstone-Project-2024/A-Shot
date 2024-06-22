@@ -49,12 +49,19 @@ jobs:
 
     - name: Configure CMake
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -S ${{ github.workspace }}/core 
-        -DImageMagick_DIR=${{ github.workspace }}/contrib/ImageMagick  
+        cd ${{ github.workspace }}/core
+        mkdir cmake-build-debug
+        cd cmake-build-debug
+        cmake -DBLUR_MODEL_PATH=/<project path>/A-Shot/core/checkpoints/D-DFFNet.ort -DJAVA_ROOT=$(dirname $(dirname $(readlink -f $(which java))))
+        cmake build .
+        cp ../imagemagick/lib/* .
+        cp ../onnxruntime/lib/* .
+        # cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        # -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        # -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        # -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        # -S ${{ github.workspace }}/core 
+        # -DImageMagick_DIR=${{ github.workspace }}/contrib/ImageMagick  
         
 
 
