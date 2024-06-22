@@ -1,0 +1,34 @@
+name: Build and Test Kotlin Project
+
+on:
+  push:
+    branches:
+      ["master", "automation/ci-cd-setup"]
+  pull_request:
+    branches:
+      ["master", "automation/ci-cd-setup"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x ${{ github.workspace }}/desktop/gradlew
+
+    - name: Build with Gradle
+      working-directory: ${{ github.workspace }}/desktop
+      run: ./gradlew build
+
+    - name: Run tests (not implemented)
+      working-directory: ${{ github.workspace }}/desktop
+      run: ./gradlew test
