@@ -131,21 +131,8 @@ def show_all_similar(folder_path, similar_images, query_image):
 	plt.show()
 
 
-def custom_test_model(model: CVNet_Rerank, data_dir, dataset, qimg: str):
-	# Idk What is that
-	# ---------------------------------------------------#
-	torch.backends.cudnn.benchmark = False
-	model.eval()  # Set the module in evaluation mode
-	state_dict = model.state_dict()
-	model.load_state_dict(state_dict)
-	# ---------------------------------------------------#
-
-	# Calculate embeddings of all images
-	images_dir = os.path.join(data_dir, dataset, "jpg")
+def find_similar(qimg, X, images_dir):
 	imgs = np.array([file for file in os.listdir(images_dir)])
-	X = calculate_embs(model, data_dir, dataset, imgs)
-
-	# Take embedding of query image
 	qimg_id = np.where(imgs == qimg)[0]
 	Q = X[qimg_id]
 
@@ -173,6 +160,24 @@ def custom_test_model(model: CVNet_Rerank, data_dir, dataset, qimg: str):
 		print(f"{k}\t\t{v}")
 
 	show_all_similar(images_dir, prob_dict, qimg)
+	return
+
+
+def custom_test_model(model: CVNet_Rerank, data_dir, dataset, qimg: str):
+	# Idk What is that
+	# ---------------------------------------------------#
+	torch.backends.cudnn.benchmark = False
+	model.eval()  # Set the module in evaluation mode
+	state_dict = model.state_dict()
+	model.load_state_dict(state_dict)
+	# ---------------------------------------------------#
+
+	# Calculate embeddings of all images
+	images_dir = os.path.join(data_dir, dataset, "jpg")
+	imgs = np.array([file for file in os.listdir(images_dir)])
+	X = calculate_embs(model, data_dir, dataset, imgs)
+
+	find_similar(qimg, X, images_dir)
 	return
 
 
