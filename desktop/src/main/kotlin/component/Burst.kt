@@ -2,6 +2,7 @@ package component
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
+import style.Roboto
 import kotlin.random.Random
 
 @Composable
@@ -30,12 +32,14 @@ fun Burst(
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 
-		val pSizeX = 512
-		val pSizeY = 256
+		var pSizeX = 512
+		var pSizeY = 256
 
 		BoxWithConstraints(modifier = modifier) {
 			val maxWidth = constraints.maxWidth
 			val maxHeight = constraints.maxHeight
+			pSizeX = maxWidth / 2
+			pSizeY = maxHeight / 4
 
 			shots.take(maxN)
 				.forEachIndexed { index, bitmap ->
@@ -57,12 +61,14 @@ fun Burst(
 
 		if (caption != null) {
 			Text(
-				text = caption,
-				color = Color(0xFF21005D),
-				fontSize = 35.sp,
-				fontWeight = FontWeight.Bold,
-				modifier = Modifier
-					.offset(y = (pSizeY * 2 / 30).dp)
+				text = "IMG_0002",
+				style = MaterialTheme.typography.body1.copy(
+					fontSize = 35.sp,
+					fontFamily = Roboto,
+					fontWeight = FontWeight.Medium,
+					color = Color(0xFF21005D)
+				),
+				modifier = Modifier.offset(y = (pSizeY * 2 / 30).dp)
 			)
 		}
 	}

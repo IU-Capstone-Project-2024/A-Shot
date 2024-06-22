@@ -17,7 +17,6 @@ fun SelectionBox(
 	width: Dp = 6.dp,
 	color: Color = Color(0xFF6750A4),
 	cornerRadius: Dp = 12.dp,
-
 	contentPadding: Dp = 30.dp,
 	content: @Composable BoxScope.() -> Unit,
 ) {
