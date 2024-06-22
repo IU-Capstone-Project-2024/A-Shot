@@ -7,11 +7,11 @@
 #include <filesystem>
 #include <Magick++.h>
 
-void hello() {
+void hello(std::string &&path) {
 	std::cout << "Hello, World!" << std::endl;
 
 	LoadingPipeline pipeline;
-	pipeline.flush("/home/a/Pictures/Screenshots", true);
+	pipeline.flush(std::move(path), true);
 	pipeline.dry();
 
 	for (ImageBlur item; !pipeline.suck(item, true);) {

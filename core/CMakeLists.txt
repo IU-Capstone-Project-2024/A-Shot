@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.22)
 project(core)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -40,7 +40,7 @@ target_include_directories(core PUBLIC "${ONNX_RUNTIME_HEADER}")
 if (NOT DEFINED BLUR_MODEL_PATH)
 	message(FATAL_ERROR "BLUR_MODEL_PATH is not defined")
 endif ()
-add_definitions(-DBLUR_MODEL_PATH= "${BLUR_MODEL_PATH}")
+add_definitions(-DBLUR_MODEL_PATH="${BLUR_MODEL_PATH}")
 #endregion onnxruntime
 
 #region ImageMagick
