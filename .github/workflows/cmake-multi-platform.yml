@@ -45,7 +45,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         distribution: 'adopt'
-        java-version: '1'
+        java-version: '11'
 
     - name: Get Java Home Directory
       id: java-home
