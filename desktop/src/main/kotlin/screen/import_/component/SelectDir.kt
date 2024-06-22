@@ -24,77 +24,77 @@ import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
 private fun selectDirectory(title: String): File? {
-    val fileChooser = JFileChooser().apply {
-        dialogTitle = title
-        fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
-        fileFilter = FileNameExtensionFilter("Directory", "directory")
-    }
+	val fileChooser = JFileChooser().apply {
+		dialogTitle = title
+		fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+		fileFilter = FileNameExtensionFilter("Directory", "directory")
+	}
 
-    val result = fileChooser.showOpenDialog(null)
-    if (result == JFileChooser.APPROVE_OPTION) {
-        return fileChooser.selectedFile
-    }
-    return null
+	val result = fileChooser.showOpenDialog(null)
+	if (result == JFileChooser.APPROVE_OPTION) {
+		return fileChooser.selectedFile
+	}
+	return null
 }
 
 @Composable
 fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
-    val scope = rememberCoroutineScope()
+	val scope = rememberCoroutineScope()
 
-    Button(
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.Transparent,
-            contentColor = Color.Black
-        ),
-        elevation = ButtonDefaults.elevation(0.dp),
-        border = BorderStroke(0.dp, Color.Transparent),
-        shape = RoundedCornerShape(40.dp),
-        modifier = Modifier
-            .align(Alignment.Center),
-        onClick = {
+	Button(
+		colors = ButtonDefaults.buttonColors(
+			backgroundColor = Color.Transparent,
+			contentColor = Color.Black
+		),
+		elevation = ButtonDefaults.elevation(0.dp),
+		border = BorderStroke(0.dp, Color.Transparent),
+		shape = RoundedCornerShape(40.dp),
+		modifier = Modifier
+			.align(Alignment.Center),
+		onClick = {
 //			scope.launch {
-            val dir = selectDirectory("Select Directory")
-            if (dir != null) {
-                onDirSelected(dir)
-            }
+			val dir = selectDirectory("Select Directory")
+			if (dir != null) {
+				onDirSelected(dir)
+			}
 //			}
-        }
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Text(
-                "Import directory",
-                style = MaterialTheme.typography.body1.copy(
-                    fontSize = 32.sp,
-                    fontFamily = Roboto,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF21005D)
-                ),
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 100.dp)
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(100.dp)
-            ) {
-                Image(
-                    painter = painterResource("drawable/download_icon_v1.0.png"),
-                    contentDescription = "Icon",
-                    modifier = Modifier
-                        .size(100.dp)
-                )
-            }
-        }
-    }
+		}
+	) {
+		Box(modifier = Modifier.fillMaxSize()) {
+			Text(
+				"Import directory",
+				style = MaterialTheme.typography.body1.copy(
+					fontSize = 32.sp,
+					fontFamily = Roboto,
+					fontWeight = FontWeight.Medium,
+					color = Color(0xFF21005D)
+				),
+				modifier = Modifier
+					.align(Alignment.TopCenter)
+					.padding(top = 100.dp)
+			)
+			Box(
+				modifier = Modifier
+					.align(Alignment.BottomCenter)
+					.padding(100.dp)
+			) {
+				Image(
+					painter = painterResource("drawable/download_icon_v1.0.png"),
+					contentDescription = "Icon",
+					modifier = Modifier
+						.size(100.dp)
+				)
+			}
+		}
+	}
 }
 
 @Composable
 @Preview
 private fun SelectDirPreview() {
-    Container(
-        state = Unit
-    ) {
-        SelectDir {}
-    }
+	Container(
+		state = Unit
+	) {
+		SelectDir {}
+	}
 }

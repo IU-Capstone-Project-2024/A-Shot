@@ -15,70 +15,68 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun BoxScope.Failure(
-    reason: String,
-    onOk: () -> Unit,
-    failureButtonColor: Color = Color(0xFFFFD8E4),
-    // todo: add font and fix paddings
+	reason: String,
+	onOk: () -> Unit,
+	failureButtonColor: Color = Color(0xFFFFD8E4),
 ) {
-    Button(
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = failureButtonColor,
-            contentColor = Color.Black
-        ),
-        elevation = ButtonDefaults.elevation(0.dp),
-        border = BorderStroke(0.dp, failureButtonColor),
-        shape = RoundedCornerShape(40.dp),
-        modifier = Modifier
-            .fillMaxSize(),
-        onClick = onOk
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = reason,
-                maxLines = 2,
-                style = MaterialTheme.typography.body1.copy(
-                    fontSize = 32.sp,
-                    fontFamily = Roboto,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF21005D)
-                ),
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 100.dp)
-                overflow = TextOverflow.Ellipsis
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(100.dp)
-            ) {
-                Image(
-                    painter = painterResource("drawable/error_icon_v1.0.png"),
-                    contentDescription = "Icon",
-                    modifier = Modifier
-                        .size(100.dp)
-                )
-            }
-        }
-    }
+	Button(
+		colors = ButtonDefaults.buttonColors(
+			backgroundColor = failureButtonColor,
+			contentColor = Color.Black
+		),
+		elevation = ButtonDefaults.elevation(0.dp),
+		border = BorderStroke(0.dp, failureButtonColor),
+		shape = RoundedCornerShape(40.dp),
+		modifier = Modifier
+			.fillMaxSize(),
+		onClick = onOk
+	) {
+		Box(modifier = Modifier.fillMaxSize()) {
+			Text(
+				text = reason,
+				maxLines = 2,
+				style = MaterialTheme.typography.body1.copy(
+					fontSize = 32.sp,
+					fontFamily = Roboto,
+					fontWeight = FontWeight.Medium,
+					color = Color(0xFF21005D)
+				),
+				modifier = Modifier
+					.align(Alignment.TopCenter)
+					.padding(top = 100.dp)
+			)
+			Box(
+				modifier = Modifier
+					.align(Alignment.BottomCenter)
+					.padding(100.dp)
+			) {
+				Image(
+					painter = painterResource("drawable/error_icon_v1.0.png"),
+					contentDescription = "Icon",
+					modifier = Modifier
+						.size(100.dp)
+				)
+			}
+		}
+	}
 }
 
 
 @Composable
 @Preview
 private fun FailurePreview() {
-    Container(
-        state = Unit
-    ) {
-        Failure(
-            reason = "No images found in the folder",
-            onOk = { }
-        )
-    }
+	Container(
+		state = Unit
+	) {
+		Failure(
+			reason = "No images found in the folder",
+			onOk = { }
+		)
+	}
 }
