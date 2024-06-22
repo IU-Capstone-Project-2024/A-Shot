@@ -1,6 +1,8 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,7 +53,6 @@ fun App(window: ComposeWindow) {
 	val state by model.stateFlow.collectAsState()
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
 	val currentRoute = navBackStackEntry?.destination?.route
-
 	fun backToSelect() {
 		model.reset()
 		navController.popBackStack(Screen.IMPORT, false)
@@ -72,13 +73,12 @@ fun App(window: ComposeWindow) {
 							}
 						}
 					}
-
 					else -> {
 						if (navController.previousBackStackEntry != null) {
 							{
 								IconButton(onClick = { navController.popBackStack() }) {
 									Icon(
-										painter = painterResource("icons/back_icon.png"), // replace with your back icon
+										imageVector = Icons.AutoMirrored.Default.ArrowBack,
 										contentDescription = null
 									)
 								}

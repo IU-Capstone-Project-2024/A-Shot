@@ -1,0 +1,12 @@
+[submodule "utils/src/blur_filtering/ddffnet"]
+	path = utils/src/blur_filtering/ddffnet
+	url = git@github.com:ATMI/D-DFFNet.git
+[submodule "libs/onnxruntime"]
+	path = libs/onnxruntime
+	url = git@github.com:microsoft/onnxruntime.git
+[submodule "contrib/onnxruntime"]
+	path = contrib/onnxruntime
+	url = git@github.com:ATMI/onnxruntime.git
+[submodule "contrib/ImageMagick"]
+	path = contrib/ImageMagick
+	url = git@github.com:ATMI/ImageMagick.git
