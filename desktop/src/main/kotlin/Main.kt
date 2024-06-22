@@ -53,6 +53,7 @@ fun App(window: ComposeWindow) {
 	val state by model.stateFlow.collectAsState()
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
 	val currentRoute = navBackStackEntry?.destination?.route
+
 	fun backToSelect() {
 		model.reset()
 		navController.popBackStack(Screen.IMPORT, false)
