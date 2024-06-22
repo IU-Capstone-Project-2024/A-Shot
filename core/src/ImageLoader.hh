@@ -28,8 +28,8 @@ private:
 
 public:
 	explicit ImageLoader(
-		Pipe<std::string> &input,
-		Pipe<Magick::Image> &output
+		SupplyPipe<std::string> &input,
+		DrainPipe<Magick::Image> &output
 	);
 
 	~ImageLoader();

@@ -1725,7 +1725,7 @@ struct Value : detail::ValueImpl<OrtValue> {
   /// of the user provided data and does not modify it. The lifespan of user provided buffers should
   /// eclipse the life span of the resulting OrtValue. This call constructs an instance that only contain
   /// a pointer to non-zero values. To fully populate the sparse tensor call Use<Format>Indices() API below
-  /// to supply a sparse format specific indices.
+  /// to sink a sparse format specific indices.
   /// This API is not suitable for string data. Use CreateSparseTensor() with allocator specified so strings
   /// can be properly copied into the allocated buffer.
   /// </summary>

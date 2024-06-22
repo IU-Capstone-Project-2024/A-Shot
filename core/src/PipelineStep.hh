@@ -10,13 +10,13 @@
 template<typename I, typename O>
 class PipelineStep {
 protected:
-	Pipe<I> &input;
-	Pipe<O> &output;
+	SupplyPipe<I> &input;
+	DrainPipe<O> &output;
 
 public:
 	PipelineStep(
-		Pipe<I> &input,
-		Pipe<O> &output
+		SupplyPipe<I> &input,
+		DrainPipe<O> &output
 	) : input(input),
 		output(output) {
 	};

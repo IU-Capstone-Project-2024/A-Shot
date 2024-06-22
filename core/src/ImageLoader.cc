@@ -5,8 +5,8 @@
 #include "ImageLoader.hh"
 
 ImageLoader::ImageLoader(
-	Pipe<std::string> &input,
-	Pipe<Magick::Image> &output
+	SupplyPipe<std::string> &input,
+	DrainPipe<Magick::Image> &output
 ) :
 	PipelineStep(input, output),
 	worker(&ImageLoader::run, this) {
@@ -15,22 +15,22 @@ ImageLoader::ImageLoader(
 void ImageLoader::process(const std::string &path) {
 	try {
 		Magick::Image image(path);
-		output.flush(std::move(image));
+		output.flush(std::move(image), true);
 	} catch (const Magick::Exception &e) {
 		// TODO: handle
 	}
 }
 
 void ImageLoader::run() {
-	for (std::string path; input.sink(path);) {
+	for (std::string path; !input.sink(path, true);) {
 		process(path);
 	}
-	output.flush(nullptr);
+	input.close();
+	output.close();
 }
 
 ImageLoader::~ImageLoader() {
-	// FIXME: closing input will close it for everyone
 	input.close();
-	worker.join();
 	output.close();
+	worker.join();
 }

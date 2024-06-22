@@ -10,12 +10,12 @@
 
 void hello() {
 	std::cout << "Hello, World!" << std::endl;
-	Pipe<std::string> input(1);
-	Pipe<Magick::Image> loader_detector(1);
-	Pipe<Magick::Image> output(1);
+	Pipe<std::string> path_pipe(1);
+	Pipe<Magick::Image> image_pipe(1);
+	Pipe<ImageBlur> blur_pipe(1);
 
-	ImageLoader loader(input, loader_detector);
-	BlurDetector detector(loader_detector, output);
+	ImageLoader loader(path_pipe, image_pipe);
+	BlurDetector detector(image_pipe, blur_pipe);
 
 	std::vector<std::filesystem::directory_entry> dir_entries;
 	for (const auto &entry: std::filesystem::directory_iterator(
@@ -34,10 +34,9 @@ void hello() {
 	);
 
 	for (const auto &entry: dir_entries) {
-		const auto &path = entry.path();
-		Magick::Image image;
-		if (input.flush(path) && output.sink(image)) {
-			image.write("results/" + path.stem().string() + ".jpg");
+		ImageBlur image;
+		if (!path_pipe.flush(entry.path(), true) && !blur_pipe.sink(image, true)) {
+			std::cout << image.first.fileName() << " " << 1 - image.second << std::endl;
 		}
 	}
 }

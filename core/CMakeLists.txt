@@ -14,6 +14,7 @@ add_library(
 		core SHARED
 
 		src/core.cc
+		src/jni/LoadingPipeline.cc
 		src/jni/Core.cpp
 		src/ImageLoader.cc
 		src/BlurDetector.cc

@@ -20,7 +20,9 @@
 #include "Util.hh"
 #include "PipelineStep.hh"
 
-class BlurDetector : PipelineStep<Magick::Image, Magick::Image> {
+using ImageBlur = std::pair<Magick::Image, float>;
+
+class BlurDetector : PipelineStep<Magick::Image, ImageBlur> {
 private:
 	const char *MODEL = "checkpoints/D-DFFNet.ort";
 
@@ -42,8 +44,8 @@ private:
 
 public:
 	BlurDetector(
-		Pipe<Magick::Image> &input,
-		Pipe<Magick::Image> &output
+		SupplyPipe<Magick::Image> &input,
+		DrainPipe<ImageBlur> &output
 	);
 
 	~BlurDetector();

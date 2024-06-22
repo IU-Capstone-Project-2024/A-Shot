@@ -5,10 +5,10 @@
 #include "BlurDetector.hh"
 
 BlurDetector::BlurDetector(
-	Pipe<Magick::Image> &input,
-	Pipe<Magick::Image> &output
+	SupplyPipe<Magick::Image> &input,
+	DrainPipe<ImageBlur> &output
 ) :
-	PipelineStep<Magick::Image, Magick::Image>(input, output),
+	PipelineStep(input, output),
 	worker(&BlurDetector::run, this) {
 	env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, "BlurDetector");
 	memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault);
@@ -18,14 +18,15 @@ BlurDetector::BlurDetector(
 }
 
 void BlurDetector::run() {
-	for (Magick::Image image; input.sink(image);) {
+	for (Magick::Image image; !input.sink(image, true);) {
 		try {
 			process(image);
 		} catch (const std::exception &e) {
 			std::cout << e.what() << std::endl;
 		}
 	}
-	output.flush(nullptr);
+	input.close();
+	output.close();
 }
 
 void BlurDetector::process(Magick::Image &input) {
@@ -57,14 +58,16 @@ void BlurDetector::process(Magick::Image &input) {
 	const auto *data = output_value.GetTensorData<float>();
 	std::vector<float> output_tensor(data, data + INPUT_HEIGHT * INPUT_WIDTH);
 
-	Magick::Image result;
-	util::TensorToMagick(output_tensor, INPUT_WIDTH, INPUT_HEIGHT, "K", result);
-	output.flush(std::move(result));
+//	Magick::Image result;
+//	util::TensorToMagick(output_tensor, INPUT_WIDTH, INPUT_HEIGHT, "K", result);
+	float avg = std::accumulate(output_tensor.begin(), output_tensor.end(), 0.0f);
+	avg = avg / (float) output_tensor.size();
+
+	output.flush(std::make_pair(input, avg), true);
 }
 
 BlurDetector::~BlurDetector() {
-	// FIXME: closing input will close it for everyone
 	input.close();
-	worker.join();
 	output.close();
+	worker.join();
 }
