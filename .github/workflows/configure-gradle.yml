@@ -19,6 +19,12 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '17'
 
     - name: Grant execute permission for gradlew
       run: chmod +x ${{ github.workspace }}/desktop/gradlew
