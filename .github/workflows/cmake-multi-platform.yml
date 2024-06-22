@@ -41,18 +41,30 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '1'
+
+    - name: Get Java Home Directory
+      id: java-home
+      run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV        
+    
     - name: Set reusable strings
       id: strings
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "core-dir=${{ github.workspace }}/core" >> "$GITHUB_OUTPUT"
+
 
     - name: Configure CMake
-      run: >
-        cd ${{ github.workspace }}/core
+      run: |
+        cd ${{ steps.strings.outputs.core-dir }}
         mkdir cmake-build-debug
         cd cmake-build-debug
-        cmake -DBLUR_MODEL_PATH=/<project path>/A-Shot/core/checkpoints/D-DFFNet.ort -DJAVA_ROOT=$(dirname $(dirname $(readlink -f $(which java))))
+        cmake -DBLUR_MODEL_PATH=${{ github.workspace }}/core/checkpoints/D-DFFNet.ort -DJAVA_ROOT=${{ env.JAVA_HOME }}
         cmake build .
         cp ../imagemagick/lib/* .
         cp ../onnxruntime/lib/* .
