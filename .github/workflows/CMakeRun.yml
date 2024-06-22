@@ -26,6 +26,11 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         echo "core-dir=${{ github.workspace }}/core" >> "$GITHUB_OUTPUT"
+    - name: Install libraries
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libtiff-dev libjpeg-dev libraw-dev
+
     - name: Execute commands
       run: |
         cd ${{ steps.strings.outputs.core-dir }}
