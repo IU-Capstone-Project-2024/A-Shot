@@ -1,42 +1,26 @@
 package core.src.jni
 
-import shot.Shot
-import shot.ShotCollection
-import shot.ShotGroup
-import java.io.File
-import java.util.LinkedList
+import kotlinx.coroutines.flow.flow
 
-class LoadingPipeline(
-	private val onProgressChange: (Float) -> Unit,
-	private val onFinished: (ShotCollection) -> Unit
-) {
-	companion object {
-		init {
-			Core.load()
-		}
-	}
+class LoadingPipeline {
+	data class ImageBlur(val path: String, val score: Float)
 
 	private external fun nNew(): Long
 	private external fun nRelease(ptr: Long)
 
+	private external fun nFlush(ptr: Long, path: String): Boolean
+	private external fun nSink(ptr: Long): ImageBlur?
+
 	private val ptr: Long = nNew()
-	private val good: MutableList<Shot> = LinkedList()
-	private val bad: MutableList<Shot> = LinkedList()
 
+	fun load(path: String): Boolean {
+		return nFlush(ptr, path)
+	}
 
-	private fun sink(path: String?, score: Float) {
-		if (path == null) {
-			onFinished(ShotCollection(listOf(ShotGroup(good)), bad))
-			// TODO: release
-			return
+	suspend fun flow() = flow {
+		while (true) {
+			val result: ImageBlur = nSink(ptr) ?: break
+			emit(result)
 		}
-
-		val shot = Shot(File(path))
-		if (1 - score > 0.95f) {
-			bad.add(shot)
-		} else {
-			good.add(shot)
-		}
-		onProgressChange(0.1f)
 	}
 }

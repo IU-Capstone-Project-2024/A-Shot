@@ -2,17 +2,18 @@
 // Created by a on 6/21/24.
 //
 
+#include <filesystem>
 #include "ImageLoader.hh"
 
 ImageLoader::ImageLoader(
-	SupplyPipe<std::string> &input,
-	DrainPipe<Magick::Image> &output
+	Exhaust<std::string> &input,
+	Drain<Magick::Image> &output
 ) :
 	PipelineStep(input, output),
 	worker(&ImageLoader::run, this) {
 }
 
-void ImageLoader::process(const std::string &path) {
+void ImageLoader::load_image(const std::string &path) {
 	try {
 		Magick::Image image(path);
 		output.flush(std::move(image), true);
@@ -21,16 +22,28 @@ void ImageLoader::process(const std::string &path) {
 	}
 }
 
+
+void ImageLoader::process(const std::string &path) {
+	if (std::filesystem::is_directory(path)) {
+		for (const auto &entry: std::filesystem::directory_iterator(path)) {
+			load_image(entry.path());
+		}
+	}
+	else {
+		load_image(path);
+	}
+}
+
 void ImageLoader::run() {
-	for (std::string path; !input.sink(path, true);) {
+	for (std::string path; !input.suck(path, true);) {
 		process(path);
 	}
-	input.close();
-	output.close();
+	input.plug();
+	output.dry();
 }
 
 ImageLoader::~ImageLoader() {
-	input.close();
-	output.close();
+	input.plug();
+	output.dry();
 	worker.join();
 }

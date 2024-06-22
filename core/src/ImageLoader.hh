@@ -22,14 +22,16 @@ private:
 
 	std::thread worker;
 
+	void load_image(const std::string &path);
+
 	void process(const std::string &path);
 
 	void run();
 
 public:
 	explicit ImageLoader(
-		SupplyPipe<std::string> &input,
-		DrainPipe<Magick::Image> &output
+		Exhaust<std::string> &input,
+		Drain<Magick::Image> &output
 	);
 
 	~ImageLoader();

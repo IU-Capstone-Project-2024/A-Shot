@@ -8,21 +8,31 @@
 extern "C" {
 #endif*/
 
-#include "Core.h"
+#include "jni_core.hh"
+#include "../Pipe.hh"
+#include "../ImageLoader.hh"
+#include "../BlurDetector.hh"
 
-class LoadingPipeline {
+class LoadingPipeline :
+	public Drain<std::string>,
+	public Exhaust<ImageBlur> {
 private:
-	jobject j_this;
+	Pipe<std::string> path_pipe{4};
+	Pipe<Magick::Image> image_pipe{1};
+	Pipe<ImageBlur> blur_pipe{1};
+
+	ImageLoader image_loader{path_pipe, image_pipe};
+	BlurDetector blur_detector{image_pipe, blur_pipe};
 
 public:
+	PipeResult flush(std::string &&item, bool block) override;
 
-	explicit LoadingPipeline(jobject j_this);
+	PipeResult suck(ImageBlur &item, bool block) override;
+
+	void dry() override;
+
+	void plug() override;
 };
-
-JNIEXPORT jlong JNICALL Java_core_src_jni_LoadingPipeline_nNew(
-	JNIEnv *,
-	jobject
-);
 
 /*#ifdef __cplusplus
 }

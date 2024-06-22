@@ -1,6 +1,6 @@
-#ifndef CORE_H
-#define CORE_H
+#ifndef CORE_HH
+#define CORE_HH
 
 void hello();
 
-#endif //CORE_H
+#endif //CORE_HH

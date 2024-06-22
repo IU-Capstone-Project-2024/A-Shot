@@ -5,8 +5,8 @@
 #include "BlurDetector.hh"
 
 BlurDetector::BlurDetector(
-	SupplyPipe<Magick::Image> &input,
-	DrainPipe<ImageBlur> &output
+	Exhaust<Magick::Image> &input,
+	Drain<ImageBlur> &output
 ) :
 	PipelineStep(input, output),
 	worker(&BlurDetector::run, this) {
@@ -18,15 +18,15 @@ BlurDetector::BlurDetector(
 }
 
 void BlurDetector::run() {
-	for (Magick::Image image; !input.sink(image, true);) {
+	for (Magick::Image image; !input.suck(image, true);) {
 		try {
 			process(image);
 		} catch (const std::exception &e) {
 			std::cout << e.what() << std::endl;
 		}
 	}
-	input.close();
-	output.close();
+	input.plug();
+	output.dry();
 }
 
 void BlurDetector::process(Magick::Image &input) {
@@ -67,7 +67,7 @@ void BlurDetector::process(Magick::Image &input) {
 }
 
 BlurDetector::~BlurDetector() {
-	input.close();
-	output.close();
+	input.plug();
+	output.dry();
 	worker.join();
 }

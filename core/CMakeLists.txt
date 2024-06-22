@@ -13,13 +13,17 @@ include_directories("${JAVA_ROOT}/include/linux")
 add_library(
 		core SHARED
 
-		src/core.cc
+		src/jni/jni_core.cc
 		src/jni/LoadingPipeline.cc
-		src/jni/Core.cpp
+
+		src/core.cc
+
 		src/ImageLoader.cc
 		src/BlurDetector.cc
+
 		src/PipelineStep.cc
 		src/Pipe.cc
+
 		src/Util.cc
 )
 add_executable(exec src/main.cc)

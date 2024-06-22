@@ -17,141 +17,143 @@ enum PipeResult {
 };
 
 template<typename T>
-class Closeable {
-public:
-	virtual void close() = 0;
-};
-
-template<typename T>
-class DrainPipe : public virtual Closeable<T> {
+class Drain {
 public:
 	virtual PipeResult flush(T &&item, bool block) = 0;
+
+	virtual void dry() = 0;
 };
 
 template<typename T>
-class SupplyPipe : public virtual Closeable<T> {
+class Exhaust {
 public:
-	virtual PipeResult sink(T &item, bool block) = 0;
+	virtual PipeResult suck(T &item, bool block) = 0;
+
+	virtual void plug() = 0;
 };
 
 template<typename T>
 class Pipe :
-	public DrainPipe<T>,
-	public SupplyPipe<T>,
-	public virtual Closeable<T> {
+	public Drain<T>,
+	public Exhaust<T> {
 private:
 	size_t capacity;
 	std::queue<T> queue;
-	std::mutex mutex;
-	std::condition_variable supply_cond;
-	std::condition_variable drain_cond;
-	bool supply_open;
-	bool drain_open;
 
-	class Drain : DrainPipe<T> {
+	std::mutex mutex;
+	std::condition_variable head_cond;
+	std::condition_variable tail_cond;
+
+	bool head_open;
+	bool tail_open;
+
+	class Head : Drain<T> {
 	private:
 		Pipe<T> &pipe;
 
 	public:
-		explicit Drain(Pipe<T> &pipe) : pipe(pipe) {}
+		explicit Head(Pipe<T> &pipe) : pipe(pipe) {}
 
-		void close() override {
+		void dry() override {
 			std::unique_lock<std::mutex> lock(pipe.mutex);
-			if (pipe.drain_open) {
-				pipe.drain_open = false;
-				pipe.supply_cond.notify_all();
-				pipe.drain_cond.notify_all();
+			if (pipe.head_open) {
+				pipe.head_open = false;
+				pipe.head_cond.notify_all();
+				pipe.tail_cond.notify_all();
 			}
 		}
 
 		PipeResult flush(T &&item, bool block) override {
 			std::unique_lock<std::mutex> lock(pipe.mutex);
 
-			for (; pipe.drain_open && (pipe.supply_open || !pipe.queue.empty());) {
-				if (pipe.queue.size() > pipe.capacity) {
+			for (; pipe.head_open && pipe.tail_open;) {
+				if (pipe.queue.size() >= pipe.capacity) {
 					if (!block) {
 						return PipeResult::PIPE_CLOGGED;
 					}
 
-					pipe.drain_cond.wait(lock);
+					pipe.head_cond.wait(lock);
 					continue;
 				}
 
 				pipe.queue.push(std::move(item));
-				pipe.supply_cond.notify_one();
+				pipe.tail_cond.notify_one();
 				return PipeResult::PIPE_OK;
 			}
 
-			pipe.drain_open = false;
+			pipe.head_open = false;
 			return PipeResult::PIPE_CLOSED;
 		}
 	};
 
-	class Supply : SupplyPipe<T> {
+	class Tail : Exhaust<T> {
 	private:
 		Pipe<T> &pipe;
 
 	public:
-		explicit Supply(Pipe<T> &pipe) : pipe(pipe) {}
+		explicit Tail(Pipe<T> &pipe) : pipe(pipe) {}
 
-		void close() override {
+		void plug() override {
 			std::unique_lock<std::mutex> lock(pipe.mutex);
-			if (pipe.supply_open) {
-				pipe.supply_open = false;
-				pipe.supply_cond.notify_all();
-				pipe.drain_cond.notify_all();
+			if (pipe.tail_open) {
+				pipe.tail_open = false;
+				pipe.tail_cond.notify_all();
+				pipe.head_cond.notify_all();
 			}
 		}
 
-		PipeResult sink(T &item, bool block) override {
+		PipeResult suck(T &item, bool block) override {
 			std::unique_lock<std::mutex> lock(pipe.mutex);
 
-			for (; pipe.supply_open && pipe.drain_open;) {
+			for (; pipe.tail_open && (pipe.head_open || !pipe.queue.empty());) {
 				if (pipe.queue.empty()) {
 					if (!block) {
 						return PipeResult::PIPE_CLOGGED;
 					}
 
-					pipe.supply_cond.wait(lock);
+					pipe.tail_cond.wait(lock);
 					continue;
 				}
 
 				item = std::move(pipe.queue.front());
 				pipe.queue.pop();
-				pipe.drain_cond.notify_one();
+				pipe.head_cond.notify_one();
 				return PipeResult::PIPE_OK;
 			}
 
-			pipe.supply_open = false;
+			pipe.tail_open = false;
 			return PipeResult::PIPE_CLOSED;
 		}
 	};
 
-	Drain drain;
-	Supply supply;
+	Head head;
+	Tail tail;
 
 public:
 	explicit Pipe(size_t capacity) :
 		capacity(capacity),
 
-		drain_open(true),
-		supply_open(true),
+		tail_open(true),
+		head_open(true),
 
-		drain(*this),
-		supply(*this) {
-	}
-
-	void close() override {
-		supply.close();
-		drain.close();
+		head(*this),
+		tail(*this) {
 	}
 
 	PipeResult flush(T &&item, bool block) override {
-		return drain.flush(std::move(item), block);
+		return head.flush(std::move(item), block);
 	}
 
-	PipeResult sink(T &item, bool block) override {
-		return supply.sink(item, block);
+	PipeResult suck(T &item, bool block) override {
+		return tail.suck(item, block);
+	}
+
+	void dry() override {
+		head.dry();
+	}
+
+	void plug() override {
+		tail.plug();
 	}
 };
 
