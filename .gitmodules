@@ -13,4 +13,3 @@
 [submodule "utils/src/image_grouping/SuperGlobal"]
 	path = utils/src/image_grouping/SuperGlobal
 	url = https://github.com/Shintifo/SuperGlobal
-  
