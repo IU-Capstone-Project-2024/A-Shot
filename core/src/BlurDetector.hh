@@ -24,7 +24,6 @@ using ImageBlur = std::pair<Magick::Image, float>;
 
 class BlurDetector : PipelineStep<Magick::Image, ImageBlur> {
 private:
-	const char *MODEL = "checkpoints/D-DFFNet.ort";
 
 	static const int INPUT_WIDTH = 320;
 	static const int INPUT_HEIGHT = 320;

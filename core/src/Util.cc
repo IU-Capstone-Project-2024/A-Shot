@@ -35,7 +35,7 @@ void util::MagickToTensor(
 			for (ssize_t x = 0; x < w; ++x) {
 				const Magick::Quantum pixel = *pixels++;
 				// FIXME: QuantumRange instead of 65535.0f
-				float value = ((float) pixel / 65535.0f - channel_mean) / channel_stddev;
+				float value = ((float) pixel / 255.0f - channel_mean) / channel_stddev;
 				tensor.emplace_back(value);
 			}
 		}

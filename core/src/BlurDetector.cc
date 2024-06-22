@@ -14,7 +14,7 @@ BlurDetector::BlurDetector(
 	memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault);
 
 	Ort::SessionOptions session_options;
-	session = Ort::Session(env, MODEL, session_options);
+	session = Ort::Session(env, BLUR_MODEL_PATH, session_options);
 }
 
 void BlurDetector::run() {

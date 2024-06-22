@@ -95,8 +95,12 @@ fun App(window: ComposeWindow) {
 	}
 }
 
-fun main() {
-	Core.load()
+fun main(argv: Array<String>) {
+	if (argv.size != 1) {
+		println("Invalid usage, expected native library path")
+		return
+	}
+	Core.load(argv[0])
 
 	application {
 		val windowState = rememberWindowState(
@@ -120,6 +124,7 @@ fun main() {
 			LaunchedEffect(loader) {
 				launch(Dispatchers.IO) {
 					loader.flow().collect { (path, score) ->
+						println(score)
 						if (score < 0.1f) {
 							bad.add(path)
 						} else {

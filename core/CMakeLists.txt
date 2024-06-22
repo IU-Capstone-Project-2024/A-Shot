@@ -36,6 +36,11 @@ set(ONNX_RUNTIME_BINARY "${CMAKE_CURRENT_LIST_DIR}/onnxruntime/lib")
 find_library(ONNX_RUNTIME NAMES onnxruntime PATHS "${ONNX_RUNTIME_BINARY}")
 target_link_libraries(core PUBLIC "${ONNX_RUNTIME}")
 target_include_directories(core PUBLIC "${ONNX_RUNTIME_HEADER}")
+
+if (NOT DEFINED BLUR_MODEL_PATH)
+	message(FATAL_ERROR "BLUR_MODEL_PATH is not defined")
+endif ()
+add_definitions(-DBLUR_MODEL_PATH= "${BLUR_MODEL_PATH}")
 #endregion onnxruntime
 
 #region ImageMagick
@@ -50,7 +55,10 @@ target_include_directories(core PUBLIC ${IMAGE_MAGICK_HEADER})
 #endregion ImageMagick
 
 #region Java
-set(JAVA_ROOT /usr/lib/jvm/openjdk-bin-8)
+if (NOT DEFINED JAVA_ROOT)
+	message(FATAL_ERROR "JAVA_ROOT is not defined")
+endif ()
+
 target_include_directories(core PRIVATE "${JAVA_ROOT}/include/")
 target_include_directories(core PRIVATE "${JAVA_ROOT}/include/linux")
 #endregion Java
