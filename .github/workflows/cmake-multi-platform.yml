@@ -52,6 +52,10 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}/core 
+        -DImageMagick_DIR=contrib/ImageMagick  
+        -DImageMagick_INCLUDE_DIR=contrib/ImageMagick/include  
+        -DImageMagick_LIBRARY=contrib/ImageMagick/lib  
+
 
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
