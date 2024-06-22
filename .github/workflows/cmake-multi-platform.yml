@@ -52,9 +52,9 @@ jobs:
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}/core 
-        -DImageMagick_DIR=${{ github.workspace }}contrib/ImageMagick  
-        -DImageMagick_INCLUDE_DIR=${{ github.workspace }}contrib/ImageMagick/include  
-        -DImageMagick_LIBRARY=${{ github.workspace }}contrib/ImageMagick/lib  
+        -DImageMagick_DIR=${{ github.workspace }}/contrib/ImageMagick  
+        -DImageMagick_INCLUDE_DIR=${{ github.workspace }}/contrib/ImageMagick/include  
+        -DImageMagick_LIBRARY=${{ github.workspace }}/contrib/ImageMagick/lib  
 
 
     - name: Build
