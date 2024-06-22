@@ -6,10 +6,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.zIndex
 import kotlin.random.Random
 
 @Composable
@@ -24,22 +29,26 @@ fun Burst(
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
+
+		val pSizeX = 512
+		val pSizeY = 256
+
 		BoxWithConstraints(modifier = modifier) {
 			val maxWidth = constraints.maxWidth
 			val maxHeight = constraints.maxHeight
 
-			// TODO:
 			shots.take(maxN)
 				.forEachIndexed { index, bitmap ->
 					Shot(
 						modifier = Modifier
-							.fillMaxSize(0.6f)
+							.size(pSizeX.dp, pSizeY.dp)
 							.offset {
 								IntOffset(
-									x = maxWidth * index / 10,
-									y = maxHeight * index / 10,
+									x = (maxWidth * (index - 1)) / 30,
+									y = -((maxHeight * (index - 1)) / 40)
 								)
-							},
+							}
+							.zIndex(maxN - 1 - index.toFloat()),
 						image = bitmap,
 						contentDescription = null,
 					)
@@ -47,14 +56,22 @@ fun Burst(
 		}
 
 		if (caption != null) {
-			Text(text = caption)
+			Text(
+				text = caption,
+				color = Color(0xFF21005D),
+				fontSize = 35.sp,
+				fontWeight = FontWeight.Bold,
+				modifier = Modifier
+					.offset(y = (pSizeY * 2 / 30).dp)
+			)
 		}
 	}
 }
 
+
 @Composable
 @Preview
-private fun BurstPreview() {
+fun BurstPreview() {
 	val image = useResource("icons/icon.png") {
 		loadImageBitmap(it)
 	}
@@ -62,6 +79,6 @@ private fun BurstPreview() {
 	val n = Random.nextInt(2, 5)
 	Burst(
 		shots = List(n) { image },
-		caption = "Hello",
+		caption = "IMG_0002",
 	)
 }
