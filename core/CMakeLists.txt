@@ -67,3 +67,9 @@ set_target_properties(core PROPERTIES LINK_FLAGS "-Wl,-rpath,.")
 
 add_dependencies(exec core)
 target_link_libraries(exec PRIVATE core)
+
+
+
+link_directories(/path/to/imagemagick/lib)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH "/path/to/imagemagick/lib")
