@@ -32,8 +32,6 @@ class DataSet(torch.utils.data.Dataset):
 			self._db.append({"im_path": im_path})
 		print(self._db)
 
-
-
 	def _prepare_im(self, im):
 		"""Prepares the image for network input."""
 		im = im.transpose([2, 0, 1])

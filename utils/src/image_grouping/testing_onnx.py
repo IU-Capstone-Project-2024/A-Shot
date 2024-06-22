@@ -8,16 +8,14 @@ from PIL import Image
 def test_onnx():
 	images_dir = os.path.join(os.getcwd(), "datasets", "custom", "jpg")
 
-	imgs = np.array([os.path.join(images_dir, file) for file in os.listdir(images_dir)])
-
-	input_img = os.path.join(images_dir, "A2.jpg")
+	input_img = os.path.join(images_dir, "A1.jpg")
 	key_img = os.path.join(images_dir, "car.jpg")
 
 	input_img = Image.open(input_img)
 	key_img = Image.open(key_img)
 
 	t = transforms.Compose([
-		transforms.Resize((224, 224)),
+		transforms.Resize((512, 512)),
 		transforms.ToTensor(),
 		transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 	])
