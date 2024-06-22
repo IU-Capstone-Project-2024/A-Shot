@@ -1,8 +1,8 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -19,17 +19,22 @@ import screen.cull.CullViewModel
 import screen.import_.ImportScreen
 import screen.overview.OverviewScreen
 import androidx.compose.ui.graphics.Color
-import Native
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 val PrimaryColor = Color(0xFFEDE7F6)
 val ContentColor = Color(0xFF7E57C2)
 
+
 @Composable
-fun TopAppBar(title: String) {
+fun MyTopAppBar(
+	title: String,
+	navigationIcon: @Composable (() -> Unit)? = null
+) {
 	TopAppBar(
 		title = { Text(title) },
 		backgroundColor = PrimaryColor,
-		contentColor = ContentColor
+		contentColor = ContentColor,
+		navigationIcon = navigationIcon
 	)
 }
 
@@ -39,12 +44,15 @@ object Screen {
 	const val CULL = "cull"
 }
 
+
 @Composable
 @Preview
 fun App(window: ComposeWindow) {
 	val model = remember { MainModel() }
 	val navController = rememberNavController()
 	val state by model.stateFlow.collectAsState()
+	val navBackStackEntry by navController.currentBackStackEntryAsState()
+	val currentRoute = navBackStackEntry?.destination?.route
 
 	fun backToSelect() {
 		model.reset()
@@ -52,7 +60,37 @@ fun App(window: ComposeWindow) {
 	}
 
 	Scaffold(
-		topBar = { TopAppBar(title = "A-Shot") }
+		topBar = {
+			MyTopAppBar(
+				title = "A-Shot",
+				navigationIcon = when (currentRoute) {
+					Screen.IMPORT -> {
+						{
+							IconButton(onClick = { /*for later development, maybe not needed*/ }) {
+								Icon(
+									painter = painterResource("icons/custom_icon.png"),
+									contentDescription = null
+								)
+							}
+						}
+					}
+					else -> {
+						if (navController.previousBackStackEntry != null) {
+							{
+								IconButton(onClick = { navController.popBackStack() }) {
+									Icon(
+										imageVector = Icons.AutoMirrored.Default.ArrowBack,
+										contentDescription = null
+									)
+								}
+							}
+						} else {
+							null
+						}
+					}
+				}
+			)
+		}
 	) { padding ->
 		NavHost(
 			modifier = Modifier.fillMaxSize(),

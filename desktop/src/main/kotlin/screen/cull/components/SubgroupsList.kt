@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.*
@@ -31,7 +32,6 @@ fun fileToImageBitmap(file: File, cache: MutableMap<File, ImageBitmap?>): ImageB
     }
 }
 
-
 @Composable
 fun SubgroupsList(
 	modifier: Modifier = Modifier,
@@ -39,7 +39,7 @@ fun SubgroupsList(
 	subgroups: List<ShotGroup>,
 	onSubgroupSelected: (Int) -> Unit,
 ) {
-	LazyRow(modifier = modifier) {
+	LazyColumn(modifier = modifier) {
 		itemsIndexed(subgroups) { index, subgroup ->
 			SubgroupItem(
 				subgroup = subgroup,

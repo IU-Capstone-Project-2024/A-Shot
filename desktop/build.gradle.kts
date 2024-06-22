@@ -19,6 +19,7 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 	implementation("org.jetbrains.androidx.navigation:navigation-compose:2.7.0-alpha07")
+	implementation("androidx.compose.material:material-icons-extended:1.6.8")
 }
 
 
