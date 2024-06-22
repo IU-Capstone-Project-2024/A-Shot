@@ -17,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
 import kotlin.random.Random
 
-
 @Composable
 fun Burst(
 	modifier: Modifier = Modifier,
@@ -30,8 +29,10 @@ fun Burst(
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
+
 		val pSizeX = 512
 		val pSizeY = 256
+
 		BoxWithConstraints(modifier = modifier) {
 			val maxWidth = constraints.maxWidth
 			val maxHeight = constraints.maxHeight
@@ -70,7 +71,7 @@ fun Burst(
 
 @Composable
 @Preview
-fun BurstPreview() {
+private fun BurstPreview() {
 	val image = useResource("icons/icon.png") {
 		loadImageBitmap(it)
 	}
