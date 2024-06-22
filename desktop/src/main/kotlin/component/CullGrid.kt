@@ -83,13 +83,13 @@ private fun ImageColumn(
 		verticalArrangement = Arrangement.Center,
 	) {
 		Image(
-			modifier = Modifier.weight(1f, false),
+			modifier = Modifier.weight(1f),
 			bitmap = a,
 			contentDescription = null,
 		)
 
 		Image(
-			modifier = Modifier.weight(1f, false),
+			modifier = Modifier.weight(1f),
 			bitmap = b,
 			contentDescription = null,
 		)
@@ -108,13 +108,13 @@ private fun ImageRow(
 		horizontalArrangement = Arrangement.Center,
 	) {
 		Image(
-			modifier = Modifier.weight(1f, false).padding(8.dp),
+			modifier = Modifier.weight(1f).padding(8.dp),
 			bitmap = a,
 			contentDescription = null,
 		)
 
 		Image(
-			modifier = Modifier.weight(1f, false).padding(8.dp),
+			modifier = Modifier.weight(1f).padding(8.dp),
 			bitmap = b,
 			contentDescription = null,
 		)
