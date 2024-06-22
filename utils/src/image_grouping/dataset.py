@@ -30,6 +30,7 @@ class DataSet(torch.utils.data.Dataset):
 			im_path = os.path.join(
 				self._data_path, self._dataset, "jpg", file)
 			self._db.append({"im_path": im_path})
+		print(self._db)
 
 
 
