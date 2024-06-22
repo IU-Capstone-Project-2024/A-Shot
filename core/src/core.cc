@@ -11,7 +11,7 @@ void hello() {
 	std::cout << "Hello, World!" << std::endl;
 
 	LoadingPipeline pipeline;
-	pipeline.flush("utils/src/blur_filtering/samples/", true);
+	pipeline.flush("/home/a/Pictures/Screenshots", true);
 	pipeline.dry();
 
 	for (ImageBlur item; !pipeline.suck(item, true);) {

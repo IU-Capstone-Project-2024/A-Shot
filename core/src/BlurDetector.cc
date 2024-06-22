@@ -33,6 +33,7 @@ void BlurDetector::process(Magick::Image &input) {
 	Magick::Geometry geometry(INPUT_WIDTH, INPUT_HEIGHT);
 	geometry.aspect(true);
 
+	input.alpha(false);
 	input.colorSpace(MagickCore::sRGBColorspace);
 	input.filterType(MagickCore::TriangleFilter);
 	input.resize(geometry);
