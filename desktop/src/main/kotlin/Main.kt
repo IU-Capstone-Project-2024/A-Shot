@@ -33,8 +33,12 @@ import kotlin.math.absoluteValue
 val PrimaryColor = Color(0xFFEDE7F6)
 val ContentColor = Color(0xFF7E57C2)
 
+
 @Composable
-fun TopAppBar(title: String) {
+fun MyTopAppBar(
+	title: String,
+	navigationIcon: @Composable (() -> Unit)? = null
+) {
 	TopAppBar(
 		title = { Text(title) }, backgroundColor = PrimaryColor, contentColor = ContentColor
 	)
@@ -46,12 +50,15 @@ object Screen {
 	const val CULL = "cull"
 }
 
+
 @Composable
 @Preview
 fun App(window: ComposeWindow) {
 	val model = remember { MainModel() }
 	val navController = rememberNavController()
 	val state by model.stateFlow.collectAsState()
+	val navBackStackEntry by navController.currentBackStackEntryAsState()
+	val currentRoute = navBackStackEntry?.destination?.route
 
 	fun backToSelect() {
 		model.reset()
