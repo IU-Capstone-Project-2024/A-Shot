@@ -31,7 +31,8 @@ jobs:
         cd ${{ steps.strings.outputs.core-dir }}
         mkdir cmake-build-debug
         cd cmake-build-debug
-        cmake -S ${{ github.workspace }}/core -DBLUR_MODEL_PATH=${{ github.workspace }}/core/checkpoints/D-DFFNet.ort -DJAVA_ROOT=${{ env.JAVA_HOME }}
-        cmake --build .
         cp ../imagemagick/lib/* .
         cp ../onnxruntime/lib/* .
+        cmake -DBLUR_MODEL_PATH=${{ github.workspace }}/core/checkpoints/D-DFFNet.ort -DJAVA_ROOT=${{ env.JAVA_HOME }}
+        cmake --build .
+        
