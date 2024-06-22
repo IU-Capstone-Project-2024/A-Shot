@@ -4,12 +4,6 @@ project(core)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
 
-add_definitions(-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=16)
-
-set(JAVA_ROOT /usr/lib/jvm/openjdk-bin-8)
-include_directories("${JAVA_ROOT}/include/")
-include_directories("${JAVA_ROOT}/include/linux")
-
 add_library(
 		core SHARED
 
@@ -28,23 +22,40 @@ add_library(
 )
 add_executable(exec src/main.cc)
 
-set(SQLITE_HEADER "${CMAKE_CURRENT_LIST_DIR}/sqlite/include")
-set(SQLITE_BINARY "${CMAKE_CURRENT_LIST_DIR}/sqlite/lib")
+#set(SQLITE_HEADER "${CMAKE_CURRENT_LIST_DIR}/sqlite/include")
+#set(SQLITE_BINARY "${CMAKE_CURRENT_LIST_DIR}/sqlite/lib")
 
-find_library(SQLITE NAMES sqlite3 PATHS "${SQLITE_BINARY}")
-target_link_libraries(core PUBLIC "${SQLITE}")
-target_include_directories(core PUBLIC "${SQLITE_HEADER}")
+#find_library(SQLITE NAMES sqlite3 PATHS "${SQLITE_BINARY}")
+#target_link_libraries(core PUBLIC "${SQLITE}")
+#target_include_directories(core PUBLIC "${SQLITE_HEADER}")
 
+#region onnxruntime
 set(ONNX_RUNTIME_HEADER "${CMAKE_CURRENT_LIST_DIR}/onnxruntime/include")
 set(ONNX_RUNTIME_BINARY "${CMAKE_CURRENT_LIST_DIR}/onnxruntime/lib")
 
 find_library(ONNX_RUNTIME NAMES onnxruntime PATHS "${ONNX_RUNTIME_BINARY}")
 target_link_libraries(core PUBLIC "${ONNX_RUNTIME}")
 target_include_directories(core PUBLIC "${ONNX_RUNTIME_HEADER}")
+#endregion onnxruntime
 
-find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
-include_directories(${ImageMagick_INCLUDE_DIRS})
-target_link_libraries(core PUBLIC "${ImageMagick_LIBRARIES}")
+#region ImageMagick
+add_definitions(-DMAGICKCORE_HDRI_ENABLE=0 -DMAGICKCORE_QUANTUM_DEPTH=8)
+
+set(IMAGE_MAGICK_HEADER "${CMAKE_CURRENT_LIST_DIR}/imagemagick/include/")
+set(IMAGE_MAGICK_BINARY "${CMAKE_CURRENT_LIST_DIR}/imagemagick/lib/")
+
+find_library(IMAGE_MAGICK PUBLIC Magick++ PATHS "${IMAGE_MAGICK_BINARY}")
+target_link_libraries(core PUBLIC "${IMAGE_MAGICK}")
+target_include_directories(core PUBLIC ${IMAGE_MAGICK_HEADER})
+#endregion ImageMagick
+
+#region Java
+set(JAVA_ROOT /usr/lib/jvm/openjdk-bin-8)
+target_include_directories(core PRIVATE "${JAVA_ROOT}/include/")
+target_include_directories(core PRIVATE "${JAVA_ROOT}/include/linux")
+#endregion Java
+
+set_target_properties(core PROPERTIES LINK_FLAGS "-Wl,-rpath,.")
 
 add_dependencies(exec core)
 target_link_libraries(exec PRIVATE core)
