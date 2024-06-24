@@ -73,3 +73,12 @@ target_link_libraries(exec PRIVATE core)
 link_directories(/path/to/imagemagick/lib)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_INSTALL_RPATH "/path/to/imagemagick/lib")
+
+find_package(TIFF REQUIRED)
+find_package(JPEG REQUIRED)
+find_package(LibRaw REQUIRED)
+find_package(LCMS2 REQUIRED)
+
+target_link_libraries(core PUBLIC ${TIFF_LIBRARIES} ${JPEG_LIBRARIES} ${LibRaw_LIBRARIES} ${LCMS2_LIBRARIES})
+target_include_directories(core PUBLIC ${TIFF_INCLUDE_DIR} ${JPEG_INCLUDE_DIR} ${LibRaw_INCLUDE_DIR} ${LCMS2_INCLUDE_DIR})
+
