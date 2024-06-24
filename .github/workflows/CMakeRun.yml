@@ -31,22 +31,15 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         echo "core-dir=${{ github.workspace }}/core" >> "$GITHUB_OUTPUT"
-    - name: Install libraries
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libtiff-dev libjpeg-dev libraw-dev liblcms2-dev
-    - name: Set library paths
-      run: echo "LD_LIBRARY_PATH=${{ github.workspace }}/core/imagemagick/lib:${{ github.workspace }}/core/onnxruntime/lib:/usr/local/lib" >> $GITHUB_ENV
-
     - name: Execute commands
       run: |
         cd ${{ steps.strings.outputs.core-dir }}
+        sudo apt-get update
+        sudo apt-get install -y libtiff libjpeg libraw liblcms2
         mkdir cmake-build-debug
         cd cmake-build-debug
-        export LD_LIBRARY_PATH=${{ github.workspace }}/core/imagemagick/lib:${{ github.workspace }}/core/onnxruntime/lib:/usr/local/lib:$LD_LIBRARY_PATH
         cmake -S ${{ github.workspace }}/core -DBLUR_MODEL_PATH=${{ github.workspace }}/core/checkpoints/D-DFFNet.ort \
               -DJAVA_ROOT=${{ env.JAVA_HOME }} \
-              -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake/LibRaw
         cmake --build .
         cp ../imagemagick/lib/* .
         cp ../onnxruntime/lib/* .
