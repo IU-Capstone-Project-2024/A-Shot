@@ -35,7 +35,7 @@ jobs:
       run: |
         cd ${{ steps.strings.outputs.core-dir }}
         sudo apt-get update
-        sudo apt-get install -y libtiff libjpeg libraw liblcms2
+        sudo apt-get install -y libtiff-dev libjpeg-dev libraw-dev liblcms2-dev
         mkdir cmake-build-debug
         cd cmake-build-debug
         cmake -S ${{ github.workspace }}/core -DBLUR_MODEL_PATH=${{ github.workspace }}/core/checkpoints/D-DFFNet.ort \
