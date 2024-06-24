@@ -35,8 +35,9 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libtiff-dev libjpeg-dev libraw-dev liblcms2-dev
-    - name: Set LD_LIBRARY_PATH
-      run: echo "${{ github.workspace }}/core/imagemagick/lib:${{ github.workspace }}/core/onnxruntime/lib:/usr/local/lib" >> $GITHUB_ENV
+    - name: Set library paths
+      run: echo "LD_LIBRARY_PATH=${{ github.workspace }}/core/imagemagick/lib:${{ github.workspace }}/core/onnxruntime/lib:/usr/local/lib" >> $GITHUB_ENV
+
     - name: Execute commands
       run: |
         cd ${{ steps.strings.outputs.core-dir }}
