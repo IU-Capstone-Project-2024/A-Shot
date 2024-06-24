@@ -1,42 +1,52 @@
 name: CMake Setup
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "master", "automation/ci-cd-setup" ]
+  pull_request:
+    branches: [ "master", "automation/ci-cd-setup" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release]
+        c_compiler: [gcc, clang, cl]
+        cpp_compiler: [g++, clang++, cl]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - name: Set up JDK 
+      uses: actions/setup-java@v3
       with:
-        java-version: 11
         distribution: 'adopt'
-
-    - name: Install dependencies
+        java-version: '11'
+    - name: Get Java Home Directory
+      id: java-home
+      run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "core-dir=${{ github.workspace }}/core" >> "$GITHUB_OUTPUT"
+    - name: Install libraries
       run: |
         sudo apt-get update
-        sudo apt-get install -y imagemagick libonnxruntime-dev libraw-dev
-
+        sudo apt-get install -y libtiff-dev libjpeg-dev libraw-dev liblcms2-dev
     - name: Set library paths
-      run: echo "LD_LIBRARY_PATH=/home/runner/work/A-Shot/A-Shot/core/imagemagick/lib:/home/runner/work/A-Shot/A-Shot/core/onnxruntime/lib:/usr/local/lib" >> $GITHUB_ENV
+      run: echo "LD_LIBRARY_PATH=${{ github.workspace }}/core/imagemagick/lib:${{ github.workspace }}/core/onnxruntime/lib:/usr/local/lib" >> $GITHUB_ENV
 
-    - name: Configure and build project
+    - name: Execute commands
       run: |
-        cd /home/runner/work/A-Shot/A-Shot/core
+        cd ${{ steps.strings.outputs.core-dir }}
         mkdir cmake-build-debug
         cd cmake-build-debug
-        export LD_LIBRARY_PATH=/home/runner/work/A-Shot/A-Shot/core/imagemagick/lib:/home/runner/work/A-Shot/A-Shot/core/onnxruntime/lib:/usr/local/lib:$LD_LIBRARY_PATH
-        cmake -S /home/runner/work/A-Shot/A-Shot/core -DBLUR_MODEL_PATH=/home/runner/work/A-Shot/A-Shot/core/checkpoints/D-DFFNet.ort \
-              -DJAVA_ROOT=/opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64 \
-              -DCMAKE_PREFIX_PATH=/usr/local/lib/cmake/LibRaw
+        export LD_LIBRARY_PATH=${{ github.workspace }}/core/imagemagick/lib:${{ github.workspace }}/core/onnxruntime/lib:/usr/local/lib:$LD_LIBRARY_PATH
+        cmake -S ${{ github.workspace }}/core -DBLUR_MODEL_PATH=${{ github.workspace }}/core/checkpoints/D-DFFNet.ort \
+              -DJAVA_ROOT=${{ env.JAVA_HOME }} \
+              -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake/LibRaw
         cmake --build .
         cp ../imagemagick/lib/* .
         cp ../onnxruntime/lib/* .
-      env:
-        JAVA_HOME: /opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64
-        JAVA_HOME_11_X64: /opt/hostedtoolcache/Java_Adopt_jdk/11.0.23-9/x64
-        LD_LIBRARY_PATH: /home/runner/work/A-Shot/A-Shot/core/imagemagick/lib:/home/runner/work/A-Shot/A-Shot/core/onnxruntime/lib:/usr/local/lib
