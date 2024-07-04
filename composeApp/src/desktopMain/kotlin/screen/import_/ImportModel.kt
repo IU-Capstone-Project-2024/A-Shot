@@ -28,7 +28,7 @@ class ImportModel(
 		}?.size
 		val step = 1.0f / (numFiles ?: 1)
 		while((good.size+bad.size)!=numFiles){
-			_stateFlow.update { ImportState.Loading(dir, step * good.size+bad.size,(good.size+bad.size),numFiles) }
+			_stateFlow.update { ImportState.Loading(dir, step * (good.size+bad.size),(good.size+bad.size),numFiles) }
 		}
 
 		if (numFiles == null || numFiles == 0) {
