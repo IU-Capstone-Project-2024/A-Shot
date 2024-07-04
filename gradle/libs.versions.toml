@@ -1,0 +1,25 @@
+[versions]
+compose-plugin = "1.6.11"
+junit = "4.13.2"
+kotlin = "2.0.0"
+room = "2.7.0-alpha04"
+ksp = "2.0.0-1.0.21"
+sqlite = "2.5.0-SNAPSHOT"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+room-runtime = {module = "androidx.room:room-runtime", version.ref = "room"}
+room-runtime-android = {module = "androidx.room:room-runtime-android",version.ref="room"}
+room-compiler = {module = "androidx.room:room-compiler", version.ref = "room"}
+sqlite-bundled = {module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite"}
+
+
+
+[plugins]
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+ksp = {id = "com.google.devtools.ksp", version.ref = "ksp"}
+room = {id = "androidx.room", version.ref = "room"}
