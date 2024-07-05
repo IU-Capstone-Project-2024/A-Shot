@@ -39,13 +39,13 @@ fun Shot(
 	) {
 		Box(
 			modifier = Modifier
-				.padding(4.dp) // Padding around the image
+				.padding(4.dp)
 				.clip(RoundedCornerShape(8.dp))
 				.border(BorderStroke(6.dp, Color(0xFFFFD8E4)), RoundedCornerShape(8.dp))
 				.wrapContentSize()
 		) {
 			Image(
-				modifier = Modifier.padding(4.dp), // Padding inside the border
+				modifier = Modifier.padding(4.dp),
 				bitmap = image,
 				contentDescription = contentDescription,
 			)
