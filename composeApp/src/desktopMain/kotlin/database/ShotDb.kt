@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class Photo(
     @PrimaryKey(autoGenerate = false) val filepath: String,
     val blur_score: Float,
+    var isGood: Boolean? = null,
 )
 
