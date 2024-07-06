@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,20 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
-import screen.cull.components.GroupsList
-import screen.cull.components.SubgroupsList
 import component.CullGrid
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.sp
 import component.Burst
 import database.Photo
 import database.getDatabaseBuilder
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Image
 import shot.ShotGroup
 import java.io.File
-import java.io.FileInputStream
 
 val BoxesColor = Color(0xFFEADDFF)
 
@@ -86,8 +81,8 @@ fun CullScreen(viewModel: CullViewModel) {
 
 			LaunchedEffect(state.subgroup, state.subgroups[state.subgroup].shots[count].file) {
 				photo = dao.getByPath(state.subgroups[state.subgroup].shots[count].file.toString())
-				val goida = photo?.isGood
-				likeState = when (goida) {
+				val isGood = photo?.isGood
+				likeState = when (isGood) {
 					true -> "Liked"
 					false -> "Disliked"
 					null -> "Undefined"
