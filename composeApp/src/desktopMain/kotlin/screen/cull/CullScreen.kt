@@ -1,10 +1,13 @@
 package screen.cull
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,7 +19,12 @@ import screen.cull.components.GroupsList
 import screen.cull.components.SubgroupsList
 import component.CullGrid
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.sp
 import component.Burst
+import database.Photo
+import database.getDatabaseBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.skia.Image
 import shot.ShotGroup
 import java.io.File
@@ -46,8 +54,10 @@ fun CullScreen(viewModel: CullViewModel) {
 	val state by viewModel.stateFlow.collectAsState()
 	var count by remember { mutableStateOf(0) }
 	val currentGroup by viewModel.currentGroup
-    //val imageCache = remember { mutableMapOf<File, ImageBitmap?>() }
-
+	val dao = getDatabaseBuilder().dao
+	var photo by remember { mutableStateOf<Photo?>(null) }
+	var likeState by remember { mutableStateOf("Undefined") }
+	val scope = rememberCoroutineScope()
 
     val imageBitmaps by remember {
         derivedStateOf {
@@ -58,14 +68,6 @@ fun CullScreen(viewModel: CullViewModel) {
     }
 
 	Row(modifier = Modifier.fillMaxSize()) {
-		// Left LazyColumn
-		/*GroupsList(
-			modifier = Modifier.weight(1f).fillMaxHeight().background(BoxesColor),
-			current = state.group,
-			groups = state.groups,
-			onGroupSelected = viewModel::onGroupSelected
-		)*/
-
 		Column(modifier = Modifier.weight(0.7f).fillMaxHeight().background(BoxesColor)){
 			LazyColumn(
 				modifier = Modifier.weight(0.7f).fillMaxHeight(1.0f).background(BoxesColor)
@@ -82,6 +84,16 @@ fun CullScreen(viewModel: CullViewModel) {
 				}
 			}
 
+			LaunchedEffect(state.subgroup, state.subgroups[state.subgroup].shots[count].file) {
+				photo = dao.getByPath(state.subgroups[state.subgroup].shots[count].file.toString())
+				val goida = photo?.isGood
+				likeState = when (goida) {
+					true -> "Liked"
+					false -> "Disliked"
+					null -> "Undefined"
+				}
+			}
+
 			// Right Box
 			Box(modifier = Modifier.weight(0.3f).fillMaxHeight().background(BoxesColor)) {
 				Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
@@ -91,12 +103,37 @@ fun CullScreen(viewModel: CullViewModel) {
 							.fillMaxWidth()
 							.weight(1.0f)
 							.align(Alignment.CenterHorizontally),
-						text = "Image path: ${state.subgroups[state.subgroup].shots[count].file} Image Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${count + 1}\n size of the group: ${state.groups[state.group].shots.size}",
+
+						text = "Image path: ${state.subgroups[state.subgroup].shots[count].file}\n Liked the image: ${likeState}\nImage Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${count + 1}\n size of the group: ${state.groups[state.group].shots.size}",
 					)
 				}
 
-				LaunchedEffect(state.subgroup) {
-					count = 0
+			}
+			// Row for Like and Dislike buttons
+			//TODO: Move this logic to other UI element on the screen
+			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+				Button(onClick = {
+					scope.launch {
+						photo?.let {
+							it.isGood = true
+							dao.updatePhoto(it)
+							likeState = "Liked"
+						}
+					}
+				}) {
+					Text(text = "Like")
+				}
+
+				Button(onClick = {
+					scope.launch {
+						photo?.let {
+							it.isGood = false
+							dao.updatePhoto(it)
+							likeState = "Disliked"
+						}
+					}
+				}) {
+					Text(text = "Dislike")
 				}
 			}
 		}
@@ -110,7 +147,23 @@ fun CullScreen(viewModel: CullViewModel) {
 			) {
 				imageBitmaps?.let {
                     CullGrid(modifier = Modifier.align(Alignment.Center), images = it)
+					//TODO: make the button grid,
+					// that chooses the num and location of buttons with respect to num of images
+					//ButtonGrid(modifier = Modifier.align(Alignment.Center))
                 }
+
+				// Circular buttons to change the selected image
+				Row(
+					modifier = Modifier
+						.align(Alignment.Center)
+						.padding(8.dp),
+					horizontalArrangement = Arrangement.SpaceEvenly
+				) {
+					CircleButton(onClick = { count = 0}, label = "1")
+					CircleButton(onClick = { count = 1}, label = "2")
+					CircleButton(onClick = { count = 2}, label = "3")
+					CircleButton(onClick = { count = 3}, label = "4")
+				}
 			}
 			//TODO: make this as slider(as presented in Figma design)
 			Row(
@@ -129,9 +182,29 @@ fun CullScreen(viewModel: CullViewModel) {
 				Button(onClick = { viewModel.nextSubgroup() }) {
 					Text("Next Subgroup")
 				}
+				LaunchedEffect(state.subgroup) {
+					count = 0
+				}
+				LaunchedEffect(state.group) {
+					count = 0
+				}
 			}
 		}
 
 	}
 	// Other UI elements like photo information and back button will be here
+}
+
+
+@Composable
+fun CircleButton(onClick: () -> Unit, label: String) {
+	Button(
+		onClick = onClick,
+		shape = CircleShape,
+		modifier = Modifier
+			.size(60.dp)
+			.border(2.dp, Color.Black, CircleShape)
+	) {
+		Text(text = label, fontSize = 12.sp, color = Color.White)
+	}
 }

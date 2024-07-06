@@ -64,7 +64,7 @@ fun App(window: ComposeWindow,shotDao:ShotDao) {
 		navController.popBackStack(Screen.IMPORT, false)
 	}
 
-	println("Current num of Enteties in DB: $photos.size")
+	println("Current num of Enteties in DB: ${photos.size}")
 
 	Scaffold(topBar = { MyTopAppBar(title = "A-Shot") }) { padding ->
 		NavHost(

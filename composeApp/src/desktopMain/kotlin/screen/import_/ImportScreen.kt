@@ -42,7 +42,7 @@ fun ImportScreen(
 						loader.flow().collect { (path, score) ->
 							val shot = Shot(File(path))
 							if (score < 0.1f) {
-								dao.upsert(Photo(filepath = path, blur_score = score))
+								dao.upsert(Photo(filepath = path, blur_score = score,isGood = false))
 								model.adding(shot, false)
 							} else {
 								dao.upsert(Photo(filepath = path, blur_score = score))
