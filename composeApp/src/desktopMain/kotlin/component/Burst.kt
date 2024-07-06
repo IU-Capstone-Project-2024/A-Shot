@@ -2,10 +2,12 @@ package component
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
@@ -15,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
+import style.Roboto
 import kotlin.random.Random
 
 @Composable
@@ -29,23 +32,19 @@ fun Burst(
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-
-		val pSizeX = 512
-		val pSizeY = 256
-
 		BoxWithConstraints(modifier = modifier) {
-			val maxWidth = constraints.maxWidth
-			val maxHeight = constraints.maxHeight
-
+			val maxWidth = 1024 * 0.5f
+			val maxHeight = 1024 * 0.25f
 			shots.take(maxN)
 				.forEachIndexed { index, bitmap ->
 					Shot(
 						modifier = Modifier
-							.size(pSizeX.dp, pSizeY.dp)
+							.scale(2.3f / 3)
+							.size(maxWidth.dp, maxHeight.dp)
 							.offset {
 								IntOffset(
-									x = (maxWidth * (index - 1)) / 30,
-									y = -((maxHeight * (index - 1)) / 40)
+									x = (maxWidth.toInt() * ((index - 1)) / 30),
+									y = -((maxHeight.toInt() * ((index - 1)) / 30))
 								)
 							}
 							.zIndex(maxN - 1 - index.toFloat()),
@@ -53,17 +52,21 @@ fun Burst(
 						contentDescription = null,
 					)
 				}
-		}
 
-		if (caption != null) {
-			Text(
-				text = caption,
-				color = Color(0xFF21005D),
-				fontSize = 35.sp,
-				fontWeight = FontWeight.Bold,
-				modifier = Modifier
-					.offset(y = (pSizeY * 2 / 30).dp)
-			)
+			if (caption != null) {
+				Text(
+					text = caption,
+					style = MaterialTheme.typography.body1.copy(
+						fontSize = 35.sp,
+						fontFamily = Roboto,
+						fontWeight = FontWeight.Medium,
+						color = Color(0xFF21005D)
+					),
+					modifier = Modifier
+						//.scale(2.3f / 3)
+						.offset(y = maxHeight.dp * 0.8f)
+				)
+			}
 		}
 	}
 }
