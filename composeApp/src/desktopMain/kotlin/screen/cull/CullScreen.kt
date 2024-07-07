@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import component.CullGrid
-import component.ButtonGrid
 
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.sp
@@ -30,8 +29,7 @@ import java.io.File
 val BoxesColor = Color(0xFFEADDFF)
 
 fun convertShotGroupToImageBitmapList(shotGroup: ShotGroup): List<ImageBitmap> {
-    return shotGroup.shots.mapNotNull { shot ->
-        convertFileToImageBitmap(shot.file)
+    return shotGroup.shots.mapNotNull { shot ->        convertFileToImageBitmap(shot.file)
     }
 }
 
@@ -104,7 +102,6 @@ fun CullScreen(viewModel: CullViewModel) {
 						text = "Image path: ${state.subgroups[state.subgroup].shots[clickedButton].file}\n Liked the image: ${likeState}\nImage Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${clickedButton + 1}\n size of the group: ${state.groups[state.group].shots.size}",
 					)
 				}
-
 			}
 			// Row for Like and Dislike buttons
 			//TODO: Move this logic to other UI element on the screen
@@ -143,13 +140,10 @@ fun CullScreen(viewModel: CullViewModel) {
 					.fillMaxWidth()
 			) {
 				imageBitmaps?.let {
-                    CullGrid(modifier = Modifier.align(Alignment.Center), images = it)
-					ButtonGrid(
-						modifier = Modifier.align(Alignment.Center),
-						images = it,
-						onClick = { index ->
-							clickedButton = index
-							viewModel.onCircleButtonClicked(index)
+                    CullGrid(modifier = Modifier.align(Alignment.Center), images = it,
+						onButtonClick = { index ->
+						clickedButton = index
+						viewModel.onCircleButtonClicked(index)
 						}
 					)
                 }

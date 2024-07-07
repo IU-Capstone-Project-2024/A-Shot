@@ -2,17 +2,23 @@ package component
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import util.Size
 import util.area
 import util.inscribe
@@ -22,10 +28,11 @@ import kotlin.math.max
 fun CullGrid(
 	modifier: Modifier = Modifier,
 	images: List<ImageBitmap>,
+	onButtonClick: (Int) -> Unit
 ) {
 	when (images.size) {
-		2 -> CullGrid2(modifier, images[0], images[1])
-		4 -> CullGrid4(modifier, images)
+		2 -> CullGrid2(modifier, images[0], images[1], onButtonClick)
+		4 -> CullGrid4(modifier, images, onButtonClick)
 		else -> {
 			// TODO: error
 		}
@@ -37,6 +44,7 @@ fun CullGrid2(
 	modifier: Modifier = Modifier,
 	a: ImageBitmap,
 	b: ImageBitmap,
+	onButtonClick: (Int) -> Unit
 ) {
 	BoxWithConstraints(modifier = modifier) {
 		val viewport = Size(
@@ -60,12 +68,16 @@ fun CullGrid2(
 				modifier.fillMaxSize(),
 				a = a,
 				b = b,
+				imageLabel = 1,
+				onButtonClick = onButtonClick
 			)
 		} else {
 			ImageRow(
 				modifier.fillMaxSize(),
 				a = a,
 				b = b,
+				imageLabel = 1,
+				onButtonClick = onButtonClick
 			)
 		}
 	}
@@ -76,22 +88,28 @@ private fun ImageColumn(
 	modifier: Modifier = Modifier,
 	a: ImageBitmap,
 	b: ImageBitmap,
+	imageLabel: Int,
+	onButtonClick: (Int) -> Unit
 ) {
 	Column(
 		modifier = modifier,
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Center,
 	) {
-		Image(
+		ImageWithButton(
 			modifier = Modifier.weight(1f),
 			bitmap = a,
-			contentDescription = null,
+			buttonIndex = 0,
+			imageLabel = imageLabel,
+			onButtonClick = onButtonClick
 		)
 
-		Image(
+		ImageWithButton(
 			modifier = Modifier.weight(1f),
 			bitmap = b,
-			contentDescription = null,
+			buttonIndex = 1,
+			imageLabel = imageLabel+1,
+			onButtonClick = onButtonClick
 		)
 	}
 }
@@ -101,22 +119,28 @@ private fun ImageRow(
 	modifier: Modifier = Modifier,
 	a: ImageBitmap,
 	b: ImageBitmap,
+	imageLabel: Int,
+	onButtonClick: (Int) -> Unit
 ) {
 	Row(
 		modifier = modifier,
 		verticalAlignment = Alignment.CenterVertically,
 		horizontalArrangement = Arrangement.Center,
 	) {
-		Image(
+		ImageWithButton(
 			modifier = Modifier.weight(1f).padding(8.dp),
 			bitmap = a,
-			contentDescription = null,
+			buttonIndex = 0,
+			imageLabel = imageLabel,
+			onButtonClick = onButtonClick
 		)
 
-		Image(
+		ImageWithButton(
 			modifier = Modifier.weight(1f).padding(8.dp),
 			bitmap = b,
-			contentDescription = null,
+			buttonIndex = 1,
+			imageLabel = imageLabel+1,
+			onButtonClick = onButtonClick
 		)
 	}
 }
@@ -124,7 +148,8 @@ private fun ImageRow(
 @Composable
 fun CullGrid4(
 	modifier: Modifier = Modifier,
-	/*@Size(4)*/ images: List<ImageBitmap>,
+	images: List<ImageBitmap>,
+	onButtonClick: (Int) -> Unit
 ) {
 	BoxWithConstraints(modifier = modifier) {
 		Column(
@@ -136,14 +161,54 @@ fun CullGrid4(
 				modifier = Modifier.weight(1f, false).padding(8.dp),
 				a = images[0],
 				b = images[1],
+				imageLabel = 1,
+				onButtonClick = onButtonClick
 			)
 
 			ImageRow(
 				modifier = Modifier.weight(1f, false).padding(8.dp),
 				a = images[2],
 				b = images[3],
+				imageLabel = 3,
+				onButtonClick = onButtonClick
 			)
 		}
+	}
+}
+
+@Composable
+fun ImageWithButton(
+	modifier: Modifier = Modifier,
+	bitmap: ImageBitmap,
+	buttonIndex: Int,
+	imageLabel: Int,
+	onButtonClick: (Int) -> Unit
+) {
+	Box(modifier = modifier) {
+		Image(
+			modifier = Modifier.fillMaxSize(),
+			bitmap = bitmap,
+			contentDescription = null,
+		)
+
+		CircleButton(
+			onClick = { onButtonClick(buttonIndex) },
+			label = imageLabel.toString(),
+			modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
+		)
+	}
+}
+
+@Composable
+fun CircleButton(onClick: () -> Unit, label: String, modifier: Modifier = Modifier) {
+	Button(
+		onClick = onClick,
+		shape = CircleShape,
+		modifier = modifier
+			.size(40.dp)
+			.border(2.dp, Color.Black, CircleShape)
+	) {
+		Text(text = label, fontSize = 12.sp, color = Color.White)
 	}
 }
 
@@ -161,7 +226,10 @@ fun CullGridPreview(paths: List<String>) {
 			modifier = Modifier
 				.fillMaxSize()
 				.align(Alignment.Center),
-			images = images
+			images = images,
+			onButtonClick = { buttonIndex ->
+				// Handle button click
+			}
 		)
 	}
 }
