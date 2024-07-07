@@ -73,6 +73,13 @@ class CullViewModel(groups: List<ShotGroup>, currentGroup: Int) {
         updateCurrentGroup()
     }
 
+    fun onCircleButtonClicked(index: Int) {
+        stateFlow_.update { current ->
+            CullState(current.groups, current.group, current.subgroup, index)
+        }
+    }
+
+
     private fun updateCurrentGroup() {
         val group = stateFlow.value.groups[stateFlow.value.group]
         val subgroups = group.shots.chunked(4).map { ShotGroup(it) }

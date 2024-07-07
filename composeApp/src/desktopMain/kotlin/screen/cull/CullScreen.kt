@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import component.CullGrid
+import component.ButtonGrid
+
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.sp
 import component.Burst
@@ -47,7 +49,7 @@ private fun convertFileToImageBitmap(file: File): ImageBitmap? {
 @Composable
 fun CullScreen(viewModel: CullViewModel) {
 	val state by viewModel.stateFlow.collectAsState()
-	var count by remember { mutableStateOf(0) }
+	var clickedButton by remember { mutableStateOf(0) }
 	val currentGroup by viewModel.currentGroup
 	val dao = getDatabaseBuilder().dao
 	var photo by remember { mutableStateOf<Photo?>(null) }
@@ -79,8 +81,8 @@ fun CullScreen(viewModel: CullViewModel) {
 				}
 			}
 
-			LaunchedEffect(state.subgroup, state.subgroups[state.subgroup].shots[count].file) {
-				photo = dao.getByPath(state.subgroups[state.subgroup].shots[count].file.toString())
+			LaunchedEffect(state.subgroup, state.subgroups[state.subgroup].shots[clickedButton].file) {
+				photo = dao.getByPath(state.subgroups[state.subgroup].shots[clickedButton].file.toString())
 				val isGood = photo?.isGood
 				likeState = when (isGood) {
 					true -> "Liked"
@@ -99,7 +101,7 @@ fun CullScreen(viewModel: CullViewModel) {
 							.weight(1.0f)
 							.align(Alignment.CenterHorizontally),
 
-						text = "Image path: ${state.subgroups[state.subgroup].shots[count].file}\n Liked the image: ${likeState}\nImage Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${count + 1}\n size of the group: ${state.groups[state.group].shots.size}",
+						text = "Image path: ${state.subgroups[state.subgroup].shots[clickedButton].file}\n Liked the image: ${likeState}\nImage Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${clickedButton + 1}\n size of the group: ${state.groups[state.group].shots.size}",
 					)
 				}
 
@@ -142,23 +144,15 @@ fun CullScreen(viewModel: CullViewModel) {
 			) {
 				imageBitmaps?.let {
                     CullGrid(modifier = Modifier.align(Alignment.Center), images = it)
-					//TODO: make the button grid,
-					// that chooses the num and location of buttons with respect to num of images
-					//ButtonGrid(modifier = Modifier.align(Alignment.Center))
+					ButtonGrid(
+						modifier = Modifier.align(Alignment.Center),
+						images = it,
+						onClick = { index ->
+							clickedButton = index
+							viewModel.onCircleButtonClicked(index)
+						}
+					)
                 }
-
-				// Circular buttons to change the selected image
-				Row(
-					modifier = Modifier
-						.align(Alignment.Center)
-						.padding(8.dp),
-					horizontalArrangement = Arrangement.SpaceEvenly
-				) {
-					CircleButton(onClick = { count = 0}, label = "1")
-					CircleButton(onClick = { count = 1}, label = "2")
-					CircleButton(onClick = { count = 2}, label = "3")
-					CircleButton(onClick = { count = 3}, label = "4")
-				}
 			}
 			//TODO: make this as slider(as presented in Figma design)
 			Row(
@@ -178,10 +172,10 @@ fun CullScreen(viewModel: CullViewModel) {
 					Text("Next Subgroup")
 				}
 				LaunchedEffect(state.subgroup) {
-					count = 0
+					clickedButton = 0
 				}
 				LaunchedEffect(state.group) {
-					count = 0
+					clickedButton = 0
 				}
 			}
 		}
@@ -191,15 +185,3 @@ fun CullScreen(viewModel: CullViewModel) {
 }
 
 
-@Composable
-fun CircleButton(onClick: () -> Unit, label: String) {
-	Button(
-		onClick = onClick,
-		shape = CircleShape,
-		modifier = Modifier
-			.size(60.dp)
-			.border(2.dp, Color.Black, CircleShape)
-	) {
-		Text(text = label, fontSize = 12.sp, color = Color.White)
-	}
-}
