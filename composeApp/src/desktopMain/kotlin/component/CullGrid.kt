@@ -1,15 +1,21 @@
 package component
 
+import ContentColor
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -30,9 +36,18 @@ fun CullGrid(
 	images: List<ImageBitmap>,
 	onButtonClick: (Int) -> Unit
 ) {
+
+	val selectedIndex = remember(images) { mutableStateOf(0) }
+
 	when (images.size) {
-		2 -> CullGrid2(modifier, images[0], images[1], onButtonClick)
-		4 -> CullGrid4(modifier, images, onButtonClick)
+		2 -> CullGrid2(modifier, images[0], images[1], selectedIndex.value, onButtonClick = { index ->
+			selectedIndex.value = index
+			onButtonClick(index)
+		})
+		4 -> CullGrid4(modifier, images, selectedIndex.value, onButtonClick = { index ->
+			selectedIndex.value = index
+			onButtonClick(index)
+		})
 		else -> {
 			// TODO: error
 		}
@@ -44,6 +59,7 @@ fun CullGrid2(
 	modifier: Modifier = Modifier,
 	a: ImageBitmap,
 	b: ImageBitmap,
+	selectedIndex: Int,
 	onButtonClick: (Int) -> Unit
 ) {
 	BoxWithConstraints(modifier = modifier) {
@@ -63,12 +79,12 @@ fun CullGrid2(
 		}
 
 		if (vArea > hArea) {
-			// One on the top, another on the bottom
 			ImageColumn(
 				modifier.fillMaxSize(),
 				a = a,
 				b = b,
 				imageLabel = 1,
+				selectedIndex = selectedIndex,
 				onButtonClick = onButtonClick
 			)
 		} else {
@@ -77,6 +93,7 @@ fun CullGrid2(
 				a = a,
 				b = b,
 				imageLabel = 1,
+				selectedIndex = selectedIndex,
 				onButtonClick = onButtonClick
 			)
 		}
@@ -84,71 +101,10 @@ fun CullGrid2(
 }
 
 @Composable
-private fun ImageColumn(
-	modifier: Modifier = Modifier,
-	a: ImageBitmap,
-	b: ImageBitmap,
-	imageLabel: Int,
-	onButtonClick: (Int) -> Unit
-) {
-	Column(
-		modifier = modifier,
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.Center,
-	) {
-		ImageWithButton(
-			modifier = Modifier.weight(1f),
-			bitmap = a,
-			buttonIndex = 0,
-			imageLabel = imageLabel,
-			onButtonClick = onButtonClick
-		)
-
-		ImageWithButton(
-			modifier = Modifier.weight(1f),
-			bitmap = b,
-			buttonIndex = 1,
-			imageLabel = imageLabel+1,
-			onButtonClick = onButtonClick
-		)
-	}
-}
-
-@Composable
-private fun ImageRow(
-	modifier: Modifier = Modifier,
-	a: ImageBitmap,
-	b: ImageBitmap,
-	imageLabel: Int,
-	onButtonClick: (Int) -> Unit
-) {
-	Row(
-		modifier = modifier,
-		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.Center,
-	) {
-		ImageWithButton(
-			modifier = Modifier.weight(1f).padding(8.dp),
-			bitmap = a,
-			buttonIndex = 0,
-			imageLabel = imageLabel,
-			onButtonClick = onButtonClick
-		)
-
-		ImageWithButton(
-			modifier = Modifier.weight(1f).padding(8.dp),
-			bitmap = b,
-			buttonIndex = 1,
-			imageLabel = imageLabel+1,
-			onButtonClick = onButtonClick
-		)
-	}
-}
-
-@Composable
 fun CullGrid4(
 	modifier: Modifier = Modifier,
 	images: List<ImageBitmap>,
+	selectedIndex: Int,
 	onButtonClick: (Int) -> Unit
 ) {
 	BoxWithConstraints(modifier = modifier) {
@@ -162,6 +118,7 @@ fun CullGrid4(
 				a = images[0],
 				b = images[1],
 				imageLabel = 1,
+				selectedIndex = selectedIndex,
 				onButtonClick = onButtonClick
 			)
 
@@ -170,6 +127,7 @@ fun CullGrid4(
 				a = images[2],
 				b = images[3],
 				imageLabel = 3,
+				selectedIndex = selectedIndex,
 				onButtonClick = onButtonClick
 			)
 		}
@@ -177,11 +135,81 @@ fun CullGrid4(
 }
 
 @Composable
+private fun ImageColumn(
+	modifier: Modifier = Modifier,
+	a: ImageBitmap,
+	b: ImageBitmap,
+	imageLabel: Int,
+	selectedIndex: Int,
+	onButtonClick: (Int) -> Unit
+) {
+	Column(
+		modifier = modifier,
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.Center,
+	) {
+		ImageWithButton(
+			modifier = Modifier.weight(1f),
+			bitmap = a,
+			buttonIndex = 0,
+			imageLabel = imageLabel,
+			selectedIndex = selectedIndex,
+			onButtonClick = onButtonClick
+		)
+
+		ImageWithButton(
+			modifier = Modifier.weight(1f),
+			bitmap = b,
+			buttonIndex = 1,
+			imageLabel = imageLabel + 1,
+			selectedIndex = selectedIndex,
+			onButtonClick = onButtonClick
+		)
+	}
+}
+
+@Composable
+private fun ImageRow(
+	modifier: Modifier = Modifier,
+	a: ImageBitmap,
+	b: ImageBitmap,
+	imageLabel: Int,
+	selectedIndex: Int,
+	onButtonClick: (Int) -> Unit
+) {
+	Row(
+		modifier = modifier,
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.Center,
+	) {
+		ImageWithButton(
+			modifier = Modifier.weight(1f).padding(8.dp),
+			bitmap = a,
+			buttonIndex = 0,
+			imageLabel = imageLabel,
+			selectedIndex = selectedIndex,
+			onButtonClick = onButtonClick
+		)
+
+		ImageWithButton(
+			modifier = Modifier.weight(1f).padding(8.dp),
+			bitmap = b,
+			buttonIndex = 1,
+			imageLabel = imageLabel + 1,
+			selectedIndex = selectedIndex,
+			onButtonClick = onButtonClick
+		)
+	}
+}
+
+
+@Composable
 fun ImageWithButton(
 	modifier: Modifier = Modifier,
 	bitmap: ImageBitmap,
 	buttonIndex: Int,
 	imageLabel: Int,
+	selectedIndex: Int,
 	onButtonClick: (Int) -> Unit
 ) {
 	Box(modifier = modifier) {
@@ -192,25 +220,28 @@ fun ImageWithButton(
 		)
 
 		CircleButton(
-			onClick = { onButtonClick(buttonIndex) },
+			onClick = { onButtonClick(imageLabel - 1) },  // Update here to pass the imageLabel - 1
 			label = imageLabel.toString(),
+			isSelected = selectedIndex == (imageLabel - 1),
 			modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
 		)
 	}
 }
 
 @Composable
-fun CircleButton(onClick: () -> Unit, label: String, modifier: Modifier = Modifier) {
+fun CircleButton(onClick: () -> Unit, label: String, isSelected: Boolean, modifier: Modifier = Modifier) {
 	Button(
 		onClick = onClick,
 		shape = CircleShape,
+		colors = if (isSelected) ButtonDefaults.buttonColors(backgroundColor = ContentColor) else ButtonDefaults.buttonColors(Color.White),
 		modifier = modifier
 			.size(40.dp)
-			.border(2.dp, Color.Black, CircleShape)
+			.border(2.dp, if (isSelected) Color.White else ContentColor, CircleShape)
 	) {
-		Text(text = label, fontSize = 12.sp, color = Color.White)
+		Text(text = label, fontSize = 12.sp, color = if (isSelected) Color.White else ContentColor)
 	}
 }
+
 
 @Composable
 @Preview

@@ -1,13 +1,10 @@
 package screen.cull
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.ImageBitmap
 import shot.ShotGroup
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import shot.Shot
-import javax.imageio.ImageIO
 
 class CullGroup (
    val group: ShotGroup,
@@ -60,7 +57,7 @@ class CullViewModel(groups: List<ShotGroup>, currentGroup: Int) {
     fun nextSubgroup() {
         stateFlow_.update { current ->
             val nextSubgroup = (current.subgroup + 1) % current.subgroups.size
-            CullState(current.groups, current.group, nextSubgroup)
+            CullState(current.groups, current.group, nextSubgroup,0)
         }
         updateCurrentGroup()
     }
@@ -68,7 +65,7 @@ class CullViewModel(groups: List<ShotGroup>, currentGroup: Int) {
     fun prevSubgroup() {
         stateFlow_.update { current ->
             val prevSubgroup = if (current.subgroup - 1 < 0) current.subgroups.size - 1 else current.subgroup - 1
-            CullState(current.groups, current.group, prevSubgroup)
+            CullState(current.groups, current.group, prevSubgroup,0)
         }
         updateCurrentGroup()
     }

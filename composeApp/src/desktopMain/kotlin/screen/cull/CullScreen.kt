@@ -54,24 +54,38 @@ fun CullScreen(viewModel: CullViewModel) {
 	var likeState by remember { mutableStateOf("Undefined") }
 	val scope = rememberCoroutineScope()
 
-    val imageBitmaps by remember {
-        derivedStateOf {
-            currentGroup?.let {
-                convertShotGroupToImageBitmapList(it.currentSubgroup)
-            }
-        }
-    }
+	val imageBitmaps by remember {
+		derivedStateOf {
+			currentGroup?.let {
+				convertShotGroupToImageBitmapList(it.currentSubgroup)
+			}
+		}
+	}
+
+	LaunchedEffect(state.subgroup, state.group) {
+		clickedButton = 0
+	}
+
+	LaunchedEffect(state.subgroup, clickedButton) {
+		if (clickedButton < state.subgroups[state.subgroup].shots.size) {
+			photo = dao.getByPath(state.subgroups[state.subgroup].shots[clickedButton].file.toString())
+			val isGood = photo?.isGood
+			likeState = when (isGood) {
+				true -> "Liked"
+				false -> "Disliked"
+				null -> "Undefined"
+			}
+		}
+	}
 
 	Row(modifier = Modifier.fillMaxSize()) {
-		Column(modifier = Modifier.weight(0.7f).fillMaxHeight().background(BoxesColor)){
+		Column(modifier = Modifier.weight(0.7f).fillMaxHeight().background(BoxesColor)) {
 			LazyColumn(
 				modifier = Modifier.weight(0.7f).fillMaxHeight(1.0f).background(BoxesColor)
 			) {
 				items(state.groups.size) { index ->
 					val images = convertShotGroupToImageBitmapList(state.groups[index])
 					Burst(
-						// TODO: move the click logic to the Burst.kt itself, when it will be ready for deployment
-						//  Also, the LazyColumn should be moved to the Burst.kt
 						modifier = Modifier.clickable { viewModel.onGroupSelected(index) },
 						shots = images,
 						caption = "Group: $index"
@@ -79,32 +93,21 @@ fun CullScreen(viewModel: CullViewModel) {
 				}
 			}
 
-			LaunchedEffect(state.subgroup, state.subgroups[state.subgroup].shots[clickedButton].file) {
-				photo = dao.getByPath(state.subgroups[state.subgroup].shots[clickedButton].file.toString())
-				val isGood = photo?.isGood
-				likeState = when (isGood) {
-					true -> "Liked"
-					false -> "Disliked"
-					null -> "Undefined"
-				}
-			}
-
-			// Right Box
 			Box(modifier = Modifier.weight(0.3f).fillMaxHeight().background(BoxesColor)) {
 				Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
-					// Text takes the bottom of Left Column (Exif later)
-					Text(
-						modifier = Modifier.padding(8.dp)
-							.fillMaxWidth()
-							.weight(1.0f)
-							.align(Alignment.CenterHorizontally),
-
-						text = "Image path: ${state.subgroups[state.subgroup].shots[clickedButton].file}\n Liked the image: ${likeState}\nImage Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${clickedButton + 1}\n size of the group: ${state.groups[state.group].shots.size}",
-					)
+					if (clickedButton < state.subgroups[state.subgroup].shots.size) {
+						Text(
+							modifier = Modifier.padding(8.dp)
+								.fillMaxWidth()
+								.weight(1.0f)
+								.align(Alignment.CenterHorizontally),
+							text = "Image path: ${state.subgroups[state.subgroup].shots[clickedButton].file}\n Liked the image: ${likeState}\nImage Grid:\ngroup: ${state.group}\nsubgroup: ${state.subgroup}\n Size of the sub Group: ${state.subgroups[state.subgroup].shots.size}\n Current Image: ${clickedButton + 1}\n size of the group: ${state.groups[state.group].shots.size}",
+						)
+					}
 				}
 			}
-			// Row for Like and Dislike buttons
-			//TODO: Move this logic to other UI element on the screen
+			//TODO: Like Dislike on images (task 3)
+			// Если будете это делать, то лучше привязать эту кнопку в CullGrid, чтобы она автоматически рендерилась с картинкой
 			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
 				Button(onClick = {
 					scope.launch {
@@ -132,23 +135,23 @@ fun CullScreen(viewModel: CullViewModel) {
 			}
 		}
 
-        // Center Column
-        Column(modifier = Modifier.weight(4.0f).fillMaxHeight()) {
+		Column(modifier = Modifier.weight(4.0f).fillMaxHeight()) {
 			Box(
 				modifier = Modifier
 					.weight(7.0f)
 					.fillMaxWidth()
 			) {
 				imageBitmaps?.let {
-                    CullGrid(modifier = Modifier.align(Alignment.Center), images = it,
+					CullGrid(modifier = Modifier.align(Alignment.Center), images = it,
 						onButtonClick = { index ->
-						clickedButton = index
-						viewModel.onCircleButtonClicked(index)
+							clickedButton = index
+							viewModel.onCircleButtonClicked(index)
 						}
 					)
-                }
+				}
 			}
-			//TODO: make this as slider(as presented in Figma design)
+
+			//TODO: SLIDER (task 2)
 			Row(
 				modifier = Modifier.fillMaxWidth().padding(8.dp),
 				horizontalArrangement = Arrangement.SpaceBetween
@@ -165,17 +168,7 @@ fun CullScreen(viewModel: CullViewModel) {
 				Button(onClick = { viewModel.nextSubgroup() }) {
 					Text("Next Subgroup")
 				}
-				LaunchedEffect(state.subgroup) {
-					clickedButton = 0
-				}
-				LaunchedEffect(state.group) {
-					clickedButton = 0
-				}
 			}
 		}
-
 	}
-	// Other UI elements like photo information and back button will be here
 }
-
-
