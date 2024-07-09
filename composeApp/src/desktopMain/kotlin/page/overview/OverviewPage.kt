@@ -14,6 +14,9 @@ fun OverviewPage(
 	onTailpondClick: () -> Unit,
 ) {
 	//TODO: Fix overview page (task 5)
+	// Здесь нужно, чтобы было 3 папки и возможность добавить еще одну,
+	// в папке Favorite будут появляться пикчи, которые в ДБ обожначены isGood = true
+	// эту папку вам надо написать Самим, в page/favorite
 	Row(
 		modifier = Modifier.fillMaxSize(),
 		horizontalArrangement = Arrangement.Center,
