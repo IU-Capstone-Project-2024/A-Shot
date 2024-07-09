@@ -1,5 +1,6 @@
 package screen.import_.component
 
+import PrimaryColor
 import style.Roboto
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
@@ -39,53 +40,40 @@ private fun selectDirectory(title: String): File? {
 
 @Composable
 fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
-	val scope = rememberCoroutineScope()
-
-	//TODO: Fix SelectDir button
 	Button(
 		colors = ButtonDefaults.buttonColors(
-			backgroundColor = Color.Transparent,
-			contentColor = Color.Black
+			backgroundColor = PrimaryColor,
+			contentColor = Color.Transparent
 		),
-		elevation = ButtonDefaults.elevation(0.dp),
-		border = BorderStroke(0.dp, Color.Transparent),
-		shape = RoundedCornerShape(40.dp),
-		modifier = Modifier
-			.align(Alignment.Center),
+		modifier = Modifier.align(Alignment.Center),
 		onClick = {
-//			scope.launch {
 			val dir = selectDirectory("Select Directory")
 			if (dir != null) {
 				onDirSelected(dir)
 			}
-//			}
 		}
 	) {
-		Box(modifier = Modifier.fillMaxSize()) {
+		Column(
+			modifier = Modifier.fillMaxSize(),
+			verticalArrangement = Arrangement.Center,
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
 			Text(
-				"Import directory",
+				text = "Import directory",
 				style = MaterialTheme.typography.body1.copy(
 					fontSize = 32.sp,
 					fontFamily = Roboto,
 					fontWeight = FontWeight.Medium,
 					color = Color(0xFF21005D)
 				),
-				modifier = Modifier
-					.align(Alignment.TopCenter)
-					.padding(top = 100.dp)
 			)
-			Box(
-				modifier = Modifier
-					.align(Alignment.BottomCenter)
-					.padding(100.dp)
-			) {
-				Image(
-					painter = painterResource("drawable/download_icon_v1.0.png"),
-					contentDescription = "Icon",
-					modifier = Modifier
-						.size(100.dp)
-				)
-			}
+
+			Spacer(modifier = Modifier.height(20.dp))
+
+			Image(
+				painter = painterResource("drawable/download_icon_v1.0.png"),
+				contentDescription = "Icon",
+			)
 		}
 	}
 }

@@ -68,7 +68,7 @@ fun ImportScreen(
 						dirName = current.dir.name,
 						progress = current.progress,
 						statusLeft = current.statusLeft,
-						TotalImg = it,
+						totalImg = it,
 						onCancel = {
 							model.reset()
 						}

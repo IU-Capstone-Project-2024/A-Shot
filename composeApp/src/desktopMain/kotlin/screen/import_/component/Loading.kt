@@ -1,7 +1,9 @@
 package screen.import_.component
 
+import PrimaryColor
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -19,11 +21,19 @@ fun BoxScope.Loading(
 	dirName: String,
 	progress: Float,
 	statusLeft: Int,
-	TotalImg: Int,
+	totalImg: Int,
 	onCancel: () -> Unit,
 	mainColor: Color = Color(0xFF21005D)
 ) {
-	Box(modifier = Modifier.align(Alignment.TopCenter)) {
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.align(Alignment.Center)
+			.background(PrimaryColor)
+			.padding(40.dp, 20.dp),
+		verticalArrangement = Arrangement.Center,
+		horizontalAlignment = Alignment.CenterHorizontally,
+	) {
 		Text(
 			text = "Importing $dirName",
 			style = MaterialTheme.typography.body1.copy(
@@ -33,72 +43,62 @@ fun BoxScope.Loading(
 				fontWeight = FontWeight.Medium,
 				color = mainColor
 			),
-			modifier = Modifier
-				.padding(top = 108.dp)
 		)
-	}
-	Box(
-		modifier = Modifier
-			.align(Alignment.Center)
-	) {
+
+		Spacer(modifier = Modifier.height(20.dp))
+
 		CircularProgressIndicator(
 			progress = progress,
 			strokeWidth = 4.dp,
 			modifier = Modifier.size(50.dp),
 			color = mainColor,
 		)
-	}
-	Box(
-		modifier = Modifier
-			.align(Alignment.BottomCenter)
-			.padding(110.dp),
-	) {
-		Column {
-			//TODO: Fix Import Screen progress bar and text (task 4)
-			LinearProgressIndicator(
-				progress = progress,
-				color = mainColor,
-				modifier = Modifier.size(404.dp, 4.dp)
-			)
-			Row {
-				Spacer(modifier = Modifier.size(45.dp, 16.dp))
-				Text(
-					text = "Imported $statusLeft",
-					style = MaterialTheme.typography.body1.copy(
-						fontSize = 16.sp,
-						fontFamily = Roboto,
-						fontWeight = FontWeight.Medium,
-						color = mainColor
-					)
-				)
-				Spacer(modifier = Modifier.size(235.dp, 16.dp))
-				Text(
-					//TODO: set how much time left
-					text = "Total Images: $TotalImg",
-					style = MaterialTheme.typography.body1.copy(
-						fontSize = 16.sp,
-						fontFamily = Roboto,
-						fontWeight = FontWeight.Medium,
-						color = mainColor
-					)
-				)
-			}
-		}
-	}
 
-	Box(
-		modifier = Modifier
-			.align(Alignment.BottomCenter)
-			.padding(50.dp)
-	) {
+		Spacer(modifier = Modifier.height(20.dp))
+
+		LinearProgressIndicator(
+// пасхалочка
+			modifier = Modifier.fillMaxSize(),
+//			modifier = Modifier.fillMaxWidth(0.8f),
+			progress = progress,
+			color = mainColor,
+		)
+
+		Spacer(modifier = Modifier.height(20.dp))
+
+		Row(
+			modifier = Modifier.fillMaxWidth(),
+			horizontalArrangement = Arrangement.SpaceBetween,
+		) {
+			Text(
+				text = "Imported $statusLeft",
+				style = MaterialTheme.typography.body1.copy(
+					fontSize = 16.sp,
+					fontFamily = Roboto,
+					fontWeight = FontWeight.Medium,
+					color = mainColor
+				)
+			)
+
+			Text(
+				//TODO: set how much time left
+				text = "Total Images: $totalImg",
+				style = MaterialTheme.typography.body1.copy(
+					fontSize = 16.sp,
+					fontFamily = Roboto,
+					fontWeight = FontWeight.Medium,
+					color = mainColor
+				)
+			)
+		}
+
+		Spacer(modifier = Modifier.height(20.dp))
+
 		Button(
 			colors = ButtonDefaults.buttonColors(
-				backgroundColor = Color(0xFFEADDFF),
+				backgroundColor = PrimaryColor,
 			),
 			onClick = onCancel,
-			modifier = Modifier.size(150.dp, 32.dp),
-			elevation = ButtonDefaults.elevation(0.dp),
-			border = BorderStroke(3.dp, mainColor),
 			shape = RoundedCornerShape(30.dp),
 		) {
 			Text(
@@ -112,7 +112,6 @@ fun BoxScope.Loading(
 			)
 		}
 	}
-
 }
 
 @Composable
@@ -125,7 +124,7 @@ private fun LoadingPreview() {
 			dirName = "SomeDir",
 			progress = 0.75f,
 			statusLeft = 12,
-			TotalImg = 18,
+			totalImg = 18,
 			onCancel = {}
 		)
 	}
