@@ -13,6 +13,7 @@ fun OverviewPage(
 	onGroupsClick: () -> Unit,
 	onTailpondClick: () -> Unit,
 ) {
+	//TODO: Fix overview page (task 5)
 	Row(
 		modifier = Modifier.fillMaxSize(),
 		horizontalArrangement = Arrangement.Center,

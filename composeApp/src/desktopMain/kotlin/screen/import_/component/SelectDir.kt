@@ -41,6 +41,7 @@ private fun selectDirectory(title: String): File? {
 fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
 	val scope = rememberCoroutineScope()
 
+	//TODO: Fix SelectDir button
 	Button(
 		colors = ButtonDefaults.buttonColors(
 			backgroundColor = Color.Transparent,

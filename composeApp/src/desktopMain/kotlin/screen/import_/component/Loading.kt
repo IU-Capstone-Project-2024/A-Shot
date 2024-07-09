@@ -54,7 +54,7 @@ fun BoxScope.Loading(
 			.padding(110.dp),
 	) {
 		Column {
-			//TODO: it has fixed size, need to redo
+			//TODO: Fix Import Screen progress bar and text (task 4)
 			LinearProgressIndicator(
 				progress = progress,
 				color = mainColor,
@@ -73,7 +73,7 @@ fun BoxScope.Loading(
 				)
 				Spacer(modifier = Modifier.size(235.dp, 16.dp))
 				Text(
-					//todo: set how much time left
+					//TODO: set how much time left
 					text = "Total Images: $TotalImg",
 					style = MaterialTheme.typography.body1.copy(
 						fontSize = 16.sp,
