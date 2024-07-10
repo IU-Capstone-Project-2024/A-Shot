@@ -1,0 +1,42 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "1c1e5be6924e439c5e1db909e54c0235",
+    "entities": [
+      {
+        "tableName": "Photo",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filepath` TEXT NOT NULL, `blur_score` REAL NOT NULL, `isGood` INTEGER, PRIMARY KEY(`filepath`))",
+        "fields": [
+          {
+            "fieldPath": "filepath",
+            "columnName": "filepath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "blur_score",
+            "columnName": "blur_score",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isGood",
+            "columnName": "isGood",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "filepath"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1c1e5be6924e439c5e1db909e54c0235')"
+    ]
+  }
+}
