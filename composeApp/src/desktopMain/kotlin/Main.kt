@@ -1,12 +1,10 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
@@ -19,7 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import core.Core
 import database.ShotDao
 import database.getDatabaseBuilder
-import screen.cull.CullScreen
+import kotlinx.coroutines.launch
 import screen.cull.CullViewModel
 import screen.import_.ImportScreen
 import screen.overview.OverviewScreen
@@ -34,10 +32,18 @@ val ContentColor = Color(0xFF7E57C2)
 @Composable
 fun MyTopAppBar(
 	title: String,
-	navigationIcon: @Composable (() -> Unit)? = null
+	navigationIcon: @Composable (() -> Unit)? = null,
+	onPopUpClick: () -> Unit
 ) {
 	TopAppBar(
-		title = { Text(title) }, backgroundColor = PrimaryColor, contentColor = ContentColor
+		title = { Text(title) },
+		backgroundColor = PrimaryColor,
+		contentColor = ContentColor,
+		actions = {
+			IconButton(onClick = { onPopUpClick() }) {
+				Icon(Icons.Default.Menu, contentDescription = "Pop-Up")
+			}
+		}
 	)
 }
 
@@ -51,7 +57,6 @@ object Screen {
 @Composable
 @Preview
 fun App(window: ComposeWindow, shotDao: ShotDao) {
-
 	val model = remember { MainModel() }
 	val navController = rememberNavController()
 	val state by model.stateFlow.collectAsState()
@@ -67,7 +72,16 @@ fun App(window: ComposeWindow, shotDao: ShotDao) {
 
 	println("Current num of Enteties in DB: ${photos.size}")
 
-	Scaffold(topBar = { MyTopAppBar(title = "A-Shot") }) { padding ->
+	var isSheetVisible by remember { mutableStateOf(false) }
+
+	Scaffold(topBar = {
+		MyTopAppBar(
+			title = "A-Shot",
+			onPopUpClick = {
+				isSheetVisible = !isSheetVisible
+			}
+		)
+	}) { padding ->
 		NavHost(
 			modifier = Modifier.fillMaxSize(),
 			navController = navController,
@@ -98,7 +112,7 @@ fun App(window: ComposeWindow, shotDao: ShotDao) {
 				val currentGroup = state.currentGroup
 				val viewModel = remember(groups) { CullViewModel(groups, currentGroup) }
 
-				CullScreen(viewModel)
+				CullScreen(viewModel, isSheetVisible)
 			}
 		}
 	}
