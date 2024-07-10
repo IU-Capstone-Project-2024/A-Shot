@@ -1,6 +1,7 @@
 package component
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -16,8 +17,11 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import style.Roboto
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.random.Random
 
 @Composable
@@ -32,19 +36,25 @@ fun Burst(
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		BoxWithConstraints(modifier = modifier) {
-			val maxWidth = 1024 * 0.5f
-			val maxHeight = 1024 * 0.25f
+		BoxWithConstraints(
+			modifier = Modifier
+				.aspectRatio(1f)
+				.padding(8.dp)
+		) {
+			val containerSize = constraints.maxWidth
+			val space = containerSize * 0.1f
+			val contentSize = containerSize - space * max(0, min(shots.size, maxN) - 1)
+			val bottomOffset = (containerSize - contentSize).toInt()
+
 			shots.take(maxN)
 				.forEachIndexed { index, bitmap ->
 					Shot(
 						modifier = Modifier
-							.scale(2.3f / 3)
-							.size(maxWidth.dp, maxHeight.dp)
+							.requiredSize(contentSize.dp)
 							.offset {
 								IntOffset(
-									x = (maxWidth.toInt() * ((index - 1)) / 30),
-									y = -((maxHeight.toInt() * ((index - 1)) / 30))
+									x = (space * index).toInt(),
+									y = bottomOffset - (space * index).toInt(),
 								)
 							}
 							.zIndex(maxN - 1 - index.toFloat()),
@@ -52,21 +62,19 @@ fun Burst(
 						contentDescription = null,
 					)
 				}
+		}
 
-			if (caption != null) {
-				Text(
-					text = caption,
-					style = MaterialTheme.typography.body1.copy(
-						fontSize = 35.sp,
-						fontFamily = Roboto,
-						fontWeight = FontWeight.Medium,
-						color = Color(0xFF21005D)
-					),
-					modifier = Modifier
-						//.scale(2.3f / 3)
-						.offset(y = maxHeight.dp * 0.8f)
+		if (caption != null) {
+			Text(
+				textAlign = TextAlign.Center,
+				text = caption,
+				style = MaterialTheme.typography.body1.copy(
+					fontSize = 35.sp,
+					fontFamily = Roboto,
+					fontWeight = FontWeight.Medium,
+					color = Color(0xFF21005D)
 				)
-			}
+			)
 		}
 	}
 }
@@ -81,6 +89,7 @@ fun BurstPreview() {
 
 	val n = Random.nextInt(2, 5)
 	Burst(
+		modifier = Modifier.wrapContentSize(),
 		shots = List(n) { image },
 		caption = "IMG_0002",
 	)
