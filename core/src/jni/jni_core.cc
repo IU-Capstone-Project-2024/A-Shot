@@ -14,7 +14,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(
 	std::cout << "Hello, World!" << std::endl;
 	JNI.vm = vm;
 
-	JNI.ImageBlur.cls = (jclass) env->NewGlobalRef(env->FindClass("core/src/jni/LoadingPipeline$ImageBlur"));
+	JNI.ImageBlur.cls = (jclass) env->NewGlobalRef(env->FindClass("core/LoadingPipeline$ImageBlur"));
 	JNI.ImageBlur.inst = env->GetMethodID(JNI.ImageBlur.cls, "<init>", "(Ljava/lang/String;F)V");
 
 	return JNI_VERSION_1_6;
@@ -28,7 +28,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(
 }
 
 
-JNIEXPORT jint JNICALL Java_core_src_jni_Core_hello(
+JNIEXPORT jint JNICALL Java_core_Core_hello(
 	JNIEnv *env,
 	jclass cls
 ) {

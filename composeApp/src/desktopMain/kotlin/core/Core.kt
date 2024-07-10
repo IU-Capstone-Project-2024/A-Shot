@@ -1,4 +1,4 @@
-package core.src.jni
+package core
 
 object Core {
 	fun load(path: String) {

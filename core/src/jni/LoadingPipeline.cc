@@ -21,14 +21,14 @@ void LoadingPipeline::plug() {
 	blur_pipe.plug();
 }
 
-[[maybe_unused]] JNIEXPORT jlong JNICALL Java_core_src_jni_LoadingPipeline_nNew(
+[[maybe_unused]] JNIEXPORT jlong JNICALL Java_core_LoadingPipeline_nNew(
 	JNIEnv *env,
 	jobject _
 ) {
 	return (jlong) new LoadingPipeline();
 }
 
-JNIEXPORT jboolean JNICALL Java_core_src_jni_LoadingPipeline_nFlush(
+JNIEXPORT jboolean JNICALL Java_core_LoadingPipeline_nFlush(
 	JNIEnv *env,
 	jobject _,
 	jlong ptr,
@@ -47,7 +47,7 @@ JNIEXPORT jboolean JNICALL Java_core_src_jni_LoadingPipeline_nFlush(
 	return result;
 }
 
-JNIEXPORT jobject JNICALL Java_core_src_jni_LoadingPipeline_nSink(
+JNIEXPORT jobject JNICALL Java_core_LoadingPipeline_nSink(
 	JNIEnv *env,
 	jobject _,
 	jlong ptr

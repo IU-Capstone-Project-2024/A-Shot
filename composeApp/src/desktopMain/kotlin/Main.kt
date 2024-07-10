@@ -1,30 +1,31 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-
-import core.src.jni.Core
-import database.Photo
+import core.Core
 import database.ShotDao
 import database.getDatabaseBuilder
 import screen.cull.CullScreen
 import screen.cull.CullViewModel
 import screen.import_.ImportScreen
 import screen.overview.OverviewScreen
+import kotlin.io.path.Path
+import kotlin.io.path.div
+import kotlin.system.exitProcess
 
 val PrimaryColor = Color(0xFFEDE7F6)
 val ContentColor = Color(0xFF7E57C2)
@@ -49,7 +50,7 @@ object Screen {
 
 @Composable
 @Preview
-fun App(window: ComposeWindow,shotDao:ShotDao) {
+fun App(window: ComposeWindow, shotDao: ShotDao) {
 
 	val model = remember { MainModel() }
 	val navController = rememberNavController()
@@ -103,14 +104,15 @@ fun App(window: ComposeWindow,shotDao:ShotDao) {
 	}
 }
 
-fun main(argv: Array<String>) {
+fun main() {
+	val path = System.getenv("LD_LIBRARY_PATH")?.let { Path(it) }
+	if (path == null) {
+		println("Please provide native library path via LD_LIBRARY_PATH env variable")
+		exitProcess(1)
+	}
 
-	val projectDirectory = System.getProperty("user.dir")
-	println(projectDirectory)
-	Core.load("$projectDirectory/src/core/cmake-build-debug/libcore.so")
-
+	Core.load((path / "libcore.so").toString())
 	val dao = getDatabaseBuilder().dao
-
 
 	application {
 		val windowState = rememberWindowState(
@@ -124,7 +126,7 @@ fun main(argv: Array<String>) {
 			icon = painterResource("icons/icon.png"),
 			undecorated = false
 		) {
-		App(window = window, dao)
+			App(window = window, dao)
 		}
 	}
 }

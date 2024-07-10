@@ -1,12 +1,9 @@
 package screen.import_.component
 
 import PrimaryColor
-import style.Roboto
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -20,6 +17,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import style.Roboto
 import java.io.File
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -40,6 +40,8 @@ private fun selectDirectory(title: String): File? {
 
 @Composable
 fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
+	val scope = rememberCoroutineScope()
+
 	Button(
 		colors = ButtonDefaults.buttonColors(
 			backgroundColor = PrimaryColor,
@@ -47,9 +49,11 @@ fun BoxScope.SelectDir(onDirSelected: (File) -> Unit) {
 		),
 		modifier = Modifier.align(Alignment.Center),
 		onClick = {
-			val dir = selectDirectory("Select Directory")
-			if (dir != null) {
-				onDirSelected(dir)
+			scope.launch(Dispatchers.IO) {
+				val dir = selectDirectory("Select Directory")
+				if (dir != null) {
+					onDirSelected(dir)
+				}
 			}
 		}
 	) {

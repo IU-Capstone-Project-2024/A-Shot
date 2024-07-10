@@ -2,7 +2,6 @@ package screen.import_.component
 
 import PrimaryColor
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,9 +56,7 @@ fun BoxScope.Loading(
 		Spacer(modifier = Modifier.height(20.dp))
 
 		LinearProgressIndicator(
-// пасхалочка
-			modifier = Modifier.fillMaxSize(),
-//			modifier = Modifier.fillMaxWidth(0.8f),
+			modifier = Modifier.fillMaxWidth(0.8f),
 			progress = progress,
 			color = mainColor,
 		)

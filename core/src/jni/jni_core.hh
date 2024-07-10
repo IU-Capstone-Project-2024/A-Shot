@@ -20,25 +20,25 @@ struct JNI {
 
 extern JNI JNI;
 
-JNIEXPORT jint JNICALL Java_core_src_jni_Core_hello(
+JNIEXPORT jint JNICALL Java_core_Core_hello(
 	JNIEnv *,
 	jclass
 ) JNIKEEP;
 
 
-JNIEXPORT jlong JNICALL Java_core_src_jni_LoadingPipeline_nNew(
+JNIEXPORT jlong JNICALL Java_core_LoadingPipeline_nNew(
 	JNIEnv *env,
 	jobject _
 ) JNIKEEP;
 
-JNIEXPORT jboolean JNICALL Java_core_src_jni_LoadingPipeline_nFlush(
+JNIEXPORT jboolean JNICALL Java_core_LoadingPipeline_nFlush(
 	JNIEnv *env,
 	jobject _,
 	jlong ptr,
 	jstring j_path
 ) JNIKEEP;
 
-JNIEXPORT jobject JNICALL Java_core_src_jni_LoadingPipeline_nSink(
+JNIEXPORT jobject JNICALL Java_core_LoadingPipeline_nSink(
 	JNIEnv *env,
 	jobject _,
 	jlong ptr

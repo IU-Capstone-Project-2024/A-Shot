@@ -1,4 +1,4 @@
-package core.src.jni
+package core
 
 import kotlinx.coroutines.flow.flow
 

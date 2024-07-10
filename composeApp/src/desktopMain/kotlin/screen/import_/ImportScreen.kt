@@ -1,7 +1,7 @@
 package screen.import_
 
 import androidx.compose.runtime.*
-import core.src.jni.LoadingPipeline
+import core.LoadingPipeline
 import database.Photo
 import database.getDatabaseBuilder
 import kotlinx.coroutines.Dispatchers
