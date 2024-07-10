@@ -63,7 +63,6 @@ fun Burst(
 					)
 				}
 		}
-
 		if (caption != null) {
 			Text(
 				textAlign = TextAlign.Center,
