@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import core.Core
 import core.LoadingPipeline
 import database.ShotDatabase
+import database.selection.CategorySizes
 import database.selection.FolderWithCount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -96,22 +97,18 @@ fun App() {
 			},
 
 			folder = { folderId ->
-				var niceCount by remember { mutableStateOf(0) }
-				var unsortedCount by remember { mutableStateOf(0) }
-				var unluckyCount by remember { mutableStateOf(0) }
+				var sizes by remember { mutableStateOf(CategorySizes(0, 0, 0)) }
 
 				LaunchedEffect(Unit) {
 					launch(Dispatchers.IO) {
-						launch { niceCount = db.categoryDao.getNiceCount(folderId) }
-						launch { unsortedCount = db.categoryDao.getUnsortedCount(folderId, 0.05f) }
-						launch { unluckyCount = db.categoryDao.getUnluckyCount(folderId, 0.05f) }
+						sizes = db.categoryDao.count(folderId, 0.05f)
 					}
 				}
 
 				FolderScreen(
-					niceCount = niceCount,
-					unsortedCount = unsortedCount,
-					unluckyCount = unluckyCount,
+					niceCount = sizes.nice,
+					unsortedCount = sizes.unsorted,
+					unluckyCount = sizes.unlucky,
 					onNiceSelected = {
 
 					},
