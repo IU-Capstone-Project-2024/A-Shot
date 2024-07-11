@@ -41,6 +41,8 @@ jobs:
         mkdir cmake-build-debug
         cd cmake-build-debug
         cmake -S ${{ github.workspace }}/core \
+              -DBLUR_MODEL_PATH=${{ github.workspace }} \
+              -DEMBEDDING_MODEL_PATH=${{ github.workspace }} \ 
               -DJAVA_ROOT=${{ env.JAVA_HOME }}
         cmake --build .
         cp ../imagemagick/lib/* .
