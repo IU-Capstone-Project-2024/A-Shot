@@ -37,12 +37,12 @@ jobs:
         echo "core-dir=${{ github.workspace }}/core" >> "$GITHUB_OUTPUT"
     - name: Execute commands
       run: |
-        cd ${{ steps.strings.outputs.core-dir }}
+        cd /home/runner/work/A-Shot/A-Shot/core
         mkdir cmake-build-debug
         cd cmake-build-debug
-        cmake -S ${{ github.workspace }}/core \
-              -DBLUR_MODEL_PATH=${{ github.workspace }} \
-              -DEMBEDDING_MODEL_PATH=${{ github.workspace }} \ 
+        cmake -S /home/runner/work/A-Shot/A-Shot/core \
+              -DBLUR_MODEL_PATH=/home/runner/work/A-Shot/A-Shot \
+              -DEMBEDDING_MODEL_PATH=/home/runner/work/A-Shot/A-Shot \
               -DJAVA_ROOT=${{ env.JAVA_HOME }}
         cmake --build .
         cp ../imagemagick/lib/* .
