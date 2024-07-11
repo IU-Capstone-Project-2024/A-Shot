@@ -243,8 +243,8 @@ fun CircleButton(onClick: () -> Unit, label: String, isSelected: Boolean, modifi
 }
 
 
-@Composable
 @Preview
+@Composable
 fun CullGridPreview(paths: List<String>) {
 	val images = paths.map { path ->
 		useResource(path) { stream ->
@@ -265,15 +265,15 @@ fun CullGridPreview(paths: List<String>) {
 	}
 }
 
-@Composable
 @Preview
+@Composable
 fun CullGrid2Preview() {
 	val images = List(2) { "stubs/putin.jpg" }
 	CullGridPreview(images)
 }
 
-@Composable
 @Preview
+@Composable
 fun CullGrid4Preview() {
 	val images = List(4) { "stubs/putin.jpg" }
 	CullGridPreview(images)

@@ -3,19 +3,27 @@
 //
 
 #include <filesystem>
+#include <utility>
 #include "ImageLoader.hh"
 
 ImageLoader::ImageLoader(
 	Exhaust<std::string> &input,
-	Drain<Magick::Image> &output
+	Drain<Magick::Image> &output,
+	const std::function<bool(const std::string &path)> &filter
 ) :
-	PipelineStep(input, output) {
+	PipelineStep(input, output),
+	filter(filter) {
 }
 
 void ImageLoader::load_image(const std::string &path) {
 	try {
-		Magick::Image image(path);
-		output.flush(std::move(image), true);
+		if (filter(path)) {
+			Magick::Image image(path);
+			image.alpha(false);
+			image.colorSpace(MagickCore::sRGBColorspace);
+
+			output.flush(std::move(image), true);
+		}
 	} catch (const Magick::Exception &e) {
 		// TODO: handle
 	}

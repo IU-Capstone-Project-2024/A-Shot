@@ -13,13 +13,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import shot.Shot
+import shot.Shot_
 import util.AsyncImage
 import java.awt.Dimension
 
 @Composable
 fun TailpondPage(
-	shots: List<Shot>,
+	shots: List<Shot_>,
 	onShotClick: (Int) -> Unit,
 ) {
 	LazyVerticalGrid(
@@ -43,7 +43,7 @@ fun TailpondPage(
 
 @Composable
 fun TailpondItem(
-	shot: Shot,
+	shot: Shot_,
 	onClick: () -> Unit
 ) {
 	Card(

@@ -1,11 +1,9 @@
 package screen.cull
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -17,10 +15,9 @@ import androidx.compose.ui.unit.dp
 import component.CullGrid
 
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.unit.sp
 import component.Burst
-import database.Photo
-import database.getDatabaseBuilder
+import database.ShotDatabase
+import database.entity.Shot
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Image
 import shot.ShotGroup
@@ -29,19 +26,20 @@ import java.io.File
 val BoxesColor = Color(0xFFEADDFF)
 
 fun convertShotGroupToImageBitmapList(shotGroup: ShotGroup): List<ImageBitmap> {
-    return shotGroup.shots.mapNotNull { shot ->        convertFileToImageBitmap(shot.file)
-    }
+	return shotGroup.shots.mapNotNull { shot ->
+		convertFileToImageBitmap(shot.file)
+	}
 }
 
 private fun convertFileToImageBitmap(file: File): ImageBitmap? {
-    return try {
-        val byteArray = file.readBytes()
-        val image = Image.makeFromEncoded(byteArray)
-        image.asImageBitmap()
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
+	return try {
+		val byteArray = file.readBytes()
+		val image = Image.makeFromEncoded(byteArray)
+		image.asImageBitmap()
+	} catch (e: Exception) {
+		e.printStackTrace()
+		null
+	}
 }
 
 @Composable
@@ -49,8 +47,8 @@ fun CullScreen(viewModel: CullViewModel) {
 	val state by viewModel.stateFlow.collectAsState()
 	var clickedButton by remember { mutableStateOf(0) }
 	val currentGroup by viewModel.currentGroup
-	val dao = getDatabaseBuilder().dao
-	var photo by remember { mutableStateOf<Photo?>(null) }
+//	val dao = ShotDatabase.instance.dao
+	var shotEntity by remember { mutableStateOf<Shot?>(null) }
 	var likeState by remember { mutableStateOf("Undefined") }
 	val scope = rememberCoroutineScope()
 
@@ -68,11 +66,10 @@ fun CullScreen(viewModel: CullViewModel) {
 
 	LaunchedEffect(state.subgroup, clickedButton) {
 		if (clickedButton < state.subgroups[state.subgroup].shots.size) {
-			photo = dao.getByPath(state.subgroups[state.subgroup].shots[clickedButton].file.toString())
-			val isGood = photo?.isGood
-			likeState = when (isGood) {
-				true -> "Liked"
-				false -> "Disliked"
+//			shotEntity = dao.select(state.subgroups[state.subgroup].shots[clickedButton].file.toString())
+			likeState = when (shotEntity?.lucky) {
+				false -> "Liked"
+				true -> "Disliked"
 				null -> "Undefined"
 			}
 		}
@@ -111,10 +108,11 @@ fun CullScreen(viewModel: CullViewModel) {
 			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
 				Button(onClick = {
 					scope.launch {
-						photo?.let {
-							it.isGood = true
-							dao.updatePhoto(it)
-							likeState = "Liked"
+						shotEntity?.let {
+							// TODO:
+							it.lucky = true
+//							dao.updatePhoto(it)
+//							likeState = "Liked"
 						}
 					}
 				}) {
@@ -123,10 +121,11 @@ fun CullScreen(viewModel: CullViewModel) {
 
 				Button(onClick = {
 					scope.launch {
-						photo?.let {
-							it.isGood = false
-							dao.updatePhoto(it)
-							likeState = "Disliked"
+						shotEntity?.let {
+							// TODO:
+							it.lucky = false
+//							dao.updatePhoto(it)
+//							likeState = "Disliked"
 						}
 					}
 				}) {

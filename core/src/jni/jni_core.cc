@@ -14,8 +14,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(
 	std::cout << "Hello, World!" << std::endl;
 	JNI.vm = vm;
 
-	JNI.ImageBlur.cls = (jclass) env->NewGlobalRef(env->FindClass("core/LoadingPipeline$ImageBlur"));
-	JNI.ImageBlur.inst = env->GetMethodID(JNI.ImageBlur.cls, "<init>", "(Ljava/lang/String;F)V");
+	JNI.LoadingPipeline.cls = (jclass) env->NewGlobalRef(env->FindClass("core/LoadingPipeline"));
+	JNI.LoadingPipeline.filter = env->GetMethodID(JNI.LoadingPipeline.cls, "filter", "(Ljava/lang/String;)Z");
+
+	JNI.Result.cls = (jclass) env->NewGlobalRef(env->FindClass("core/LoadingPipeline$Result"));
+	JNI.Result.inst = env->GetMethodID(JNI.Result.cls, "<init>", "(Ljava/lang/String;F[B[B)V");
 
 	return JNI_VERSION_1_6;
 }

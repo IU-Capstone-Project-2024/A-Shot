@@ -10,7 +10,7 @@
 void hello(std::string &&path) {
 	std::cout << "Hello, World!" << std::endl;
 
-	LoadingPipeline pipeline;
+	LoadingPipeline pipeline([](const std::string &) { return true; });
 	pipeline.flush(std::move(path), true);
 	pipeline.dry();
 

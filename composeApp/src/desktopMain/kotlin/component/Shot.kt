@@ -66,8 +66,8 @@ fun Shot(
 }
 
 
-@Composable
 @Preview
+@Composable
 fun ShotPreview() {
 	val image = useResource("icons/icon.png") {
 		loadImageBitmap(it)
