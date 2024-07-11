@@ -41,6 +41,11 @@ if (NOT DEFINED BLUR_MODEL_PATH)
 	message(FATAL_ERROR "BLUR_MODEL_PATH is not defined")
 endif ()
 add_definitions(-DBLUR_MODEL_PATH="${BLUR_MODEL_PATH}")
+
+if (NOT DEFINED EMBEDDING_MODEL_PATH)
+	message(FATAL_ERROR "EMBEDDING_MODEL_PATH is not defined")
+endif ()
+add_definitions(-DEMBEDDING_MODEL_PATH="${EMBEDDING_MODEL_PATH}")
 #endregion onnxruntime
 
 #region ImageMagick

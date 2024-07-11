@@ -37,17 +37,13 @@ private:
 
 	std::thread worker;
 
-	void process(Magick::Image &input);
-
-	void run();
+	void process(Magick::Image &input) override;
 
 public:
 	BlurDetector(
 		Exhaust<Magick::Image> &input,
 		Drain<ImageBlur> &output
 	);
-
-	~BlurDetector();
 };
 
 

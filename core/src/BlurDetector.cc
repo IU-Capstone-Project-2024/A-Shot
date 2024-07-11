@@ -8,25 +8,12 @@ BlurDetector::BlurDetector(
 	Exhaust<Magick::Image> &input,
 	Drain<ImageBlur> &output
 ) :
-	PipelineStep(input, output),
-	worker(&BlurDetector::run, this) {
+	PipelineStep(input, output) {
 	env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, "BlurDetector");
 	memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault);
 
 	Ort::SessionOptions session_options;
 	session = Ort::Session(env, BLUR_MODEL_PATH, session_options);
-}
-
-void BlurDetector::run() {
-	for (Magick::Image image; !input.suck(image, true);) {
-		try {
-			process(image);
-		} catch (const std::exception &e) {
-			std::cout << e.what() << std::endl;
-		}
-	}
-	input.plug();
-	output.dry();
 }
 
 void BlurDetector::process(Magick::Image &input) {
@@ -65,10 +52,4 @@ void BlurDetector::process(Magick::Image &input) {
 	avg = avg / (float) output_tensor.size();
 
 	output.flush(std::make_pair(input, avg), true);
-}
-
-BlurDetector::~BlurDetector() {
-	input.plug();
-	output.dry();
-	worker.join();
 }

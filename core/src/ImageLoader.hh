@@ -20,21 +20,15 @@
 class ImageLoader : PipelineStep<std::string, Magick::Image> {
 private:
 
-	std::thread worker;
-
 	void load_image(const std::string &path);
 
-	void process(const std::string &path);
-
-	void run();
+	void process(std::string &path) override;
 
 public:
 	explicit ImageLoader(
 		Exhaust<std::string> &input,
 		Drain<Magick::Image> &output
 	);
-
-	~ImageLoader();
 };
 
 
