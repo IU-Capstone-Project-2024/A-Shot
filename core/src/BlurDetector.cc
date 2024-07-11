@@ -33,8 +33,8 @@ void BlurDetector::process(Magick::Image &input) {
 	auto output_name = session.GetOutputNameAllocated(0, allocator);
 
 	int64_t shape[4] = {1, INPUT_DEPTH, INPUT_WIDTH, INPUT_HEIGHT};
-	Ort::Value inputs[] = {
-		Ort::Value::CreateTensor<float>(memory_info, input_tensor.data(), INPUT_LENGTH, shape, 4)
+	Ort::Value inputs[1] = {
+		Ort::Value::CreateTensor<float>(memory_info, input_tensor.data(), input_tensor.size(), shape, 4)
 	};
 
 	Ort::RunOptions run_options;
@@ -51,5 +51,5 @@ void BlurDetector::process(Magick::Image &input) {
 	float avg = std::accumulate(output_tensor.begin(), output_tensor.end(), 0.0f);
 	avg = avg / (float) output_tensor.size();
 
-	output.flush(std::make_pair(input, avg), true);
+	output.flush({input, avg}, true);
 }

@@ -9,8 +9,8 @@ PipeResult LoadingPipeline::flush(std::string &&item, bool block) {
 	return path_pipe.flush(std::move(item), false);
 }
 
-PipeResult LoadingPipeline::suck(ImageBlur &item, bool block) {
-	return blur_pipe.suck(item, block);
+PipeResult LoadingPipeline::suck(ImageBlurEmbedding &item, bool block) {
+	return embedding_pipe.suck(item, block);
 }
 
 void LoadingPipeline::dry() {
@@ -54,14 +54,14 @@ JNIEXPORT jobject JNICALL Java_core_LoadingPipeline_nSink(
 ) {
 	auto *pipeline = (LoadingPipeline *) ptr;
 
-	ImageBlur result;
+	ImageBlurEmbedding result;
 	if (pipeline->suck(result, true)) {
 		// TODO: return something else on CLOG
 		return nullptr;
 	}
 
-	jstring path = env->NewStringUTF(result.first.fileName().c_str());
-	jfloat score = result.second;
+	jstring path = env->NewStringUTF(result.image.fileName().c_str());
+	jfloat score = result.blur;
 
 	return env->NewObject(JNI.ImageBlur.cls, JNI.ImageBlur.inst, path, score);
 }

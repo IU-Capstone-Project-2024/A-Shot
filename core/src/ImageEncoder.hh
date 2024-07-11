@@ -10,7 +10,11 @@
 #include <optional>
 #include <tuple>
 
-using ImageBlurEmbedding = std::tuple<Magick::Image, float, std::optional<std::vector<float>>>;
+#define EMBEDDING_SIZE 2048
+
+struct ImageBlurEmbedding : ImageBlur {
+	std::array<float, EMBEDDING_SIZE> embedding{};
+};
 
 class ImageEncoder : PipelineStep<ImageBlur, ImageBlurEmbedding> {
 private:

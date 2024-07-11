@@ -14,6 +14,7 @@ add_library(
 
 		src/ImageLoader.cc
 		src/BlurDetector.cc
+		src/ImageEncoder.cc
 
 		src/PipelineStep.cc
 		src/Pipe.cc
