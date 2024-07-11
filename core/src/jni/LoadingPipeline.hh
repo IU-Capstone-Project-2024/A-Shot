@@ -12,22 +12,25 @@ extern "C" {
 #include "../Pipe.hh"
 #include "../ImageLoader.hh"
 #include "../BlurDetector.hh"
+#include "../ImageEncoder.hh"
 
 class LoadingPipeline :
 	public Drain<std::string>,
-	public Exhaust<ImageBlur> {
+	public Exhaust<ImageBlurEmbedding > {
 private:
 	Pipe<std::string> path_pipe{4};
 	Pipe<Magick::Image> image_pipe{1};
 	Pipe<ImageBlur> blur_pipe{1};
+	Pipe<ImageBlurEmbedding> embedding_pipe{1};
 
 	ImageLoader image_loader{path_pipe, image_pipe};
 	BlurDetector blur_detector{image_pipe, blur_pipe};
+	ImageEncoder image_encoder{blur_pipe, embedding_pipe};
 
 public:
 	PipeResult flush(std::string &&item, bool block) override;
 
-	PipeResult suck(ImageBlur &item, bool block) override;
+	PipeResult suck(ImageBlurEmbedding &item, bool block) override;
 
 	void dry() override;
 

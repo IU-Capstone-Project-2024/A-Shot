@@ -9,8 +9,7 @@ ImageLoader::ImageLoader(
 	Exhaust<std::string> &input,
 	Drain<Magick::Image> &output
 ) :
-	PipelineStep(input, output),
-	worker(&ImageLoader::run, this) {
+	PipelineStep(input, output) {
 }
 
 void ImageLoader::load_image(const std::string &path) {
@@ -22,8 +21,7 @@ void ImageLoader::load_image(const std::string &path) {
 	}
 }
 
-
-void ImageLoader::process(const std::string &path) {
+void ImageLoader::process(std::string &path) {
 	if (std::filesystem::is_directory(path)) {
 		for (const auto &entry: std::filesystem::directory_iterator(path)) {
 			load_image(entry.path());
@@ -32,18 +30,4 @@ void ImageLoader::process(const std::string &path) {
 	else {
 		load_image(path);
 	}
-}
-
-void ImageLoader::run() {
-	for (std::string path; !input.suck(path, true);) {
-		process(path);
-	}
-	input.plug();
-	output.dry();
-}
-
-ImageLoader::~ImageLoader() {
-	input.plug();
-	output.dry();
-	worker.join();
 }

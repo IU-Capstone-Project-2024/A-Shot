@@ -20,7 +20,10 @@
 #include "Util.hh"
 #include "PipelineStep.hh"
 
-using ImageBlur = std::pair<Magick::Image, float>;
+struct ImageBlur {
+	Magick::Image image;
+	float blur;
+};
 
 class BlurDetector : PipelineStep<Magick::Image, ImageBlur> {
 private:
@@ -29,25 +32,19 @@ private:
 	static const int INPUT_HEIGHT = 320;
 	static const int INPUT_DEPTH = 3;
 
-	static constexpr int INPUT_LENGTH = INPUT_WIDTH * INPUT_HEIGHT * INPUT_DEPTH;
-
 	Ort::Env env{nullptr};
 	Ort::Session session{nullptr};
 	Ort::MemoryInfo memory_info{nullptr};
 
 	std::thread worker;
 
-	void process(Magick::Image &input);
-
-	void run();
+	void process(Magick::Image &input) override;
 
 public:
 	BlurDetector(
 		Exhaust<Magick::Image> &input,
 		Drain<ImageBlur> &output
 	);
-
-	~BlurDetector();
 };
 
 
