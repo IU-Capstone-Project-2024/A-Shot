@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import database.entity.Folder
 import database.selection.FolderWithCount
 import ui.stubListOfFolderWithCount
-import ui.stubListOfFolderWithShots
 
 
 @Composable

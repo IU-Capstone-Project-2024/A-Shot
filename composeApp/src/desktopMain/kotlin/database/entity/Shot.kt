@@ -31,6 +31,6 @@ class Shot(
 	@ColumnInfo(name = "thumbnail", typeAffinity = ColumnInfo.BLOB)
 	val thumbnail: ByteArray,
 
-	@ColumnInfo(name = "lucky")
-	var lucky: Boolean? = null,
+	@ColumnInfo(name = "starred")
+	var starred: Boolean,
 )

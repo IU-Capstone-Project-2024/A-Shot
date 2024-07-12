@@ -27,7 +27,7 @@ fun CollectionGrid(
 
 	LazyVerticalGrid(
 		modifier = modifier,
-		columns = GridCells.Adaptive(192.dp),
+		columns = GridCells.Adaptive(224.dp),
 		contentPadding = PaddingValues(8.dp),
 //		verticalArrangement = Arrangement.spacedBy(8.dp),
 //		horizontalArrangement = Arrangement.spacedBy(8.dp)

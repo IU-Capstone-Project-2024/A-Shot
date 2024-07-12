@@ -2,6 +2,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.*
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -18,7 +19,10 @@ import ui.component.AppNavHost
 import ui.component.Screen
 import ui.screen.cull.CullScreen
 import ui.screen.folder.FolderScreen
+import ui.screen.normal.NormalScreen
 import ui.screen.overview.OverviewScreen
+import util.DBSCAN
+import util.ShotCluster
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
@@ -80,8 +84,8 @@ fun App() {
 
 				LaunchedEffect(Unit) {
 					launch(Dispatchers.IO) {
-						db.folderDao.selectFoldersWithCount().collect { items ->
-							folders = items
+						db.folderDao.selectFoldersWithCount().collect { value ->
+							folders = value
 						}
 					}
 				}
@@ -101,22 +105,63 @@ fun App() {
 
 				LaunchedEffect(Unit) {
 					launch(Dispatchers.IO) {
-						sizes = db.categoryDao.count(folderId, 0.05f)
+						db.categoryDao.count(folderId, 0.05f).collect { value ->
+							sizes = value
+						}
 					}
 				}
 
 				FolderScreen(
-					niceCount = sizes.nice,
-					unsortedCount = sizes.unsorted,
-					unluckyCount = sizes.unlucky,
-					onNiceSelected = {
+					starredCount = sizes.starred,
+					normalCount = sizes.normal,
+					blurryCount = sizes.blurry,
+					onStarredSelected = {
 
 					},
-					onUnsortedSelected = {
-
+					onNormalSelected = {
+						navController.navigate("${Screen.Normal}/${folderId}") {
+							launchSingleTop = true
+						}
 					},
-					onUnluckySelected = {
+					onBlurrySelected = {
 
+					}
+				)
+			},
+
+			normal = { folderId ->
+				var clusters by remember { mutableStateOf(emptyList<ShotCluster>()) }
+
+				LaunchedEffect(Unit) {
+					launch(Dispatchers.IO) {
+						val embeddings = db.shotDao.embeddings(folderId)
+						val dbscan = DBSCAN(0.9, 2)
+						val clusterIndices = dbscan.cluster(embeddings.map { it.embedding })
+
+						println(clusterIndices)
+						var max = clusterIndices.max()
+						val result = clusterIndices
+							.map {
+								if (it == -1) {
+									max += 1
+									max
+								} else {
+									it
+								}
+							}
+							.zip(embeddings)
+							.groupBy({ it.first }, { it.second.id })
+							.map { ShotCluster(it.key, it.value) }
+							.sortedBy { it.id }
+
+						clusters = result
+					}
+				}
+
+				NormalScreen(
+					clusters = clusters,
+					thumbnail = { shotId ->
+						db.shotDao.thumbnail(shotId)?.toComposeImageBitmap()
 					}
 				)
 			},

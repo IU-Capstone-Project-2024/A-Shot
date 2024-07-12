@@ -8,24 +8,24 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun FolderScreen(
-	niceCount: Int,
-	unsortedCount: Int,
-	unluckyCount: Int,
+	starredCount: Int,
+	normalCount: Int,
+	blurryCount: Int,
 
-	onNiceSelected: () -> Unit,
-	onUnsortedSelected: () -> Unit,
-	onUnluckySelected: () -> Unit,
+	onStarredSelected: () -> Unit,
+	onNormalSelected: () -> Unit,
+	onBlurrySelected: () -> Unit,
 ) {
 	CategoryGrid(
 		modifier = Modifier.fillMaxSize(),
 
-		niceCount = niceCount,
-		unsortedCount = unsortedCount,
-		unluckyCount = unluckyCount,
+		starredCount = starredCount,
+		normalCount = normalCount,
+		blurryCount = blurryCount,
 
-		onNiceSelected = onNiceSelected,
-		onUnsortedSelected = onUnsortedSelected,
-		onUnluckySelected = onUnluckySelected,
+		onStarredSelected = onStarredSelected,
+		onNormalSelected = onNormalSelected,
+		onBlurrySelected = onBlurrySelected,
 	)
 }
 
@@ -33,12 +33,12 @@ fun FolderScreen(
 @Composable
 fun FolderPreview() {
 	FolderScreen(
-		niceCount = 120,
-		unsortedCount = 3141,
-		unluckyCount = 1,
+		starredCount = 120,
+		normalCount = 3141,
+		blurryCount = 1,
 
-		onNiceSelected = {},
-		onUnsortedSelected = {},
-		onUnluckySelected = {},
+		onStarredSelected = {},
+		onNormalSelected = {},
+		onBlurrySelected = {},
 	)
 }

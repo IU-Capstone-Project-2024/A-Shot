@@ -19,19 +19,19 @@ import ui.component.Folder
 fun CategoryGrid(
 	modifier: Modifier = Modifier,
 
-	niceCount: Int,
-	unsortedCount: Int,
-	unluckyCount: Int,
+	starredCount: Int,
+	normalCount: Int,
+	blurryCount: Int,
 
-	onNiceSelected: () -> Unit,
-	onUnsortedSelected: () -> Unit,
-	onUnluckySelected: () -> Unit,
+	onStarredSelected: () -> Unit,
+	onNormalSelected: () -> Unit,
+	onBlurrySelected: () -> Unit,
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
 
 	LazyVerticalGrid(
 		modifier = modifier,
-		columns = GridCells.Adaptive(192.dp),
+		columns = GridCells.Adaptive(224.dp),
 		contentPadding = PaddingValues(8.dp),
 //		verticalArrangement = Arrangement.spacedBy(8.dp),
 //		horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -43,10 +43,10 @@ fun CategoryGrid(
 					.clickable(
 						interactionSource = interactionSource,
 						indication = null,
-						onClick = onNiceSelected
+						onClick = onStarredSelected
 					),
-				label = "Nice",
-				caption = "$niceCount items",
+				label = "Starred",
+				caption = "$starredCount items",
 				backColor = Color(0xFFA1D665),
 				frontColor = Color(0xCCC3E88D),
 			)
@@ -59,10 +59,10 @@ fun CategoryGrid(
 					.clickable(
 						interactionSource = interactionSource,
 						indication = null,
-						onClick = onUnsortedSelected
+						onClick = onNormalSelected
 					),
-				label = "Unsorted",
-				caption = "$unsortedCount items",
+				label = "Normal",
+				caption = "$normalCount items",
 			)
 		}
 
@@ -73,10 +73,10 @@ fun CategoryGrid(
 					.clickable(
 						interactionSource = interactionSource,
 						indication = null,
-						onClick = onUnluckySelected
+						onClick = onBlurrySelected
 					),
-				label = "Unlucky",
-				caption = "$unluckyCount items",
+				label = "Blurry",
+				caption = "$blurryCount items",
 				backColor = Color(0xFFCC4022),
 				frontColor = Color(0xCCFF5733),
 			)
@@ -90,12 +90,12 @@ fun CategoryGridContent() {
 	CategoryGrid(
 		modifier = Modifier.fillMaxSize(),
 
-		niceCount = 1,
-		unsortedCount = 2,
-		unluckyCount = 20,
+		starredCount = 1,
+		normalCount = 2,
+		blurryCount = 20,
 
-		onNiceSelected = {},
-		onUnsortedSelected = {},
-		onUnluckySelected = {},
+		onStarredSelected = {},
+		onNormalSelected = {},
+		onBlurrySelected = {},
 	)
 }

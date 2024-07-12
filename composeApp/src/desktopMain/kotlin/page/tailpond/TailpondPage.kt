@@ -24,7 +24,7 @@ fun TailpondPage(
 ) {
 	LazyVerticalGrid(
 		modifier = Modifier.fillMaxSize(),
-		columns = GridCells.Adaptive(256.dp),
+		columns = GridCells.Adaptive(224.dp),
 		contentPadding = PaddingValues(16.dp),
 		horizontalArrangement = Arrangement.spacedBy(16.dp),
 		verticalArrangement = Arrangement.spacedBy(16.dp),

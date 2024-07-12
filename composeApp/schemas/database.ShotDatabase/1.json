@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4e1e86e42a9036c68e356bc6ea0daacc",
+    "identityHash": "cf6d0fe9123308cee1ddab1d41d346ab",
     "entities": [
       {
         "tableName": "shot",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `folder_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `blur_score` REAL NOT NULL, `embedding` BLOB NOT NULL, `thumbnail` BLOB NOT NULL, `lucky` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `folder_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `blur_score` REAL NOT NULL, `embedding` BLOB NOT NULL, `thumbnail` BLOB NOT NULL, `starred` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -45,9 +45,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "lucky",
-            "columnName": "lucky",
-            "affinity": "INTEGER"
+            "fieldPath": "starred",
+            "columnName": "starred",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -95,7 +96,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4e1e86e42a9036c68e356bc6ea0daacc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cf6d0fe9123308cee1ddab1d41d346ab')"
     ]
   }
 }

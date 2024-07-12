@@ -4,15 +4,17 @@ import database.entity.Folder
 import database.selection.FolderWithShots
 import database.entity.Shot
 import database.selection.FolderWithCount
+import database.selection.ShotIdName
+import util.ShotCluster
 import kotlin.random.Random
 
 fun stubShot(folderId: Long, random: Random = Random(42)): Shot {
 	val id = random.nextLong()
 	val name = "$id.jpg"
 	val blurScore = random.nextFloat()
-	val culled = if (random.nextBoolean()) random.nextBoolean() else null
+	val starred = random.nextBoolean()
 
-	return Shot(id, folderId, name, blurScore, ByteArray(0), ByteArray(0), culled)
+	return Shot(id, folderId, name, blurScore, ByteArray(0), ByteArray(0), starred)
 }
 
 fun stubFolder(random: Random = Random(42)): Folder {
@@ -49,4 +51,26 @@ fun stubListOfFolderWithShots(random: Random = Random(42)): List<FolderWithShots
 	val folders = List(size) { stubFolderWithShots(random) }
 
 	return folders
+}
+
+fun stubShotIdName(random: Random = Random(42)): ShotIdName {
+	val id = random.nextLong()
+	val name = "$id.jpg"
+
+	return ShotIdName(id, name)
+}
+
+fun stubShotCluster(random: Random = Random(42)): ShotCluster {
+	val id = random.nextInt()
+	val size = random.nextInt(1, 20)
+	val cluster = List(size) { random.nextLong() }
+
+	return ShotCluster(id, cluster)
+}
+
+fun stubListOfShotCluster(random: Random = Random(42)): List<ShotCluster> {
+	val size = random.nextInt(1, 20)
+	val clusters = List(size) { stubShotCluster(random) }
+
+	return clusters
 }

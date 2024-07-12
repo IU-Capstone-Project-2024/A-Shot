@@ -14,6 +14,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 sealed class Screen(val route: String) {
 	data object Overview : Screen("overview")
 	data object Collection : Screen("collection/{id}")
+	data object Normal : Screen("normal/{id}")
 	data object Cull : Screen("cull")
 }
 
@@ -25,6 +26,7 @@ fun AppNavHost(
 
 	overview: @Composable () -> Unit,
 	folder: @Composable (id: Long) -> Unit,
+	normal: @Composable (id: Long) -> Unit,
 	cull: @Composable () -> Unit,
 ) {
 	NavHost(
@@ -44,6 +46,14 @@ fun AppNavHost(
 			folder(id)
 		}
 
+		composable(
+			Screen.Normal.route,
+			arguments = listOf(navArgument("id") { type = NavType.LongType })
+		) { entry ->
+			val id = entry.arguments?.getLong("id") ?: TODO("Return to previous screen")
+			normal(id)
+		}
+
 		composable(Screen.Cull.route) {
 			cull()
 		}
@@ -59,6 +69,7 @@ fun AppNavHostPreview() {
 		startDestination = Screen.Overview,
 		overview = {},
 		folder = {},
+		normal = {},
 		cull = {},
 	)
 }

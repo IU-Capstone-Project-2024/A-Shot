@@ -16,7 +16,6 @@ import component.CullGrid
 
 import androidx.compose.ui.graphics.asImageBitmap
 import component.Burst
-import database.ShotDatabase
 import database.entity.Shot
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Image
@@ -67,7 +66,7 @@ fun CullScreen(viewModel: CullViewModel) {
 	LaunchedEffect(state.subgroup, clickedButton) {
 		if (clickedButton < state.subgroups[state.subgroup].shots.size) {
 //			shotEntity = dao.select(state.subgroups[state.subgroup].shots[clickedButton].file.toString())
-			likeState = when (shotEntity?.lucky) {
+			likeState = when (shotEntity?.starred) {
 				false -> "Liked"
 				true -> "Disliked"
 				null -> "Undefined"
@@ -110,7 +109,7 @@ fun CullScreen(viewModel: CullViewModel) {
 					scope.launch {
 						shotEntity?.let {
 							// TODO:
-							it.lucky = true
+							it.starred = true
 //							dao.updatePhoto(it)
 //							likeState = "Liked"
 						}
@@ -123,7 +122,7 @@ fun CullScreen(viewModel: CullViewModel) {
 					scope.launch {
 						shotEntity?.let {
 							// TODO:
-							it.lucky = false
+							it.starred = false
 //							dao.updatePhoto(it)
 //							likeState = "Disliked"
 						}

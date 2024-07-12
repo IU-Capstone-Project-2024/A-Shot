@@ -2,6 +2,8 @@ package database.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import database.selection.ShotIdEmbedding
+import java.awt.image.BufferedImage
 
 @Dao
 interface ShotDao {
@@ -18,10 +20,16 @@ interface ShotDao {
 	@Query(
 		"""
 			INSERT INTO shot 
-				(folder_id, name, blur_score, embedding, thumbnail, lucky) 
+				(folder_id, name, blur_score, embedding, thumbnail, starred) 
 			VALUES 
-				(:folderId, :shotName, :blurScore, :embedding, :thumbnail, NULL)
+				(:folderId, :shotName, :blurScore, :embedding, :thumbnail, FALSE)
 		"""
 	)
 	suspend fun insert(folderId: Long, shotName: String, blurScore: Float, embedding: ByteArray, thumbnail: ByteArray)
+
+	@Query("SELECT thumbnail FROM shot WHERE id = :shotId")
+	suspend fun thumbnail(shotId: Long): BufferedImage?
+
+	@Query("SELECT id, embedding FROM shot WHERE folder_id = :folderId")
+	suspend fun embeddings(folderId: Long): List<ShotIdEmbedding>
 }
