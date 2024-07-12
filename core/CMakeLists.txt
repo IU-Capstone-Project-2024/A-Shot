@@ -73,3 +73,4 @@ set_target_properties(core PROPERTIES LINK_FLAGS "-Wl,-rpath,.")
 
 add_dependencies(exec core)
 target_link_libraries(exec PRIVATE core)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,/usr/lib/x86_64-linux-gnu")
