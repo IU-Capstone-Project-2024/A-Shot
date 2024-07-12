@@ -20,6 +20,8 @@
 class ImageLoader : PipelineStep<std::string, Magick::Image> {
 private:
 
+	std::function<bool(const std::string &path)> filter;
+
 	void load_image(const std::string &path);
 
 	void process(std::string &path) override;
@@ -27,7 +29,8 @@ private:
 public:
 	explicit ImageLoader(
 		Exhaust<std::string> &input,
-		Drain<Magick::Image> &output
+		Drain<Magick::Image> &output,
+		const std::function<bool(const std::string &path)> &filter
 	);
 };
 

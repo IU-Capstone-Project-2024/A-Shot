@@ -1,5 +1,5 @@
 package shot
 
 class ShotGroup(
-	val shots: List<Shot>
+	val shots: List<Shot_>
 )

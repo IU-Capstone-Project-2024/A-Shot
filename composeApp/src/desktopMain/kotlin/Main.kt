@@ -1,118 +1,180 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.ComposeWindow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.*
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import core.Core
-import database.ShotDao
-import database.getDatabaseBuilder
-import screen.cull.CullScreen
-import screen.cull.CullViewModel
-import screen.import_.ImportScreen
-import screen.overview.OverviewScreen
-import kotlin.io.path.Path
-import kotlin.io.path.div
-import kotlin.system.exitProcess
-
-val PrimaryColor = Color(0xFFEDE7F6)
-val ContentColor = Color(0xFF7E57C2)
-
-
-@Composable
-fun MyTopAppBar(
-	title: String,
-	navigationIcon: @Composable (() -> Unit)? = null
-) {
-	TopAppBar(
-		title = { Text(title) }, backgroundColor = PrimaryColor, contentColor = ContentColor
-	)
-}
-
-object Screen {
-	const val IMPORT = "import"
-	const val OVERVIEW = "overview"
-	const val CULL = "cull"
-}
-
+import core.LoadingPipeline
+import database.ShotDatabase
+import database.selection.CategorySizes
+import database.selection.FolderWithCount
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ui.component.AppContainer
+import ui.component.AppNavHost
+import ui.component.Screen
+import ui.screen.cull.CullScreen
+import ui.screen.folder.FolderScreen
+import ui.screen.normal.NormalScreen
+import ui.screen.overview.OverviewScreen
+import util.DBSCAN
+import util.ShotCluster
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileNameExtensionFilter
 
 @Composable
-@Preview
-fun App(window: ComposeWindow, shotDao: ShotDao) {
+fun App() {
+	val scope = rememberCoroutineScope()
 
-	val model = remember { MainModel() }
+	val db = remember { ShotDatabase.instance }
+	val loadingPipeline = remember(db) { LoadingPipeline(db.folderDao, db.shotDao) }
 	val navController = rememberNavController()
-	val state by model.stateFlow.collectAsState()
-	val navBackStackEntry by navController.currentBackStackEntryAsState()
-	val currentRoute = navBackStackEntry?.destination?.route
 
-	val photos by shotDao.getShots().collectAsState(initial = emptyList())
+	val backStackEntry by navController.currentBackStackEntryAsState()
+	val backButtonVisible = remember(backStackEntry) { navController.previousBackStackEntry != null }
 
-	fun backToSelect() {
-		model.reset()
-		navController.popBackStack(Screen.IMPORT, false)
-	}
+	AppContainer(
+		modifier = Modifier.fillMaxSize(),
+		backButtonVisible = backButtonVisible,
+		importButtonVisible = true,
+		onBackClick = {
+			navController.popBackStack()
+		},
+		onImportClick = {
+			scope.launch(Dispatchers.IO) {
+				val fileChooser = JFileChooser().apply {
+					dialogTitle = "Choose an image or a directory"
+					fileSelectionMode = JFileChooser.FILES_AND_DIRECTORIES
+					fileFilter = FileNameExtensionFilter("Directory or image", "*")
+				}
 
-	println("Current num of Enteties in DB: ${photos.size}")
+				val result = fileChooser.showOpenDialog(null)
+				if (result != JFileChooser.APPROVE_OPTION) {
+					return@launch
+				}
 
-	Scaffold(topBar = { MyTopAppBar(title = "A-Shot") }) { padding ->
-		NavHost(
-			modifier = Modifier.fillMaxSize(),
-			navController = navController,
-			startDestination = Screen.IMPORT,
-		) {
-			composable(Screen.IMPORT) {
-				ImportScreen(onImported = { dir, collection ->
-					model.imported(dir, collection)
-					navController.navigate(Screen.OVERVIEW)
-				})
-			}
-
-			composable(Screen.OVERVIEW) {
-				OverviewScreen(
-					collection = state.shots,
-					onGroupSelected = { group ->
-						model.cull(group)
-						navController.navigate(Screen.CULL)
-					},
-					onClose = {
-						backToSelect()
-					},
-				)
-			}
-
-			composable(Screen.CULL) {
-				val groups = state.shots.grouped
-				val currentGroup = state.currentGroup
-				val viewModel = remember(groups) { CullViewModel(groups, currentGroup) }
-
-				CullScreen(viewModel)
+				if (fileChooser.selectedFile != null) {
+					val path = fileChooser.selectedFile.absolutePath
+					loadingPipeline.load(path)
+				} else if (!fileChooser.selectedFiles.isNullOrEmpty()) {
+					for (file in fileChooser.selectedFiles) {
+						val path = file.absolutePath
+						loadingPipeline.load(path)
+					}
+				} else {
+					// TODO:
+				}
 			}
 		}
+	) { paddings ->
+		AppNavHost(
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(paddings),
+
+			navController = navController,
+			startDestination = Screen.Overview,
+
+			overview = {
+				var folders by remember { mutableStateOf(emptyList<FolderWithCount>()) }
+
+				LaunchedEffect(Unit) {
+					launch(Dispatchers.IO) {
+						db.folderDao.selectFoldersWithCount().collect { value ->
+							folders = value
+						}
+					}
+				}
+
+				OverviewScreen(
+					folders = folders,
+					onFolderSelected = { folder ->
+						navController.navigate("${Screen.Collection}/${folder.id}") {
+							launchSingleTop = true
+						}
+					}
+				)
+			},
+
+			folder = { folderId ->
+				var sizes by remember { mutableStateOf(CategorySizes(0, 0, 0)) }
+
+				LaunchedEffect(Unit) {
+					launch(Dispatchers.IO) {
+						db.categoryDao.count(folderId, 0.05f).collect { value ->
+							sizes = value
+						}
+					}
+				}
+
+				FolderScreen(
+					starredCount = sizes.starred,
+					normalCount = sizes.normal,
+					blurryCount = sizes.blurry,
+					onStarredSelected = {
+
+					},
+					onNormalSelected = {
+						navController.navigate("${Screen.Normal}/${folderId}") {
+							launchSingleTop = true
+						}
+					},
+					onBlurrySelected = {
+
+					}
+				)
+			},
+
+			normal = { folderId ->
+				var clusters by remember { mutableStateOf(emptyList<ShotCluster>()) }
+
+				LaunchedEffect(Unit) {
+					launch(Dispatchers.IO) {
+						val embeddings = db.shotDao.embeddings(folderId)
+						val dbscan = DBSCAN(0.9, 2)
+						val clusterIndices = dbscan.cluster(embeddings.map { it.embedding })
+
+						println(clusterIndices)
+						var max = clusterIndices.max()
+						val result = clusterIndices
+							.map {
+								if (it == -1) {
+									max += 1
+									max
+								} else {
+									it
+								}
+							}
+							.zip(embeddings)
+							.groupBy({ it.first }, { it.second.id })
+							.map { ShotCluster(it.key, it.value) }
+							.sortedBy { it.id }
+
+						clusters = result
+					}
+				}
+
+				NormalScreen(
+					clusters = clusters,
+					thumbnail = { shotId ->
+						db.shotDao.thumbnail(shotId)?.toComposeImageBitmap()
+					}
+				)
+			},
+
+			cull = {
+				CullScreen()
+			},
+		)
 	}
 }
 
 fun main() {
-	val path = System.getenv("LD_LIBRARY_PATH")?.let { Path(it) }
-	if (path == null) {
-		println("Please provide native library path via LD_LIBRARY_PATH env variable")
-		exitProcess(1)
-	}
-
-	Core.load((path / "libcore.so").toString())
-	val dao = getDatabaseBuilder().dao
+	Core.load()
 
 	application {
 		val windowState = rememberWindowState(
@@ -126,7 +188,7 @@ fun main() {
 			icon = painterResource("icons/icon.png"),
 			undecorated = false
 		) {
-			App(window = window, dao)
+			App()
 		}
 	}
 }

@@ -13,18 +13,18 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import shot.Shot
+import shot.Shot_
 import util.AsyncImage
 import java.awt.Dimension
 
 @Composable
 fun TailpondPage(
-	shots: List<Shot>,
+	shots: List<Shot_>,
 	onShotClick: (Int) -> Unit,
 ) {
 	LazyVerticalGrid(
 		modifier = Modifier.fillMaxSize(),
-		columns = GridCells.Adaptive(256.dp),
+		columns = GridCells.Adaptive(224.dp),
 		contentPadding = PaddingValues(16.dp),
 		horizontalArrangement = Arrangement.spacedBy(16.dp),
 		verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -43,7 +43,7 @@ fun TailpondPage(
 
 @Composable
 fun TailpondItem(
-	shot: Shot,
+	shot: Shot_,
 	onClick: () -> Unit
 ) {
 	Card(

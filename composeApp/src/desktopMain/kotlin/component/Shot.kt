@@ -28,7 +28,7 @@ import style.Roboto
 @Composable
 fun Shot(
 	modifier: Modifier = Modifier,
-	image: ImageBitmap,
+	image: ImageBitmap?,
 	caption: String? = null,
 	contentDescription: String? = null,
 ) {
@@ -44,11 +44,15 @@ fun Shot(
 				.border(BorderStroke(6.dp, Color(0xFFFFD8E4)), RoundedCornerShape(8.dp))
 				.wrapContentSize()
 		) {
-			Image(
-				modifier = Modifier.padding(4.dp),
-				bitmap = image,
-				contentDescription = contentDescription,
-			)
+			if (image == null) {
+				// TODO:
+			} else {
+				Image(
+					modifier = Modifier.padding(4.dp),
+					bitmap = image,
+					contentDescription = contentDescription,
+				)
+			}
 		}
 
 		if (caption != null) {
@@ -66,8 +70,8 @@ fun Shot(
 }
 
 
-@Composable
 @Preview
+@Composable
 fun ShotPreview() {
 	val image = useResource("icons/icon.png") {
 		loadImageBitmap(it)

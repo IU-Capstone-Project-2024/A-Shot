@@ -20,13 +20,12 @@ void BlurDetector::process(Magick::Image &input) {
 	Magick::Geometry geometry(INPUT_WIDTH, INPUT_HEIGHT);
 	geometry.aspect(true);
 
-	input.alpha(false);
-	input.colorSpace(MagickCore::sRGBColorspace);
-	input.filterType(MagickCore::TriangleFilter);
-	input.resize(geometry);
+	Magick::Image image(input);
+	image.filterType(MagickCore::TriangleFilter);
+	image.resize(geometry);
 
 	std::vector<float> input_tensor;
-	util::MagickToTensor(input, {0.485f, 0.456f, 0.406f}, {0.229f, 0.224f, 0.225f}, input_tensor);
+	util::MagickToTensor(image, {0.485f, 0.456f, 0.406f}, {0.229f, 0.224f, 0.225f}, input_tensor);
 
 	Ort::Allocator allocator{session, memory_info};
 	auto input_name = session.GetInputNameAllocated(0, allocator);
@@ -49,7 +48,7 @@ void BlurDetector::process(Magick::Image &input) {
 //	Magick::Image result;
 //	util::TensorToMagick(output_tensor, INPUT_WIDTH, INPUT_HEIGHT, "K", result);
 	float avg = std::accumulate(output_tensor.begin(), output_tensor.end(), 0.0f);
-	avg = avg / (float) output_tensor.size();
+	avg /= (float) output_tensor.size();
 
 	output.flush({input, avg}, true);
 }

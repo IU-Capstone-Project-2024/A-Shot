@@ -72,8 +72,8 @@ fun Burst(
 }
 
 
-@Composable
 @Preview
+@Composable
 fun BurstPreview() {
 	val image = useResource("icons/icon.png") {
 		loadImageBitmap(it)

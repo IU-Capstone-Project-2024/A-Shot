@@ -29,8 +29,8 @@ fun SelectionBox(
 	}
 }
 
-@Composable
 @Preview
+@Composable
 fun SelectionBoxPreview() {
 	SelectionBox(
 		modifier = Modifier.wrapContentSize(),
