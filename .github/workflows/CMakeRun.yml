@@ -29,6 +29,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libtiff-dev libjpeg-dev libraw-dev liblcms2-dev
+        dpkg-query -L libtiff-dev
     - name: Set reusable strings
       id: strings
       shell: bash
