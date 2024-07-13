@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import core.Core
@@ -14,6 +15,9 @@ import database.selection.CategorySizes
 import database.selection.FolderWithCount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import logic.CullViewModel
+import logic.NormalUiState
+import logic.NormalViewModel
 import ui.component.AppContainer
 import ui.component.AppNavHost
 import ui.component.Screen
@@ -21,8 +25,6 @@ import ui.screen.cull.CullScreen
 import ui.screen.folder.FolderScreen
 import ui.screen.normal.NormalScreen
 import ui.screen.overview.OverviewScreen
-import util.DBSCAN
-import util.ShotCluster
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
@@ -71,6 +73,8 @@ fun App() {
 			}
 		}
 	) { paddings ->
+		val normalViewModel = viewModel { NormalViewModel(db.shotDao) }
+
 		AppNavHost(
 			modifier = Modifier
 				.fillMaxSize()
@@ -93,7 +97,7 @@ fun App() {
 				OverviewScreen(
 					folders = folders,
 					onFolderSelected = { folder ->
-						navController.navigate("${Screen.Collection}/${folder.id}") {
+						navController.navigate("${Screen.Collection.route}/${folder.id}") {
 							launchSingleTop = true
 						}
 					}
@@ -119,7 +123,7 @@ fun App() {
 
 					},
 					onNormalSelected = {
-						navController.navigate("${Screen.Normal}/${folderId}") {
+						navController.navigate("${Screen.Normal.route}/${folderId}") {
 							launchSingleTop = true
 						}
 					},
@@ -130,44 +134,34 @@ fun App() {
 			},
 
 			normal = { folderId ->
-				var clusters by remember { mutableStateOf(emptyList<ShotCluster>()) }
-
-				LaunchedEffect(Unit) {
-					launch(Dispatchers.IO) {
-						val embeddings = db.shotDao.embeddings(folderId)
-						val dbscan = DBSCAN(0.9, 2)
-						val clusterIndices = dbscan.cluster(embeddings.map { it.embedding })
-
-						println(clusterIndices)
-						var max = clusterIndices.max()
-						val result = clusterIndices
-							.map {
-								if (it == -1) {
-									max += 1
-									max
-								} else {
-									it
-								}
-							}
-							.zip(embeddings)
-							.groupBy({ it.first }, { it.second.id })
-							.map { ShotCluster(it.key, it.value) }
-							.sortedBy { it.id }
-
-						clusters = result
-					}
+				LaunchedEffect(folderId) {
+					normalViewModel.load(folderId)
 				}
 
 				NormalScreen(
-					clusters = clusters,
-					thumbnail = { shotId ->
-						db.shotDao.thumbnail(shotId)?.toComposeImageBitmap()
+					normalViewModel = normalViewModel,
+					onClusterClicked = { clusterIndex ->
+						normalViewModel.setCurrentCluster(clusterIndex)
+						navController.navigate(Screen.Cull.route)
 					}
 				)
 			},
 
 			cull = {
-				CullScreen()
+				val state = normalViewModel.state.value as? NormalUiState.Success ?: TODO("AAAAAAAAAAAA")
+				val cullViewModel = viewModel {
+					CullViewModel(
+						shotDao = db.shotDao,
+						initialCluster = state.currentCluster,
+						clusters = state.clusters,
+					)
+				}
+
+				/*LaunchedEffect(clusterIndex) {
+					normalViewModel
+				}*/
+
+				CullScreen(cullViewModel = cullViewModel)
 			},
 		)
 	}

@@ -2,6 +2,6 @@ package util
 
 
 data class ShotCluster(
-	val id: Int,
+	val id: Long,
 	val shots: List<Long>
 )

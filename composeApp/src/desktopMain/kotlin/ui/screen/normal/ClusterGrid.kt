@@ -1,6 +1,7 @@
 package ui.screen.normal
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,6 +26,7 @@ fun ClusterGrid(
 	modifier: Modifier,
 	clusters: List<ShotCluster>,
 	thumbnail: suspend (Long) -> ImageBitmap?,
+	onClusterClicked: (Int) -> Unit,
 ) {
 	LazyVerticalGrid(
 		modifier = modifier,
@@ -32,13 +35,16 @@ fun ClusterGrid(
 		verticalArrangement = Arrangement.spacedBy(8.dp),
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-		items(
+		itemsIndexed(
 			items = clusters,
-			key = { item -> item.id },
-		) { cluster ->
+			key = { _, item -> item.id },
+		) { index, cluster ->
 			Cluster(
 				modifier = Modifier
-					.aspectRatio(1f),
+					.aspectRatio(1f)
+					.clickable {
+						onClusterClicked(index)
+					},
 				cluster = cluster,
 				thumbnail = thumbnail,
 			)
@@ -60,6 +66,7 @@ fun ClusterGridPreview() {
 		clusters = stubListOfShotCluster(),
 		thumbnail = {
 			image
-		}
+		},
+		onClusterClicked = {}
 	)
 }

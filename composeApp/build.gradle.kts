@@ -28,11 +28,13 @@ kotlin {
 			implementation(libs.room.runtime)
 			implementation(libs.sqlite.bundled)
 
-			implementation("org.jetbrains.compose.material3:material3-desktop:1.6.11")
 			implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-			implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-			implementation("org.jetbrains.androidx.navigation:navigation-compose:2.7.0-alpha07")
+			implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.1")
+//			implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
+			implementation("org.jetbrains.compose.material3:material3-desktop:1.6.11")
+			implementation("org.jetbrains.androidx.navigation:navigation-compose:2.7.0-alpha07")
+			implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
 		}
 
 		desktopMain.dependencies {

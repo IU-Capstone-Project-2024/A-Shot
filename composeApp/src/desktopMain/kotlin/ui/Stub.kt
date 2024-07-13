@@ -1,5 +1,13 @@
 package ui
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.useResource
 import database.entity.Folder
 import database.selection.FolderWithShots
 import database.entity.Shot
@@ -61,7 +69,7 @@ fun stubShotIdName(random: Random = Random(42)): ShotIdName {
 }
 
 fun stubShotCluster(random: Random = Random(42)): ShotCluster {
-	val id = random.nextInt()
+	val id = random.nextLong()
 	val size = random.nextInt(1, 20)
 	val cluster = List(size) { random.nextLong() }
 
@@ -73,4 +81,33 @@ fun stubListOfShotCluster(random: Random = Random(42)): List<ShotCluster> {
 	val clusters = List(size) { stubShotCluster(random) }
 
 	return clusters
+}
+
+@Composable
+fun stubImageBitmap(random: Random = Random(42)) = remember {
+	val image = listOf("stubs/putin.jpg", "stubs/shaurma.jpg").random(random)
+	useResource(image) {
+		loadImageBitmap(it)
+	}
+}
+
+@Composable
+fun stubListOfImageBitmap(size: Int, random: Random = Random(42)) = remember {
+	val images = listOf("stubs/putin.jpg", "stubs/shaurma.jpg")
+	List(size) {
+		val image = images.random(random)
+		useResource(image) {
+			loadImageBitmap(it)
+		}
+	}
+}
+
+@Preview
+@Composable
+fun StubImage(modifier: Modifier = Modifier) {
+	Image(
+		modifier = modifier,
+		painter = painterResource("stubs/putin.jpg"),
+		contentDescription = "Vladimir Putin"
+	)
 }

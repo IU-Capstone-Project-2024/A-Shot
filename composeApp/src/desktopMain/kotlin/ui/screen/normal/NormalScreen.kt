@@ -1,41 +1,37 @@
 package ui.screen.normal
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
-import ui.stubListOfShotCluster
-import util.ShotCluster
+import logic.NormalUiState
+import logic.NormalViewModel
 
 @Composable
 fun NormalScreen(
-	clusters: List<ShotCluster>,
-	thumbnail: suspend (Long) -> ImageBitmap?,
+	normalViewModel: NormalViewModel,
+	onClusterClicked: (Int) -> Unit,
 ) {
-	ClusterGrid(
-		modifier = Modifier.fillMaxSize(),
-		clusters = clusters,
-		thumbnail = thumbnail,
-	)
-}
+	Box(modifier = Modifier.fillMaxSize()) {
+		val state by normalViewModel.state.collectAsState()
 
-@Preview
-@Composable
-fun NormalScreenPreview() {
-	val image = remember {
-		useResource("icons/icon.png") {
-			loadImageBitmap(it)
+		when (val currentState = state) {
+			NormalUiState.Loading -> {
+
+			}
+
+			is NormalUiState.Success -> {
+				ClusterGrid(
+					modifier = Modifier.fillMaxSize(),
+					clusters = currentState.clusters,
+					thumbnail = normalViewModel::thumbnail,
+					onClusterClicked = onClusterClicked,
+				)
+			}
 		}
 	}
-
-	NormalScreen(
-		clusters = stubListOfShotCluster(),
-		thumbnail = {
-			image
-		}
-	)
 }
