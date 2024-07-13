@@ -2,7 +2,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.*
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,8 +22,8 @@ import ui.component.AppNavHost
 import ui.component.Screen
 import ui.screen.cull.CullScreen
 import ui.screen.folder.FolderScreen
-import ui.screen.normal.NormalScreen
-import ui.screen.overview.OverviewScreen
+import ui.screen.regular.NormalScreen
+import ui.screen.home.HomeScreen
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
@@ -94,7 +93,7 @@ fun App() {
 					}
 				}
 
-				OverviewScreen(
+				HomeScreen(
 					folders = folders,
 					onFolderSelected = { folder ->
 						navController.navigate("${Screen.Collection.route}/${folder.id}") {
@@ -116,8 +115,8 @@ fun App() {
 				}
 
 				FolderScreen(
-					starredCount = sizes.starred,
-					normalCount = sizes.normal,
+					favouriteCount = sizes.favourite,
+					regularCount = sizes.regular,
 					blurryCount = sizes.blurry,
 					onStarredSelected = {
 

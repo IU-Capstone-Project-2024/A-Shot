@@ -1,7 +1,7 @@
 package database.selection
 
 data class CategorySizes(
-	val starred: Int,
-	val normal: Int,
+	val favourite: Int,
+	val regular: Int,
 	val blurry: Int,
 )

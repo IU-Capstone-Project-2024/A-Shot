@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun FolderScreen(
-	starredCount: Int,
-	normalCount: Int,
+	favouriteCount: Int,
+	regularCount: Int,
 	blurryCount: Int,
 
 	onStarredSelected: () -> Unit,
@@ -19,12 +19,12 @@ fun FolderScreen(
 	CategoryGrid(
 		modifier = Modifier.fillMaxSize(),
 
-		starredCount = starredCount,
-		normalCount = normalCount,
+		favouriteCount = favouriteCount,
+		regularCount = regularCount,
 		blurryCount = blurryCount,
 
-		onStarredSelected = onStarredSelected,
-		onNormalSelected = onNormalSelected,
+		onFavouriteSelected = onStarredSelected,
+		onRegularSelected = onNormalSelected,
 		onBlurrySelected = onBlurrySelected,
 	)
 }
@@ -33,8 +33,8 @@ fun FolderScreen(
 @Composable
 fun FolderPreview() {
 	FolderScreen(
-		starredCount = 120,
-		normalCount = 3141,
+		favouriteCount = 120,
+		regularCount = 3141,
 		blurryCount = 1,
 
 		onStarredSelected = {},

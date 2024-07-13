@@ -10,8 +10,8 @@ interface CategoryDao {
 	@Query(
 		"""
 			SELECT
-				COUNT(CASE WHEN starred THEN 1 END) AS starred,
-				COUNT(CASE WHEN :blurThreshold <= blur_score THEN 1 END) AS normal,
+				COUNT(CASE WHEN starred THEN 1 END) AS favourite,
+				COUNT(CASE WHEN :blurThreshold <= blur_score THEN 1 END) AS regular,
 				COUNT(CASE WHEN :blurThreshold > blur_score THEN 1 END) AS blurry
 			FROM
 				shot

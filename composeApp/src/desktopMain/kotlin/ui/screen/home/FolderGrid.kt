@@ -1,4 +1,4 @@
-package ui.screen.overview
+package ui.screen.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
@@ -18,7 +18,7 @@ import database.selection.FolderWithCount
 import ui.stubListOfFolderWithCount
 
 @Composable
-fun CollectionGrid(
+fun FolderGrid(
 	modifier: Modifier = Modifier,
 	folders: List<FolderWithCount>,
 	onFolderSelected: (Folder) -> Unit
@@ -54,7 +54,7 @@ fun CollectionGrid(
 @Preview
 @Composable
 fun CollectionGridPreview() {
-	CollectionGrid(
+	FolderGrid(
 		modifier = Modifier.fillMaxSize(),
 		folders = stubListOfFolderWithCount(),
 		onFolderSelected = {}

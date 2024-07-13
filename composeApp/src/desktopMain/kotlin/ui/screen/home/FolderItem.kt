@@ -1,4 +1,4 @@
-package ui.screen.overview
+package ui.screen.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import database.selection.FolderWithCount
 import ui.component.Folder
 import ui.stubFolderWithCount
-import ui.stubFolderWithShots
 import kotlin.io.path.Path
 import kotlin.io.path.name
 

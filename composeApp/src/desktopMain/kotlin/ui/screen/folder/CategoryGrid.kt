@@ -19,12 +19,12 @@ import ui.component.Folder
 fun CategoryGrid(
 	modifier: Modifier = Modifier,
 
-	starredCount: Int,
-	normalCount: Int,
+	favouriteCount: Int,
+	regularCount: Int,
 	blurryCount: Int,
 
-	onStarredSelected: () -> Unit,
-	onNormalSelected: () -> Unit,
+	onFavouriteSelected: () -> Unit,
+	onRegularSelected: () -> Unit,
 	onBlurrySelected: () -> Unit,
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
@@ -43,10 +43,10 @@ fun CategoryGrid(
 					.clickable(
 						interactionSource = interactionSource,
 						indication = null,
-						onClick = onStarredSelected
+						onClick = onFavouriteSelected
 					),
-				label = "Starred",
-				caption = "$starredCount items",
+				label = "Favourite",
+				caption = "$favouriteCount items",
 				backColor = Color(0xFFA1D665),
 				frontColor = Color(0xCCC3E88D),
 			)
@@ -59,10 +59,10 @@ fun CategoryGrid(
 					.clickable(
 						interactionSource = interactionSource,
 						indication = null,
-						onClick = onNormalSelected
+						onClick = onRegularSelected
 					),
-				label = "Normal",
-				caption = "$normalCount items",
+				label = "Regular",
+				caption = "$regularCount items",
 			)
 		}
 
@@ -90,12 +90,12 @@ fun CategoryGridContent() {
 	CategoryGrid(
 		modifier = Modifier.fillMaxSize(),
 
-		starredCount = 1,
-		normalCount = 2,
+		favouriteCount = 1,
+		regularCount = 2,
 		blurryCount = 20,
 
-		onStarredSelected = {},
-		onNormalSelected = {},
+		onFavouriteSelected = {},
+		onRegularSelected = {},
 		onBlurrySelected = {},
 	)
 }

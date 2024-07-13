@@ -1,4 +1,4 @@
-package ui.screen.overview
+package ui.screen.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,11 +10,11 @@ import ui.stubListOfFolderWithCount
 
 
 @Composable
-fun OverviewScreen(
+fun HomeScreen(
 	folders: List<FolderWithCount>,
 	onFolderSelected: (Folder) -> Unit
 ) {
-	CollectionGrid(
+	FolderGrid(
 		modifier = Modifier.fillMaxSize(),
 		folders = folders,
 		onFolderSelected = onFolderSelected
@@ -23,8 +23,8 @@ fun OverviewScreen(
 
 @Preview
 @Composable
-fun OverviewScreenPreview() {
-	OverviewScreen(
+fun HomeScreenPreview() {
+	HomeScreen(
 		folders = stubListOfFolderWithCount(),
 		onFolderSelected = {}
 	)
