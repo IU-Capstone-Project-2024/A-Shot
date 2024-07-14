@@ -2,6 +2,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.*
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -14,16 +15,16 @@ import database.selection.CategorySizes
 import database.selection.FolderWithCount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import logic.CullViewModel
-import logic.NormalUiState
-import logic.NormalViewModel
 import ui.component.AppContainer
 import ui.component.AppNavHost
 import ui.component.Screen
-import ui.screen.cull.CullScreen
-import ui.screen.folder.FolderScreen
-import ui.screen.regular.NormalScreen
 import ui.screen.home.HomeScreen
+import ui.screen.home.categories.FolderScreen
+import ui.screen.home.categories.regular.RegularScreen
+import ui.screen.viewer.ViewerScreen
+import ui.screen.viewer.ViewerViewModel
+import ui.screen.virtual_folder.VirtualFolderUiState
+import ui.screen.virtual_folder.VirtualFolderViewModel
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
@@ -72,8 +73,6 @@ fun App() {
 			}
 		}
 	) { paddings ->
-		val normalViewModel = viewModel { NormalViewModel(db.shotDao) }
-
 		AppNavHost(
 			modifier = Modifier
 				.fillMaxSize()
@@ -103,7 +102,7 @@ fun App() {
 				)
 			},
 
-			folder = { folderId ->
+			folder = { _, folderId ->
 				var sizes by remember { mutableStateOf(CategorySizes(0, 0, 0)) }
 
 				LaunchedEffect(Unit) {
@@ -122,7 +121,7 @@ fun App() {
 
 					},
 					onNormalSelected = {
-						navController.navigate("${Screen.Normal.route}/${folderId}") {
+						navController.navigate("${Screen.Regular.route}/${folderId}") {
 							launchSingleTop = true
 						}
 					},
@@ -132,35 +131,61 @@ fun App() {
 				)
 			},
 
-			normal = { folderId ->
+			regular = { entry, folderId ->
+				val viewModel = viewModel<VirtualFolderViewModel>(entry) {
+					VirtualFolderViewModel {
+						db.shotDao.embeddings(folderId, 0.05f)
+					}
+				}
 				LaunchedEffect(folderId) {
-					normalViewModel.load(folderId)
+					viewModel.load(folderId)
 				}
 
-				NormalScreen(
-					normalViewModel = normalViewModel,
-					onClusterClicked = { clusterIndex ->
-						normalViewModel.setCurrentCluster(clusterIndex)
-						navController.navigate(Screen.Cull.route)
+				val state by viewModel.uiStateFlow.collectAsState()
+				RegularScreen(
+					state = state,
+					thumbnail = { shotId ->
+						runCatching { db.shotDao.thumbnail(shotId)?.toComposeImageBitmap() }.getOrNull()
+					},
+					onVirtualFolderClicked = { folderIndex ->
+						navController.navigate("${Screen.Viewer}/${folderIndex}") {
+							launchSingleTop = true
+							restoreState = true
+						}
 					}
 				)
 			},
 
-			cull = {
-				val state = normalViewModel.state.value as? NormalUiState.Success ?: TODO("AAAAAAAAAAAA")
-				val cullViewModel = viewModel {
-					CullViewModel(
-						shotDao = db.shotDao,
-						initialCluster = state.currentCluster,
-						clusters = state.clusters,
-					)
+			viewer = { entry, folderIndex ->
+				println(navController.previousBackStackEntry)
+				val virtualFoldersViewModel = viewModel<VirtualFolderViewModel>(navController.previousBackStackEntry!!)
+				val virtualFoldersState by virtualFoldersViewModel.uiStateFlow.collectAsState()
+
+				when (val state = virtualFoldersState) {
+					VirtualFolderUiState.Idle, is VirtualFolderUiState.Loading -> {}
+					is VirtualFolderUiState.Success -> {
+						val viewerViewModel = viewModel {
+							ViewerViewModel(
+								state.folders,
+								folderIndex,
+							)
+						}
+
+						LaunchedEffect(Unit) {
+							viewerViewModel.load(0)
+						}
+
+						val viewerState by viewerViewModel.uiStateFlow.collectAsState()
+						ViewerScreen(
+							state = viewerState,
+							onNextShot = viewerViewModel::nextShot,
+							onPrevShot = viewerViewModel::prevShot,
+							thumbnail = { shotId ->
+								db.shotDao.thumbnail(shotId)?.toComposeImageBitmap()
+							}
+						)
+					}
 				}
-
-				/*LaunchedEffect(clusterIndex) {
-					normalViewModel
-				}*/
-
-				CullScreen(cullViewModel = cullViewModel)
 			},
 		)
 	}

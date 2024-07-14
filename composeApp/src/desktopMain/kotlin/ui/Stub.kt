@@ -3,8 +3,8 @@ package ui
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.useResource
@@ -13,7 +13,7 @@ import database.selection.FolderWithShots
 import database.entity.Shot
 import database.selection.FolderWithCount
 import database.selection.ShotIdName
-import util.ShotCluster
+import ui.screen.virtual_folder.VirtualFolder
 import kotlin.random.Random
 
 fun stubShot(folderId: Long, random: Random = Random(42)): Shot {
@@ -42,9 +42,9 @@ fun stubFolderWithCount(random: Random = Random(42)): FolderWithCount {
 fun stubFolderWithShots(random: Random = Random(42)): FolderWithShots {
 	val size = random.nextInt(1, 20)
 	val folder = stubFolder(random)
-	val shots = List(size) { stubShot(folder.id) }
+	val pictures = List(size) { stubShot(folder.id) }
 
-	return FolderWithShots(folder, shots)
+	return FolderWithShots(folder, pictures)
 }
 
 fun stubListOfFolderWithCount(random: Random = Random(42)): List<FolderWithCount> {
@@ -68,37 +68,25 @@ fun stubShotIdName(random: Random = Random(42)): ShotIdName {
 	return ShotIdName(id, name)
 }
 
-fun stubShotCluster(random: Random = Random(42)): ShotCluster {
+fun stubVirtualFolder(random: Random = Random(42)): VirtualFolder {
 	val id = random.nextLong()
 	val size = random.nextInt(1, 20)
-	val cluster = List(size) { random.nextLong() }
+	val pictures = List(size) { random.nextLong() }
 
-	return ShotCluster(id, cluster)
+	return VirtualFolder(id, pictures)
 }
 
-fun stubListOfShotCluster(random: Random = Random(42)): List<ShotCluster> {
+fun stubListOfVirtualFolders(random: Random = Random(42)): List<VirtualFolder> {
 	val size = random.nextInt(1, 20)
-	val clusters = List(size) { stubShotCluster(random) }
+	val folders = List(size) { stubVirtualFolder(random) }
 
-	return clusters
+	return folders
 }
 
-@Composable
-fun stubImageBitmap(random: Random = Random(42)) = remember {
+fun stubImageBitmap(random: Random = Random(42)): ImageBitmap {
 	val image = listOf("stubs/putin.jpg", "stubs/shaurma.jpg").random(random)
-	useResource(image) {
+	return useResource(image) {
 		loadImageBitmap(it)
-	}
-}
-
-@Composable
-fun stubListOfImageBitmap(size: Int, random: Random = Random(42)) = remember {
-	val images = listOf("stubs/putin.jpg", "stubs/shaurma.jpg")
-	List(size) {
-		val image = images.random(random)
-		useResource(image) {
-			loadImageBitmap(it)
-		}
 	}
 }
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FolderDao {
 	/*@Query("SELECT * FROM folder")
-	fun selectAll(): Flow<List<FolderWithShots>>*/
+	fun selectAll(): Flow<List<FolderWithpictures>>*/
 
 	@Query(
 		"""

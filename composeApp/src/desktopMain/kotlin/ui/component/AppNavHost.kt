@@ -2,6 +2,7 @@ package ui.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,8 +12,12 @@ import androidx.navigation.navArgument
 sealed class Screen(val route: String) {
 	data object Overview : Screen("overview")
 	data object Collection : Screen("collection")
-	data object Normal : Screen("normal")
-	data object Cull : Screen("cull")
+	data object Regular : Screen("regular")
+	data object Viewer : Screen("viewer")
+
+	override fun toString(): String {
+		return route
+	}
 }
 
 @Composable
@@ -21,38 +26,42 @@ fun AppNavHost(
 	navController: NavHostController,
 	startDestination: Screen,
 
-	overview: @Composable () -> Unit,
-	folder: @Composable (folderId: Long) -> Unit,
-	normal: @Composable (folderId: Long) -> Unit,
-	cull: @Composable () -> Unit,
+	overview: @Composable (entry: NavBackStackEntry) -> Unit,
+	folder: @Composable (entry: NavBackStackEntry, folderId: Long) -> Unit,
+	regular: @Composable (entry: NavBackStackEntry, folderId: Long) -> Unit,
+	viewer: @Composable (entry: NavBackStackEntry, folderIndex: Int) -> Unit,
 ) {
 	NavHost(
 		modifier = modifier,
 		navController = navController,
-		startDestination = startDestination.route,
+		startDestination = "$startDestination",
 	) {
-		composable(Screen.Overview.route) {
-			overview()
+		composable("${Screen.Overview}") { entry ->
+			overview(entry)
 		}
 
 		composable(
-			route = "${Screen.Collection.route}/{id}",
+			route = "${Screen.Collection}/{id}",
 			arguments = listOf(navArgument("id") { type = NavType.LongType })
 		) { entry ->
 			val folderId = entry.arguments?.getLong("id") ?: TODO("Return to previous screen")
-			folder(folderId)
+			folder(entry, folderId)
 		}
 
 		composable(
-			route = "${Screen.Normal.route}/{id}",
+			route = "${Screen.Regular}/{id}",
 			arguments = listOf(navArgument("id") { type = NavType.LongType })
 		) { entry ->
 			val folderId = entry.arguments?.getLong("id") ?: TODO("Return to previous screen")
-			normal(folderId)
+			regular(entry, folderId)
 		}
 
-		composable(Screen.Cull.route) { entry ->
-			cull()
+		composable(
+			"${Screen.Viewer}/{folderIndex}",
+			arguments = listOf(navArgument("folderIndex") { type = NavType.IntType })
+		) { entry ->
+			val folderIndex = entry.arguments?.getInt("folderIndex") ?: 0
+			viewer(entry, folderIndex)
 		}
 	}
 }

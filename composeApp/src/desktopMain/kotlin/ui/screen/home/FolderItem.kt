@@ -24,7 +24,7 @@ fun FolderItem(
 	Folder(
 		modifier = modifier,
 		label = folderName,
-		caption = "$count shots",
+		caption = "$count pictures",
 	)
 }
 
