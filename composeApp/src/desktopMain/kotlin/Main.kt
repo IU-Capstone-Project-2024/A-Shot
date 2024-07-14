@@ -73,6 +73,12 @@ fun App() {
 			}
 		}
 	) { paddings ->
+		val virtualFoldersViewModel = viewModel<VirtualFolderViewModel>() {
+			VirtualFolderViewModel { folderId ->
+				db.shotDao.embeddings(folderId, 0.05f)
+			}
+		}
+
 		AppNavHost(
 			modifier = Modifier
 				.fillMaxSize()
@@ -132,16 +138,11 @@ fun App() {
 			},
 
 			regular = { entry, folderId ->
-				val viewModel = viewModel<VirtualFolderViewModel>(entry) {
-					VirtualFolderViewModel {
-						db.shotDao.embeddings(folderId, 0.05f)
-					}
-				}
 				LaunchedEffect(folderId) {
-					viewModel.load(folderId)
+					virtualFoldersViewModel.load(folderId)
 				}
 
-				val state by viewModel.uiStateFlow.collectAsState()
+				val state by virtualFoldersViewModel.uiStateFlow.collectAsState()
 				RegularScreen(
 					state = state,
 					thumbnail = { shotId ->
@@ -158,7 +159,7 @@ fun App() {
 
 			viewer = { entry, folderIndex ->
 				// TODO: fix
-				val virtualFoldersViewModel = viewModel<VirtualFolderViewModel>(navController.previousBackStackEntry!!)
+//				val virtualFoldersViewModel = viewModel<VirtualFolderViewModel>(navController.previousBackStackEntry!!)
 				val virtualFoldersState by virtualFoldersViewModel.uiStateFlow.collectAsState()
 
 				when (val state = virtualFoldersState) {
@@ -172,14 +173,23 @@ fun App() {
 						}
 
 						LaunchedEffect(Unit) {
-							viewerViewModel.load(0)
+							viewerViewModel.load()
 						}
 
 						val viewerState by viewerViewModel.uiStateFlow.collectAsState()
 						ViewerScreen(
 							state = viewerState,
+
+							onFolderSelected = viewerViewModel::selectFolder,
+							onNextFolder = viewerViewModel::nextFolder,
+							onPrevFolder = viewerViewModel::prevFolder,
+
+							onShotSelected = viewerViewModel::selectShot,
 							onNextShot = viewerViewModel::nextShot,
 							onPrevShot = viewerViewModel::prevShot,
+
+							onBack = { navController.popBackStack() },
+
 							thumbnail = { shotId ->
 								db.shotDao.thumbnail(shotId)?.toComposeImageBitmap()
 							}

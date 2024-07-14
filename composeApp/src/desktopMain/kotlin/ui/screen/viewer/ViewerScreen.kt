@@ -21,8 +21,16 @@ import kotlin.coroutines.cancellation.CancellationException
 fun ViewerScreen(
 	state: ViewerUiState,
 	thumbnail: suspend (Long) -> ImageBitmap?,
+
+	onFolderSelected: (Int) -> Unit,
+	onNextFolder: () -> Unit,
+	onPrevFolder: () -> Unit,
+
+	onShotSelected: (Int) -> Unit,
 	onNextShot: () -> Unit,
-	onPrevShot: () -> Unit
+	onPrevShot: () -> Unit,
+
+	onBack: () -> Unit,
 ) {
 	val requester = remember { FocusRequester() }
 
@@ -41,8 +49,11 @@ fun ViewerScreen(
 				}
 
 				when (event.key) {
-					Key.D, Key.Spacebar, Key.DirectionRight -> onNextShot()
-					Key.A, Key.DirectionLeft -> onPrevShot()
+					Key.Escape -> onBack()
+					Key.DirectionDown, Key.S -> onNextFolder()
+					Key.DirectionUp, Key.W -> onPrevFolder()
+					Key.DirectionRight, Key.D -> onNextShot()
+					Key.DirectionLeft, Key.A -> onPrevShot()
 					else -> return@onKeyEvent false
 				}
 				true
@@ -67,18 +78,24 @@ fun ViewerScreen(
 				.width(256.dp)
 				.fillMaxHeight(),
 			folders = state.folders,
+			currentFolder = state.folderIndex,
 			thumbnail = thumbnail,
+			onItemClick = onFolderSelected,
 		)
 
-		image?.let {
-			Viewer(
-				modifier = Modifier
-					.fillMaxHeight()
-					.weight(1f),
-				image = it
-			)
-		} ?: run {
+		when (val currentImage = image) {
+			is ImageBitmap -> {
+				Viewer(
+					modifier = Modifier
+						.fillMaxHeight()
+						.weight(1f),
+					image = currentImage
+				)
+			}
 
+			else -> {
+
+			}
 		}
 
 		ShotList(
@@ -86,7 +103,9 @@ fun ViewerScreen(
 				.width(256.dp)
 				.fillMaxHeight(),
 			shots = state.folders[state.folderIndex].shots,
+			currentShot = state.shotIndex,
 			thumbnail = thumbnail,
+			onItemClick = onShotSelected,
 		)
 	}
 }
@@ -100,8 +119,16 @@ fun ViewerScreenPreview() {
 			0,
 			0
 		),
+
+		onFolderSelected = {},
+		onNextFolder = {},
+		onPrevFolder = {},
+
+		onShotSelected = {},
 		onNextShot = {},
 		onPrevShot = {},
-		thumbnail = { _ -> stubImageBitmap() }
+
+		onBack = {},
+		thumbnail = { _ -> stubImageBitmap() },
 	)
 }

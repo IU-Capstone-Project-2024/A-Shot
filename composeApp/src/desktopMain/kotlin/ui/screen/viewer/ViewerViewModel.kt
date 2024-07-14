@@ -13,13 +13,18 @@ class ViewerViewModel(
 	private val _uiStateFlow = MutableStateFlow(ViewerUiState(folders, folderIndex, 0))
 	val uiStateFlow = _uiStateFlow.asStateFlow()
 
-	fun load(delta: Int) {
+	fun load(position: (current: Pair<Int, Int>) -> Pair<Int, Int> = { it }) {
 		_uiStateFlow.update { state ->
-			var folderIndex = state.folderIndex
-			var shotIndex = state.shotIndex + delta
+			var (folderIndex, shotIndex) = position(Pair(state.folderIndex, state.shotIndex))
+			folderIndex = when {
+				folderIndex in folders.indices -> folderIndex
+				folderIndex < 0 -> folders.indices.last
+				else -> folders.indices.first
+			}
 
 			shotIndex = when {
 				shotIndex in folders[folderIndex].shots.indices -> shotIndex
+
 				shotIndex < 0 -> {
 					folderIndex--
 					if (folderIndex < 0) {
@@ -36,15 +41,16 @@ class ViewerViewModel(
 					folders[folderIndex].shots.indices.first
 				}
 			}
+
 			ViewerUiState(folders, folderIndex, shotIndex)
 		}
 	}
 
-	fun nextShot() {
- 		load(+1)
-	}
+	fun selectFolder(index: Int) = load { (_, _) -> Pair(index, 0) }
+	fun nextFolder() = load { (folder, _) -> Pair(folder + 1, 0) }
+	fun prevFolder() = load { (folder, _) -> Pair(folder - 1, 0) }
 
-	fun prevShot() {
-		load(-1)
-	}
+	fun selectShot(index: Int) = load { (folder, _) -> Pair(folder, index) }
+	fun nextShot() = load { (folder, shot) -> Pair(folder, shot + 1) }
+	fun prevShot() = load { (folder, shot) -> Pair(folder, shot - 1) }
 }

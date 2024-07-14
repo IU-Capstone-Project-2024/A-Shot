@@ -1,5 +1,6 @@
 package ui.component
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.aspectRatio
@@ -17,7 +18,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -75,18 +75,23 @@ fun DrawScope.inscribeRoundedImage(
 fun DrawScope.drawPhotoCard(
 	image: ImageBitmap?,
 	color: Color = Color(0x25000000), alpha: Float = 1f,
-	radius: Float = min(size.width, size.height) * 0.1f
+//	radius: Float = min(size.width, size.height) * 0.1f
 ) {
-	drawRoundRect(color = color, cornerRadius = CornerRadius(radius), alpha = alpha)
-	inset(radius / 2) {
-		inscribeRoundedImage(image, radius / 2, alpha)
+//	drawRoundRect(color = color, cornerRadius = CornerRadius(radius), alpha = alpha)
+//	inset(radius / 2) {
+//		inscribeRoundedImage(image, radius / 2, alpha)
+//	}
+	if (image != null) {
+		inscribeImage(image, alpha)
 	}
 }
 
 @Composable
 fun PhotoCard(modifier: Modifier = Modifier, image: ImageBitmap?, color: Color = Color(0x25000000), alpha: Float = 1f) {
-	Canvas(modifier = modifier.aspectRatio(1f)) {
-		drawPhotoCard(image = image, color = color, alpha = alpha)
+	Crossfade(targetState = image) {
+		Canvas(modifier = modifier.aspectRatio(1f)) {
+			drawPhotoCard(image = it/*, color = color, alpha = alpha*/)
+		}
 	}
 }
 

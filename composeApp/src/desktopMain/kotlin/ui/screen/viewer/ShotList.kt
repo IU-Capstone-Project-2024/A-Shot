@@ -1,42 +1,58 @@
 package ui.screen.viewer
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import ui.component.PhotoCard
+import ui.component.SelectionBox
 import ui.stubImageBitmap
 
 @Composable
 fun ShotList(
 	modifier: Modifier = Modifier,
 	shots: List<Long>,
-	thumbnail: suspend (Long) -> ImageBitmap?
+	currentShot: Int,
+	thumbnail: suspend (Long) -> ImageBitmap?,
+	onItemClick: (Int) -> Unit
 ) {
+	val state = rememberLazyListState()
+
+	LaunchedEffect(currentShot) {
+		state.animateScrollToItem(currentShot)
+	}
+
 	LazyColumn(
-		modifier = modifier
+		modifier = modifier,
+		state = state,
+		contentPadding = PaddingValues(4.dp),
+		verticalArrangement = Arrangement.spacedBy(4.dp)
 	) {
-		items(
+		itemsIndexed(
 			items = shots,
-			key = { shotId -> shotId }
-		) { shotId ->
+			key = { _, shotId -> shotId }
+		) { index, shotId ->
 			val image by produceState<ImageBitmap?>(null, shotId) {
 				value = thumbnail(shotId)
 			}
 
-			PhotoCard(
-				modifier = Modifier.aspectRatio(1f),
-				image = image,
-			)
+			SelectionBox(
+				modifier = Modifier
+					.aspectRatio(1f)
+					.clickable(onClick = { onItemClick(index) }),
+				selected = index == currentShot
+			) { modifier ->
+				PhotoCard(
+					modifier = modifier,
+					image = image,
+				)
+			}
 		}
 	}
 }
@@ -48,9 +64,11 @@ fun ShotListPreview() {
 		modifier = Modifier
 			.fillMaxHeight()
 			.width(256.dp),
+		currentShot = 0,
 		shots = remember { List(10) { 1 } },
+		onItemClick = {},
 		thumbnail = {
 			stubImageBitmap()
-		}
+		},
 	)
 }

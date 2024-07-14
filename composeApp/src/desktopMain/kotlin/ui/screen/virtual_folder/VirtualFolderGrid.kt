@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -40,12 +41,13 @@ fun VirtualFolderGrid(
 			key = { _, item -> item.id },
 		) { index, folder ->
 			VirtualFolder(
-				modifier = Modifier.clickable(
-					interactionSource = interactionSource,
-					indication = null
-				) {
-					onFolderClicked(index)
-				},
+				modifier = Modifier
+					.clickable(
+						interactionSource = interactionSource,
+						indication = null
+					) {
+						onFolderClicked(index)
+					},
 				folder = folder,
 				thumbnail = thumbnail
 			)
