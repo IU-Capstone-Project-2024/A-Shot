@@ -11,5 +11,5 @@ data class FolderWithShots(
 		parentColumn = "id",
 		entityColumn = "folder_id",
 	)
-	val shots: List<Shot>
+	val pictures: List<Shot>
 )

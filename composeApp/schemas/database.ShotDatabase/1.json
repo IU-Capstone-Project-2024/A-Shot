@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cf6d0fe9123308cee1ddab1d41d346ab",
+    "identityHash": "ac431740dd101efa7606dffaa466db46",
     "entities": [
       {
         "tableName": "shot",
@@ -56,18 +56,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [
-          {
-            "name": "index_shot_name",
-            "unique": true,
-            "columnNames": [
-              "name"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_shot_name` ON `${TABLE_NAME}` (`name`)"
-          }
-        ]
+        }
       },
       {
         "tableName": "folder",
@@ -91,12 +80,23 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_folder_path",
+            "unique": true,
+            "columnNames": [
+              "path"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_folder_path` ON `${TABLE_NAME}` (`path`)"
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cf6d0fe9123308cee1ddab1d41d346ab')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac431740dd101efa7606dffaa466db46')"
     ]
   }
 }

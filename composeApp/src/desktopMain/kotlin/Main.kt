@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import core.Core
@@ -17,12 +18,13 @@ import kotlinx.coroutines.launch
 import ui.component.AppContainer
 import ui.component.AppNavHost
 import ui.component.Screen
-import ui.screen.cull.CullScreen
-import ui.screen.folder.FolderScreen
-import ui.screen.normal.NormalScreen
-import ui.screen.overview.OverviewScreen
-import util.DBSCAN
-import util.ShotCluster
+import ui.screen.home.HomeScreen
+import ui.screen.home.categories.FolderScreen
+import ui.screen.home.categories.regular.RegularScreen
+import ui.screen.viewer.ViewerScreen
+import ui.screen.viewer.ViewerViewModel
+import ui.screen.virtual_folder.VirtualFolderUiState
+import ui.screen.virtual_folder.VirtualFolderViewModel
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
@@ -71,6 +73,12 @@ fun App() {
 			}
 		}
 	) { paddings ->
+		val virtualFoldersViewModel = viewModel<VirtualFolderViewModel>() {
+			VirtualFolderViewModel { folderId ->
+				db.shotDao.embeddings(folderId, 0.05f)
+			}
+		}
+
 		AppNavHost(
 			modifier = Modifier
 				.fillMaxSize()
@@ -90,17 +98,17 @@ fun App() {
 					}
 				}
 
-				OverviewScreen(
+				HomeScreen(
 					folders = folders,
 					onFolderSelected = { folder ->
-						navController.navigate("${Screen.Collection}/${folder.id}") {
+						navController.navigate("${Screen.Collection.route}/${folder.id}") {
 							launchSingleTop = true
 						}
 					}
 				)
 			},
 
-			folder = { folderId ->
+			folder = { _, folderId ->
 				var sizes by remember { mutableStateOf(CategorySizes(0, 0, 0)) }
 
 				LaunchedEffect(Unit) {
@@ -112,14 +120,14 @@ fun App() {
 				}
 
 				FolderScreen(
-					starredCount = sizes.starred,
-					normalCount = sizes.normal,
+					favouriteCount = sizes.favourite,
+					regularCount = sizes.regular,
 					blurryCount = sizes.blurry,
 					onStarredSelected = {
 
 					},
 					onNormalSelected = {
-						navController.navigate("${Screen.Normal}/${folderId}") {
+						navController.navigate("${Screen.Regular.route}/${folderId}") {
 							launchSingleTop = true
 						}
 					},
@@ -129,45 +137,65 @@ fun App() {
 				)
 			},
 
-			normal = { folderId ->
-				var clusters by remember { mutableStateOf(emptyList<ShotCluster>()) }
-
-				LaunchedEffect(Unit) {
-					launch(Dispatchers.IO) {
-						val embeddings = db.shotDao.embeddings(folderId)
-						val dbscan = DBSCAN(0.9, 2)
-						val clusterIndices = dbscan.cluster(embeddings.map { it.embedding })
-
-						println(clusterIndices)
-						var max = clusterIndices.max()
-						val result = clusterIndices
-							.map {
-								if (it == -1) {
-									max += 1
-									max
-								} else {
-									it
-								}
-							}
-							.zip(embeddings)
-							.groupBy({ it.first }, { it.second.id })
-							.map { ShotCluster(it.key, it.value) }
-							.sortedBy { it.id }
-
-						clusters = result
-					}
+			regular = { entry, folderId ->
+				LaunchedEffect(folderId) {
+					virtualFoldersViewModel.load(folderId)
 				}
 
-				NormalScreen(
-					clusters = clusters,
+				val state by virtualFoldersViewModel.uiStateFlow.collectAsState()
+				RegularScreen(
+					state = state,
 					thumbnail = { shotId ->
-						db.shotDao.thumbnail(shotId)?.toComposeImageBitmap()
+						runCatching { db.shotDao.thumbnail(shotId)?.toComposeImageBitmap() }.getOrNull()
+					},
+					onVirtualFolderClicked = { folderIndex ->
+						navController.navigate("${Screen.Viewer}/${folderIndex}") {
+							launchSingleTop = true
+							restoreState = true
+						}
 					}
 				)
 			},
 
-			cull = {
-				CullScreen()
+			viewer = { entry, folderIndex ->
+				// TODO: fix
+//				val virtualFoldersViewModel = viewModel<VirtualFolderViewModel>(navController.previousBackStackEntry!!)
+				val virtualFoldersState by virtualFoldersViewModel.uiStateFlow.collectAsState()
+
+				when (val state = virtualFoldersState) {
+					VirtualFolderUiState.Idle, is VirtualFolderUiState.Loading -> {}
+					is VirtualFolderUiState.Success -> {
+						val viewerViewModel = viewModel {
+							ViewerViewModel(
+								state.folders,
+								folderIndex,
+							)
+						}
+
+						LaunchedEffect(Unit) {
+							viewerViewModel.load()
+						}
+
+						val viewerState by viewerViewModel.uiStateFlow.collectAsState()
+						ViewerScreen(
+							state = viewerState,
+
+							onFolderSelected = viewerViewModel::selectFolder,
+							onNextFolder = viewerViewModel::nextFolder,
+							onPrevFolder = viewerViewModel::prevFolder,
+
+							onShotSelected = viewerViewModel::selectShot,
+							onNextShot = viewerViewModel::nextShot,
+							onPrevShot = viewerViewModel::prevShot,
+
+							onBack = { navController.popBackStack() },
+
+							thumbnail = { shotId ->
+								db.shotDao.thumbnail(shotId)?.toComposeImageBitmap()
+							}
+						)
+					}
+				}
 			},
 		)
 	}

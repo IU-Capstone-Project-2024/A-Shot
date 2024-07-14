@@ -20,6 +20,7 @@ void ImageLoader::load_image(const std::string &path) {
 		if (filter(path)) {
 			Magick::Image image(path);
 			image.alpha(false);
+			image.autoOrient();
 			image.colorSpace(MagickCore::sRGBColorspace);
 
 			output.flush(std::move(image), true);

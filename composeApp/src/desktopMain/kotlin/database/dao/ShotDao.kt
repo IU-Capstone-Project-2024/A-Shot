@@ -32,4 +32,7 @@ interface ShotDao {
 
 	@Query("SELECT id, embedding FROM shot WHERE folder_id = :folderId")
 	suspend fun embeddings(folderId: Long): List<ShotIdEmbedding>
+
+	@Query("SELECT id, embedding FROM shot WHERE folder_id = :folderId AND blur_score >= :blurThreshold")
+	suspend fun embeddings(folderId: Long, blurThreshold: Float): List<ShotIdEmbedding>
 }
