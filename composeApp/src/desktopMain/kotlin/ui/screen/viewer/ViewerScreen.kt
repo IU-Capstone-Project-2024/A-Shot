@@ -2,14 +2,17 @@ package ui.screen.viewer
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.unit.dp
 import ui.stubImageBitmap
 import ui.stubListOfVirtualFolders
 import kotlin.coroutines.cancellation.CancellationException
@@ -27,7 +30,7 @@ fun ViewerScreen(
 		requester.requestFocus()
 	}
 
-	Box(
+	Row(
 		modifier = Modifier
 			.fillMaxSize()
 			.focusRequester(requester)
@@ -59,14 +62,32 @@ fun ViewerScreen(
 			}
 		}
 
+		FolderList(
+			modifier = Modifier
+				.width(256.dp)
+				.fillMaxHeight(),
+			folders = state.folders,
+			thumbnail = thumbnail,
+		)
+
 		image?.let {
 			Viewer(
-				modifier = Modifier.fillMaxSize(),
+				modifier = Modifier
+					.fillMaxHeight()
+					.weight(1f),
 				image = it
 			)
 		} ?: run {
 
 		}
+
+		ShotList(
+			modifier = Modifier
+				.width(256.dp)
+				.fillMaxHeight(),
+			shots = state.folders[state.folderIndex].shots,
+			thumbnail = thumbnail,
+		)
 	}
 }
 

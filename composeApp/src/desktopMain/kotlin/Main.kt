@@ -157,7 +157,7 @@ fun App() {
 			},
 
 			viewer = { entry, folderIndex ->
-				println(navController.previousBackStackEntry)
+				// TODO: fix
 				val virtualFoldersViewModel = viewModel<VirtualFolderViewModel>(navController.previousBackStackEntry!!)
 				val virtualFoldersState by virtualFoldersViewModel.uiStateFlow.collectAsState()
 

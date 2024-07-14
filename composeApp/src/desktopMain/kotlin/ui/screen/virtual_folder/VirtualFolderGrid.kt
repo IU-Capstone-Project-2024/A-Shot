@@ -5,23 +5,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import ui.component.MediaFolder
+import ui.component.VirtualFolder
 import ui.stubListOfVirtualFolders
 
 @Composable
@@ -44,30 +39,15 @@ fun VirtualFolderGrid(
 			items = folders,
 			key = { _, item -> item.id },
 		) { index, folder ->
-			val thumbs by produceState<List<ImageBitmap>?>(null, folder) {
-				value = folder.shots
-					.take(3)
-					.map {
-						async {
-							thumbnail(folder.id)
-						}
-					}
-					.awaitAll()
-					.filterNotNull()
-			}
-
-			MediaFolder(
-				modifier = Modifier
-					.aspectRatio(1f)
-					.clickable(
-						interactionSource = interactionSource,
-						indication = null
-					) {
-						onFolderClicked(index)
-					},
-				thumbs = thumbs,
-				label = "${index + 1}",
-				caption = "${folder.shots.size} items",
+			VirtualFolder(
+				modifier = Modifier.clickable(
+					interactionSource = interactionSource,
+					indication = null
+				) {
+					onFolderClicked(index)
+				},
+				folder = folder,
+				thumbnail = thumbnail
 			)
 		}
 	}
