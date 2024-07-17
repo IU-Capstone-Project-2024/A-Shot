@@ -29,7 +29,8 @@ private:
 public:
 	ImageEncoder(
 		Exhaust<ImageBlur> &input,
-		Drain<ImageBlurEmbedding> &output
+		Drain<ImageBlurEmbedding> &output,
+		const char *model_path
 	);
 };
 

@@ -28,9 +28,10 @@ fun AppContainer(
 			)
 		},
 		floatingActionButton = {
-			AnimatedVisibility(visible = importButtonVisible) {
-				ImportFloatingButton(onClicked = onImportClick)
-			}
+			ImportFloatingButton(
+				visible = importButtonVisible,
+				onClicked = onImportClick
+			)
 		}
 	) { padding ->
 		content(padding)

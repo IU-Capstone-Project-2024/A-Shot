@@ -6,14 +6,15 @@
 
 ImageEncoder::ImageEncoder(
 	Exhaust<ImageBlur> &input,
-	Drain<ImageBlurEmbedding> &output
+	Drain<ImageBlurEmbedding> &output,
+	const char *model_path
 ) :
 	PipelineStep(input, output) {
 	env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, "ImageEncoder");
 	memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault);
 
 	Ort::SessionOptions session_options;
-	session = Ort::Session(env, EMBEDDING_MODEL_PATH, session_options);
+	session = Ort::Session(env, model_path, session_options);
 }
 
 void ImageEncoder::process(ImageBlur &input) {

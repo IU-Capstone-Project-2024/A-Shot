@@ -9,6 +9,9 @@ import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 
 class LoadingPipeline(
+	blurModel: String,
+	embeddingModel: String,
+
 	private val folderDao: FolderDao,
 	private val shotDao: ShotDao
 ) {
@@ -19,13 +22,13 @@ class LoadingPipeline(
 		val thumbnail: ByteArray,
 	)
 
-	private external fun nNew(): Long
+	private external fun nNew(blurModel: String, embeddingModel: String): Long
 	private external fun nRelease(ptr: Long)
 
 	private external fun nFlush(ptr: Long, path: String): Boolean
 	private external fun nSuck(ptr: Long): Result?
 
-	private val ptr: Long = nNew()
+	private val ptr: Long = nNew(blurModel, embeddingModel)
 	private val scope = CoroutineScope(Dispatchers.IO + Job())
 
 	@Keep

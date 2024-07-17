@@ -33,7 +33,9 @@ JNIEXPORT jint JNICALL Java_core_Core_hello(
 
 JNIEXPORT jlong JNICALL Java_core_LoadingPipeline_nNew(
 	JNIEnv *env,
-	jobject _
+	jobject _,
+	jstring j_bm_path,
+	jstring j_em_path
 ) JNIKEEP;
 
 JNIEXPORT jboolean JNICALL Java_core_LoadingPipeline_nFlush(
