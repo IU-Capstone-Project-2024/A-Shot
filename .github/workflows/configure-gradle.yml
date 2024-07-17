@@ -27,12 +27,12 @@ jobs:
         java-version: '17'
 
     - name: Grant execute permission for gradlew
-      run: chmod +x ${{ github.workspace }}/desktop/gradlew
+      run: chmod +x ${{ github.workspace }}/gradlew
 
     - name: Build with Gradle
-      working-directory: ${{ github.workspace }}/desktop
+      working-directory: ${{ github.workspace }}
       run: ./gradlew build
 
     - name: Run tests
-      working-directory: ${{ github.workspace }}/desktop
+      working-directory: ${{ github.workspace }}
       run: ./gradlew test
