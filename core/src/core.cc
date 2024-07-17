@@ -10,7 +10,11 @@
 void hello(std::string &&path) {
 	std::cout << "Hello, World!" << std::endl;
 
-	LoadingPipeline pipeline;
+	LoadingPipeline pipeline(
+		"/home/a/Projects/A-Shot/core/checkpoints/D-DFFNet.ort",
+		"/home/a/Projects/A-Shot/core/checkpoints/CVNet50.ort",
+		[](const std::string &) { return true; }
+	);
 	pipeline.flush(std::move(path), true);
 	pipeline.dry();
 

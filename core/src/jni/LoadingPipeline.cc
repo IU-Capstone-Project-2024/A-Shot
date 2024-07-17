@@ -5,6 +5,17 @@
 #include <Magick++/Image.h>
 #include "LoadingPipeline.hh"
 
+LoadingPipeline::LoadingPipeline(
+	const char *blur_model_path,
+	const char *encoder_model_path,
+	const std::function<bool(const std::string &path)> &filter
+) :
+	image_loader(path_pipe, image_pipe, filter),
+	blur_detector(image_pipe, blur_pipe, blur_model_path),
+	image_encoder(blur_pipe, embedding_pipe, encoder_model_path) {
+
+}
+
 PipeResult LoadingPipeline::flush(std::string &&item, bool block) {
 	return path_pipe.flush(std::move(item), false);
 }
@@ -21,11 +32,34 @@ void LoadingPipeline::plug() {
 	blur_pipe.plug();
 }
 
+
 [[maybe_unused]] JNIEXPORT jlong JNICALL Java_core_LoadingPipeline_nNew(
 	JNIEnv *env,
-	jobject _
+	jobject instance,
+	jstring j_bm_path,
+	jstring j_em_path
 ) {
-	return (jlong) new LoadingPipeline();
+	instance = env->NewGlobalRef(instance);
+	auto filter = [instance](const std::string &path) {
+		JNIEnv *env;
+		JNI.vm->AttachCurrentThread((void **) &env, nullptr);
+
+		jstring j_path = env->NewStringUTF(path.c_str());
+		return (bool) env->CallBooleanMethod(instance, JNI.LoadingPipeline.filter, j_path);
+	};
+
+	jboolean bm_copy;
+	jboolean em_copy;
+
+	const char *bm_path = env->GetStringUTFChars(j_bm_path, &bm_copy);
+	const char *em_path = env->GetStringUTFChars(j_em_path, &em_copy);
+
+	jlong pipeline = (jlong) new LoadingPipeline(bm_path, em_path, filter);
+
+	if (bm_copy) env->ReleaseStringUTFChars(j_bm_path, bm_path);
+	if (bm_copy) env->ReleaseStringUTFChars(j_em_path, em_path);
+
+	return pipeline;
 }
 
 JNIEXPORT jboolean JNICALL Java_core_LoadingPipeline_nFlush(
@@ -47,7 +81,7 @@ JNIEXPORT jboolean JNICALL Java_core_LoadingPipeline_nFlush(
 	return result;
 }
 
-JNIEXPORT jobject JNICALL Java_core_LoadingPipeline_nSink(
+JNIEXPORT jobject JNICALL Java_core_LoadingPipeline_nSuck(
 	JNIEnv *env,
 	jobject _,
 	jlong ptr
@@ -61,7 +95,16 @@ JNIEXPORT jobject JNICALL Java_core_LoadingPipeline_nSink(
 	}
 
 	jstring path = env->NewStringUTF(result.image.fileName().c_str());
-	jfloat score = result.blur;
+	jfloat blur = result.blur;
 
-	return env->NewObject(JNI.ImageBlur.cls, JNI.ImageBlur.inst, path, score);
+	jbyteArray embedding = env->NewByteArray(result.embedding.size() * (sizeof(float) / sizeof(jbyte)));
+	env->SetByteArrayRegion(embedding, 0, (jsize) result.embedding.size(), (jbyte *) result.embedding.data());
+
+	Magick::Blob blob;
+	result.image.write(&blob, "JPEG");
+
+	jbyteArray thumbnail = env->NewByteArray((jsize) blob.length());
+	env->SetByteArrayRegion(thumbnail, 0, (jsize) blob.length(), (jbyte *) blob.data());
+
+	return env->NewObject(JNI.Result.cls, JNI.Result.inst, path, blur, embedding, thumbnail);
 }

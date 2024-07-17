@@ -14,8 +14,13 @@ struct JNI {
 
 	struct {
 		jclass cls;
+		jmethodID filter;
+	} LoadingPipeline;
+
+	struct {
+		jclass cls;
 		jmethodID inst;
-	} ImageBlur;
+	} Result;
 };
 
 extern JNI JNI;
@@ -28,7 +33,9 @@ JNIEXPORT jint JNICALL Java_core_Core_hello(
 
 JNIEXPORT jlong JNICALL Java_core_LoadingPipeline_nNew(
 	JNIEnv *env,
-	jobject _
+	jobject _,
+	jstring j_bm_path,
+	jstring j_em_path
 ) JNIKEEP;
 
 JNIEXPORT jboolean JNICALL Java_core_LoadingPipeline_nFlush(
@@ -38,7 +45,7 @@ JNIEXPORT jboolean JNICALL Java_core_LoadingPipeline_nFlush(
 	jstring j_path
 ) JNIKEEP;
 
-JNIEXPORT jobject JNICALL Java_core_LoadingPipeline_nSink(
+JNIEXPORT jobject JNICALL Java_core_LoadingPipeline_nSuck(
 	JNIEnv *env,
 	jobject _,
 	jlong ptr

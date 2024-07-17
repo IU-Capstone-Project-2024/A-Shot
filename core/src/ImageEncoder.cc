@@ -6,20 +6,24 @@
 
 ImageEncoder::ImageEncoder(
 	Exhaust<ImageBlur> &input,
-	Drain<ImageBlurEmbedding> &output
+	Drain<ImageBlurEmbedding> &output,
+	const char *model_path
 ) :
 	PipelineStep(input, output) {
 	env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, "ImageEncoder");
 	memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault);
 
 	Ort::SessionOptions session_options;
-	session = Ort::Session(env, EMBEDDING_MODEL_PATH, session_options);
+	session = Ort::Session(env, model_path, session_options);
 }
 
 void ImageEncoder::process(ImageBlur &input) {
+	Magick::Geometry geometry(640, 640);
+	geometry.aspect(false);
+
 	Magick::Image &image = input.image;
-	image.alpha(false);
-	image.colorSpace(MagickCore::sRGBColorspace);
+	image.filterType(MagickCore::Lanczos2Filter);
+	image.resize(geometry);
 
 	std::vector<float> input_tensor;
 	util::MagickToTensor(image, {0.485f, 0.456f, 0.406f}, {0.229f, 0.224f, 0.225f}, input_tensor);
@@ -44,5 +48,5 @@ void ImageEncoder::process(ImageBlur &input) {
 	std::array<float, EMBEDDING_SIZE> embedding{};
 	std::copy(data, data + EMBEDDING_SIZE, embedding.begin());
 
-	output.flush({input.image, input.blur, embedding}, true);
+	output.flush({image, input.blur, embedding}, true);
 }

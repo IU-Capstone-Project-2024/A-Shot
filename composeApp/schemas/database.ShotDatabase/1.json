@@ -2,41 +2,101 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1c1e5be6924e439c5e1db909e54c0235",
+    "identityHash": "ac431740dd101efa7606dffaa466db46",
     "entities": [
       {
-        "tableName": "Photo",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`filepath` TEXT NOT NULL, `blur_score` REAL NOT NULL, `isGood` INTEGER, PRIMARY KEY(`filepath`))",
+        "tableName": "shot",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `folder_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `blur_score` REAL NOT NULL, `embedding` BLOB NOT NULL, `thumbnail` BLOB NOT NULL, `starred` INTEGER NOT NULL)",
         "fields": [
           {
-            "fieldPath": "filepath",
-            "columnName": "filepath",
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "folderId",
+            "columnName": "folder_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "blur_score",
+            "fieldPath": "blurScore",
             "columnName": "blur_score",
             "affinity": "REAL",
             "notNull": true
           },
           {
-            "fieldPath": "isGood",
-            "columnName": "isGood",
-            "affinity": "INTEGER"
+            "fieldPath": "embedding",
+            "columnName": "embedding",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbnail",
+            "columnName": "thumbnail",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "starred",
+            "columnName": "starred",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
-          "autoGenerate": false,
+          "autoGenerate": true,
           "columnNames": [
-            "filepath"
+            "id"
           ]
         }
+      },
+      {
+        "tableName": "folder",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_folder_path",
+            "unique": true,
+            "columnNames": [
+              "path"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_folder_path` ON `${TABLE_NAME}` (`path`)"
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1c1e5be6924e439c5e1db909e54c0235')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac431740dd101efa7606dffaa466db46')"
     ]
   }
 }

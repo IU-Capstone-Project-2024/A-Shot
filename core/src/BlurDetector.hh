@@ -43,7 +43,8 @@ private:
 public:
 	BlurDetector(
 		Exhaust<Magick::Image> &input,
-		Drain<ImageBlur> &output
+		Drain<ImageBlur> &output,
+		const char *model_path
 	);
 };
 

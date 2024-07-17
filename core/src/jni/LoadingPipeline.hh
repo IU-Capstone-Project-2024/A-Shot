@@ -16,18 +16,25 @@ extern "C" {
 
 class LoadingPipeline :
 	public Drain<std::string>,
-	public Exhaust<ImageBlurEmbedding > {
+	public Exhaust<ImageBlurEmbedding> {
 private:
-	Pipe<std::string> path_pipe{4};
+
+	Pipe<std::string> path_pipe{16};
 	Pipe<Magick::Image> image_pipe{1};
 	Pipe<ImageBlur> blur_pipe{1};
 	Pipe<ImageBlurEmbedding> embedding_pipe{1};
 
-	ImageLoader image_loader{path_pipe, image_pipe};
-	BlurDetector blur_detector{image_pipe, blur_pipe};
-	ImageEncoder image_encoder{blur_pipe, embedding_pipe};
+	ImageLoader image_loader;
+	BlurDetector blur_detector;
+	ImageEncoder image_encoder;
 
 public:
+	explicit LoadingPipeline(
+		const char *blur_model_path,
+		const char *encoder_model_path,
+		const std::function<bool(const std::string &path)> &filter
+	);
+
 	PipeResult flush(std::string &&item, bool block) override;
 
 	PipeResult suck(ImageBlurEmbedding &item, bool block) override;
