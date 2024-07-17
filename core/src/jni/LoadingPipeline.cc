@@ -6,9 +6,13 @@
 #include "LoadingPipeline.hh"
 
 LoadingPipeline::LoadingPipeline(
+	const char *blur_model_path,
+	const char *encoder_model_path,
 	const std::function<bool(const std::string &path)> &filter
 ) :
-	image_loader(path_pipe, image_pipe, filter) {
+	image_loader(path_pipe, image_pipe, filter),
+	blur_detector(image_pipe, blur_pipe, blur_model_path),
+	image_encoder(blur_pipe, embedding_pipe, encoder_model_path) {
 
 }
 
@@ -31,7 +35,9 @@ void LoadingPipeline::plug() {
 
 [[maybe_unused]] JNIEXPORT jlong JNICALL Java_core_LoadingPipeline_nNew(
 	JNIEnv *env,
-	jobject instance
+	jobject instance,
+	jstring j_bm_path,
+	jstring j_em_path
 ) {
 	instance = env->NewGlobalRef(instance);
 	auto filter = [instance](const std::string &path) {
@@ -42,7 +48,18 @@ void LoadingPipeline::plug() {
 		return (bool) env->CallBooleanMethod(instance, JNI.LoadingPipeline.filter, j_path);
 	};
 
-	return (jlong) new LoadingPipeline(filter);
+	jboolean bm_copy;
+	jboolean em_copy;
+
+	const char *bm_path = env->GetStringUTFChars(j_bm_path, &bm_copy);
+	const char *em_path = env->GetStringUTFChars(j_em_path, &em_copy);
+
+	jlong pipeline = (jlong) new LoadingPipeline(bm_path, em_path, filter);
+
+	if (bm_copy) env->ReleaseStringUTFChars(j_bm_path, bm_path);
+	if (bm_copy) env->ReleaseStringUTFChars(j_em_path, em_path);
+
+	return pipeline;
 }
 
 JNIEXPORT jboolean JNICALL Java_core_LoadingPipeline_nFlush(

@@ -6,14 +6,15 @@
 
 BlurDetector::BlurDetector(
 	Exhaust<Magick::Image> &input,
-	Drain<ImageBlur> &output
+	Drain<ImageBlur> &output,
+	const char *model_path
 ) :
 	PipelineStep(input, output) {
 	env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, "BlurDetector");
 	memory_info = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeDefault);
 
 	Ort::SessionOptions session_options;
-	session = Ort::Session(env, BLUR_MODEL_PATH, session_options);
+	session = Ort::Session(env, model_path, session_options);
 }
 
 void BlurDetector::process(Magick::Image &input) {

@@ -10,14 +10,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 
 sealed class Screen(val route: String) {
-	data object Overview : Screen("overview")
-	data object Collection : Screen("collection")
-	data object Regular : Screen("regular")
-	data object Viewer : Screen("viewer")
-
-	override fun toString(): String {
-		return route
-	}
+	data object Home : Screen("Home")
+	data object Collection : Screen("Collection")
+	data object Regular : Screen("Regular")
+	data object Viewer : Screen("Viewer")
 }
 
 @Composable
@@ -36,7 +32,7 @@ fun AppNavHost(
 		navController = navController,
 		startDestination = "$startDestination",
 	) {
-		composable("${Screen.Overview}") { entry ->
+		composable("${Screen.Home}") { entry ->
 			overview(entry)
 		}
 

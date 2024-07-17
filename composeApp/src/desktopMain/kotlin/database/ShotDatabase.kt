@@ -5,13 +5,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import core.Core
 import database.converter.ShotConverters
 import database.dao.CategoryDao
 import database.dao.FolderDao
 import database.dao.ShotDao
 import database.entity.Folder
 import database.entity.Shot
-import java.io.File
 
 @Database(
 	entities = [
@@ -29,8 +29,8 @@ abstract class ShotDatabase : RoomDatabase() {
 
 	companion object {
 		val instance by lazy {
-			val dbFile = File(System.getProperty("java.io.tmpdir"), "room.db")
-			Room.databaseBuilder<ShotDatabase>(dbFile.absolutePath)
+			val dbPath = Core.dbPath()
+			Room.databaseBuilder<ShotDatabase>(dbPath)
 				.setDriver(BundledSQLiteDriver())
 				.build()
 		}

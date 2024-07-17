@@ -8,6 +8,8 @@ plugins {
 	alias(libs.plugins.compose.compiler)
 	alias(libs.plugins.ksp)
 	alias(libs.plugins.room)
+
+	kotlin("plugin.serialization") version "2.0.0"
 }
 
 kotlin {
@@ -35,6 +37,8 @@ kotlin {
 			implementation("org.jetbrains.compose.material3:material3-desktop:1.6.11")
 			implementation("org.jetbrains.androidx.navigation:navigation-compose:2.7.0-alpha07")
 			implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+
+			implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
 		}
 
 		desktopMain.dependencies {
