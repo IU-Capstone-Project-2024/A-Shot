@@ -41,8 +41,7 @@ jobs:
         mkdir cmake-build-debug
         cd cmake-build-debug
         cmake -S /home/runner/work/A-Shot/A-Shot/core \
-              -DJAVA_ROOT=${{ env.JAVA_HOME }} \
-              --target core
-        cmake --build .
+              -DJAVA_ROOT=${{ env.JAVA_HOME }}
+        cmake --build . --target core
         cp ../imagemagick/lib/* .
         cp ../onnxruntime/lib/* .
