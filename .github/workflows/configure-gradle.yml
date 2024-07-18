@@ -1,0 +1,34 @@
+name: Configure Gradle
+
+on:
+  push:
+    branches:
+      ["master", "automation/ci-cd-setup"]
+  pull_request:
+    branches:
+      ["master", "automation/ci-cd-setup"]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '17'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x ${{ github.workspace }}/gradlew
+
+    - name: Build with Gradle
+      working-directory: ${{ github.workspace }}
+      run: ./gradlew build

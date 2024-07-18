@@ -1,0 +1,47 @@
+name: CMake Setup
+
+on:
+  push:
+    branches: [ "master", "automation/ci-cd-setup" ]
+  pull_request:
+    branches: [ "master", "automation/ci-cd-setup" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Release]
+        c_compiler: [gcc, clang]
+        cpp_compiler: [g++, clang++]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+    - name: Get Java Home Directory
+      id: java-home
+      run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libtiff-dev libjpeg-dev libraw-dev liblcms2-dev
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "core-dir=${{ github.workspace }}/core" >> "$GITHUB_OUTPUT"
+    - name: Execute commands
+      run: |
+        cd /home/runner/work/A-Shot/A-Shot/core
+        mkdir cmake-build-debug
+        cd cmake-build-debug
+        cmake -S /home/runner/work/A-Shot/A-Shot/core \
+              -DJAVA_ROOT=${{ env.JAVA_HOME }}
+        cmake --build . --target core
+        cp ../imagemagick/lib/* .
+        cp ../onnxruntime/lib/* .

@@ -1,0 +1,80 @@
+# This starter workflow is for a CMake project running on multiple platforms.
+name: CMake on multiple platforms
+
+# Trigger the workflow on pushes to the master and automation/ci-cd-setup branches, and pull requests targeting these branches.
+on:
+  push:
+    branches: [ "master", "automation/ci-cd-setup" ]
+  pull_request:
+    branches: [ "master", "automation/ci-cd-setup" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        build_type: [Release]
+        c_compiler: [gcc, clang, cl]
+        cpp_compiler: [g++, clang++, cl]
+        include:
+          - os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+        exclude:
+          - os: windows-latest
+            c_compiler: gcc
+            cpp_compiler: cl
+          - os: windows-latest
+            c_compiler: clang
+            cpp_compiler: cl
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: clang++
+          - os: ubuntu-latest
+            c_compiler: cl
+          - os: macos-latest
+            
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+
+    - name: Get Java Home Directory
+      id: java-home
+      run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV        
+    
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "core-dir=${{ github.workspace }}/core" >> "$GITHUB_OUTPUT"
+
+
+    - name: Configure CMake
+      run: |
+        cd ${{ steps.strings.outputs.core-dir }}
+        mkdir cmake-build-debug
+        cd cmake-build-debug
+        cmake -B ${{ steps.strings.outputs.build-output-dir }} -DBLUR_MODEL_PATH=${{ github.workspace }}/core/checkpoints/D-DFFNet.ort -DJAVA_ROOT=${{ env.JAVA_HOME }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S ${{ github.workspace }}/core 
+        cmake build .
+        cp ../imagemagick/lib/* .
+        cp ../onnxruntime/lib/* .
+        
+        
+
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    # - name: Test
+    #   working-directory: ${{ steps.strings.outputs.build-output-dir }}
+    #   run: ctest --build-config ${{ matrix.build_type }}

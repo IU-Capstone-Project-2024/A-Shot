@@ -1,0 +1,21 @@
+name: Notify reviewer
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const { context } = require('@actions/github');
+            const issue_number = context.issue.number;
+            const octokit = require('@actions/github').getOctokit(process.env.GITHUB_TOKEN);
+            await octokit.issues.addAssignees({
+              ...context.repo,
+              issue_number: issue_number,
+              assignees: ['Post-Modern28']
+            });
