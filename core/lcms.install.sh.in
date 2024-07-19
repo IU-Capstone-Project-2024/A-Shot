@@ -1,0 +1,11 @@
+#!/bin/bash
+
+rm -r @LCMS_INSTALL@
+mkdir -p @LCMS_INSTALL@
+
+ln -s @SOURCE_DIR@/include @LCMS_INCLUDE@
+
+mkdir -p @LCMS_LIB@
+ln -s @SOURCE_DIR@/src/.libs/liblcms2.a @LCMS_LIB@/liblcms2.a
+ln -s @SOURCE_DIR@/plugins/fast_float/src/.libs/liblcms2_fast_float.a @LCMS_LIB@/liblcms2_fast_float.a
+ln -s @SOURCE_DIR@/plugins/threaded/src/.libs/liblcms2_threaded.a @LCMS_LIB@/liblcms2_threaded.a

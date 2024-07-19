@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd @SOURCE_DIR@ || exit 1
+
+make -j @CMAKE_BUILD_PARALLEL_LEVEL@

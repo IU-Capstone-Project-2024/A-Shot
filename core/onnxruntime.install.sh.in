@@ -1,0 +1,17 @@
+#!/bin/bash
+
+mkdir -p @ONNXRUNTIME_INSTALL@
+
+if [ ! -L @ONNXRUNTIME_INCLUDE@ ]; then
+	ln -s @SOURCE_DIR@/include @ONNXRUNTIME_INCLUDE@
+fi
+
+if [ ! -f @ONNXRUNTIME_LIB@/libonnxruntime.a ]; then
+	mkdir -p @ONNXRUNTIME_LIB@
+	find @SOURCE_DIR@/build -type f -name '*.o' -exec cp --backup=numbered {} @ONNXRUNTIME_LIB@/ \;
+	rename o.~1~ 1.o @ONNXRUNTIME_LIB@/*.o.~1~
+	rename o.~2~ 2.o @ONNXRUNTIME_LIB@/*.o.~2~
+	rename o.~3~ 3.o @ONNXRUNTIME_LIB@/*.o.~3~
+	find @ONNXRUNTIME_LIB@ -type f -name '*.o' -print0 | xargs -0 ar rcs @ONNXRUNTIME_LIB@/libonnxruntime.a
+	rm -f @ONNXRUNTIME_LIB@/*.o
+fi

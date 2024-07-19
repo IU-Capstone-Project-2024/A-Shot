@@ -1,0 +1,57 @@
+diff --git a/configure b/configure
+index 811ee1cf8..369184829 100755
+--- a/configure
++++ b/configure
+@@ -31567,8 +31567,6 @@ if test "$with_heic" != 'yes'; then
+ fi
+ 
+ have_heic='no'
+-HEIF_CFLAGS=""
+-HEIF_LIBS=""
+ HEIF_PKG=""
+ if test "x$with_heic" = "xyes"; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: -------------------------------------------------------------" >&5
+@@ -31793,7 +31791,6 @@ if test "$with_jpeg" != 'yes'; then
+ fi
+ 
+ have_jpeg='no'
+-JPEG_LIBS=''
+ if test "$with_jpeg" != 'no'; then
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: -------------------------------------------------------------" >&5
+ printf "%s\n" "-------------------------------------------------------------" >&6; }
+@@ -31961,7 +31958,7 @@ printf %s "checking if JPEG package is complete... " >&6; }
+ printf "%s\n" "no -- some components failed test" >&6; }
+             have_jpeg='no (failed tests)'
+         else
+-            JPEG_LIBS='-ljpeg'
++            JPEG_LIBS=$pkg_cv_JPEG_LIBS
+             LIBS="$JPEG_LIBS $LIBS"
+ 
+ printf "%s\n" "#define JPEG_DELEGATE 1" >>confdefs.h
+@@ -32914,8 +32911,6 @@ if test "$with_png" != 'yes'; then
+ fi
+ 
+ have_png='no'
+-PNG_CFLAGS=""
+-PNG_LIBS=""
+ PNG_PKG=""
+ if test "x$with_png" = "xyes"; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: -------------------------------------------------------------" >&5
+@@ -33032,8 +33027,6 @@ if test "$with_raw" != 'yes'; then
+ fi
+ 
+ have_raw='no'
+-RAW_R_CFLAGS=""
+-RAW_R_LIBS=""
+ RAW_R_PKG=""
+ if test "x$with_raw" = "xyes"; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: -------------------------------------------------------------" >&5
+@@ -33357,8 +33350,6 @@ if test "$with_tiff" != 'yes'; then
+ fi
+ 
+ have_tiff='no'
+-TIFF_CFLAGS=""
+-TIFF_LIBS=""
+ TIFF_PKG=""
+ if test "x$with_tiff" = "xyes"; then
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: -------------------------------------------------------------" >&5

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cd @SOURCE_DIR@ || exit 1
+
+export CFLAGS="@IMAGEMAGICK_CFLAGS@ $CFLAGS"
+export CXXFLAGS="@IMAGEMAGICK_CXXFLAGS@ $CXXFLAGS"
+
+export JPEG_CFLAGS="-I@JPEG_INCLUDE@"
+export JPEG_LIBS="-L@JPEG_LIB@ -ljpeg"
+
+export PNG_CFLAGS="-I@PNG_INCLUDE@"
+export PNG_LIBS="-L@PNG_LIB@ -lpng"
+
+export RAW_R_CFLAGS="-I@RAW_INCLUDE@"
+export RAW_R_LIBS="-L@RAW_LIB@ -lraw_r"
+
+export LCMS2_CFLAGS="-I@LCMS_INCLUDE@"
+export LCMS2_LIBS="-L@LCMS_LIB@ -llcms2 -llcms2_fast_float -llcms2_threaded"
+
+./configure --enable-shared --enable-static --disable-deprecated @IMAGEMAGICK_HDRI_OPTION@ --disable-docs --with-quantum-depth=@IMAGEMAGICK_QUANTUM_DEPTH@ --without-perl --without-djvu --without-fontconfig --without-freetype --without-pango --without-gslib --without-bzlib --without-lzma --without-zip --without-zstd --with-heic --with-x=no --without-openexr --without-openjp2 --without-xml --without-webp --without-tiff --with-zlib

@@ -5,7 +5,6 @@
 
 #include <iostream>
 #include <filesystem>
-#include <Magick++.h>
 
 void hello(std::string &&path) {
 	std::cout << "Hello, World!" << std::endl;
