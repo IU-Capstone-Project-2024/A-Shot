@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         build_type: [Release]
-        c_compiler: [gcc, clang]
-        cpp_compiler: [g++, clang++]
+        c_compiler: [gcc]
+        cpp_compiler: [g++]
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 
@@ -27,8 +27,7 @@ jobs:
       run: echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> $GITHUB_ENV
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y libtiff-dev libjpeg-dev libraw-dev liblcms2-dev
+        sudo apt install rename
     - name: Set reusable strings
       id: strings
       shell: bash
@@ -43,5 +42,3 @@ jobs:
         cmake -S /home/runner/work/A-Shot/A-Shot/core \
               -DJAVA_ROOT=${{ env.JAVA_HOME }}
         cmake --build . --target core
-        cp ../imagemagick/lib/* .
-        cp ../onnxruntime/lib/* .
