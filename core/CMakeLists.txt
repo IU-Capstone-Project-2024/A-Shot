@@ -225,6 +225,11 @@ add_dependencies(
 
 		onnxruntime
 		imagemagick
+
+		lcms
+		jpeg
+		raw
+		png
 )
 
 target_link_libraries(
