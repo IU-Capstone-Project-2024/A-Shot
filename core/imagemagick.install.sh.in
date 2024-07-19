@@ -1,0 +1,18 @@
+#!/bin/bash
+
+rm -r @IMAGEMAGICK_INSTALL@
+mkdir -p @IMAGEMAGICK_INSTALL@
+
+mkdir -p @IMAGEMAGICK_INCLUDE@
+ln -s @SOURCE_DIR@/Magick++/lib/Magick++ @IMAGEMAGICK_INCLUDE@/Magick++
+
+mkdir -p @IMAGEMAGICK_INCLUDE@/MagickCore
+find @SOURCE_DIR@/MagickCore/ -type f -name "*.h" -exec ln -s {} @IMAGEMAGICK_INCLUDE@/MagickCore/ \;
+
+mkdir -p @IMAGEMAGICK_INCLUDE@/MagickWand
+find @SOURCE_DIR@/MagickWand/ -type f -name "*.h" -exec ln -s {} @IMAGEMAGICK_INCLUDE@/MagickWand/ \;
+
+mkdir -p @IMAGEMAGICK_LIB@
+ln -s @SOURCE_DIR@/Magick++/lib/.libs/libMagick++-7.Q@IMAGEMAGICK_QUANTUM_DEPTH@@IMAGEMAGICK_HDRI_POSTFIX@.a @IMAGEMAGICK_LIB@/libMagick++.a
+ln -s @SOURCE_DIR@/MagickCore/.libs/libMagickCore-7.Q@IMAGEMAGICK_QUANTUM_DEPTH@@IMAGEMAGICK_HDRI_POSTFIX@.a @IMAGEMAGICK_LIB@/libMagickCore.a
+ln -s @SOURCE_DIR@/MagickWand/.libs/libMagickWand-7.Q@IMAGEMAGICK_QUANTUM_DEPTH@@IMAGEMAGICK_HDRI_POSTFIX@.a @IMAGEMAGICK_LIB@/libMagickWand.a

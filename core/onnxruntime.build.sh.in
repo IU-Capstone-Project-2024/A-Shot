@@ -1,0 +1,3 @@
+#!/bin/bash
+
+@SOURCE_DIR@/build.sh --config Release --parallel --compile_no_warning_as_error --skip_submodule_sync --minimal_build --skip_tests

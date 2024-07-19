@@ -10,7 +10,7 @@
 
 #undef IsNaN
 
-#include <onnxruntime_cxx_api.h>
+#include <onnxruntime/core/session/onnxruntime_cxx_api.h>
 #include <Magick++/Functions.h>
 #include <Magick++/STL.h>
 #include <filesystem>

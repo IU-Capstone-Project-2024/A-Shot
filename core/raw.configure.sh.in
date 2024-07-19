@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd @SOURCE_DIR@ || exit 1
+
+export CFLAGS="@RAW_CFLAGS@ $CFLAGS"
+export CXXFLAGS="@RAW_CXXFLAGS@ $CXXFLAGS"
+
+export LCMS2_CFLAGS="-I@LCMS_INCLUDE@"
+export LCMS2_LIBS="-L@LCMS_LIB@ -llcms2 -llcms2_fast_float -llcms2_threaded"
+
+./mkdist.sh
+./configure --disable-examples --disable-jasper --disable-jpeg

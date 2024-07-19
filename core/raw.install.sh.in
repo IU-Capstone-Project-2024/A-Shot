@@ -1,0 +1,10 @@
+#!/bin/bash
+
+rm -r @RAW_INSTALL@
+mkdir -p @RAW_INSTALL@
+
+ln -s @SOURCE_DIR@/libraw @RAW_INCLUDE@
+
+mkdir -p @RAW_LIB@
+ln -s @SOURCE_DIR@/lib/.libs/libraw.a @RAW_LIB@/libraw.a
+ln -s @SOURCE_DIR@/lib/.libs/libraw_r.a @RAW_LIB@/libraw_r.a

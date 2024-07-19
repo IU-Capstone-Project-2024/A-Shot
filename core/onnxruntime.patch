@@ -1,0 +1,590 @@
+diff --git a/cmake/external/helper_functions.cmake b/cmake/external/helper_functions.cmake
+index 768e807b40..cf372a19f2 100644
+--- a/cmake/external/helper_functions.cmake
++++ b/cmake/external/helper_functions.cmake
+@@ -103,7 +103,8 @@ macro(onnxruntime_fetchcontent_makeavailable)
+       get_property(__cmake_haveFpArgs GLOBAL PROPERTY
+         _FetchContent_${__cmake_contentNameLower}_find_package_args DEFINED
+       )
+-      if(__cmake_haveFpArgs)
++      #if(__cmake_haveFpArgs)
++      if(FALSE)
+         unset(__cmake_haveFpArgs)
+         message(VERBOSE "Trying find_package(${__cmake_contentName} ...) before FetchContent")
+         get_property(__cmake_fpArgs GLOBAL PROPERTY
+diff --git a/cmake/external/onnxruntime_external_deps.cmake b/cmake/external/onnxruntime_external_deps.cmake
+index 8839dbc8fd..723d49246c 100644
+--- a/cmake/external/onnxruntime_external_deps.cmake
++++ b/cmake/external/onnxruntime_external_deps.cmake
+@@ -382,8 +382,8 @@ include_directories(${utf8_range_SOURCE_DIR})
+ 
+ onnxruntime_fetchcontent_makeavailable(Protobuf nlohmann_json mp11 re2 GSL flatbuffers ${ONNXRUNTIME_CPUINFO_PROJ} ${ONNXRUNTIME_CLOG_PROJ})
+ if(NOT flatbuffers_FOUND)
+-  if(NOT TARGET flatbuffers::flatbuffers)
+-    add_library(flatbuffers::flatbuffers ALIAS flatbuffers)
++  if(NOT TARGET flatbuffers::flatbuffers_shared)
++    add_library(flatbuffers::flatbuffers_shared ALIAS flatbuffers)
+   endif()
+   if(TARGET flatc AND NOT TARGET flatbuffers::flatc)
+     add_executable(flatbuffers::flatc ALIAS flatc)
+@@ -517,10 +517,10 @@ endif()
+ #onnxruntime_EXTERNAL_LIBRARIES could contain onnx, onnx_proto,libprotobuf, cuda/cudnn,
+ # dnnl/mklml, onnxruntime_codegen_tvm, tvm and pthread
+ # pthread is always at the last
+-set(onnxruntime_EXTERNAL_LIBRARIES ${onnxruntime_EXTERNAL_LIBRARIES_XNNPACK} ${WIL_TARGET} nlohmann_json::nlohmann_json onnx onnx_proto ${PROTOBUF_LIB} re2::re2 Boost::mp11 safeint_interface flatbuffers::flatbuffers ${GSL_TARGET} ${ABSEIL_LIBS} date::date ${ONNXRUNTIME_CLOG_TARGET_NAME})
++set(onnxruntime_EXTERNAL_LIBRARIES ${onnxruntime_EXTERNAL_LIBRARIES_XNNPACK} ${WIL_TARGET} nlohmann_json::nlohmann_json onnx onnx_proto ${PROTOBUF_LIB} re2::re2 Boost::mp11 safeint_interface flatbuffers::flatbuffers_shared ${GSL_TARGET} ${ABSEIL_LIBS} date::date ${ONNXRUNTIME_CLOG_TARGET_NAME})
+ # The source code of onnx_proto is generated, we must build this lib first before starting to compile the other source code that uses ONNX protobuf types.
+ # The other libs do not have the problem. All the sources are already there. We can compile them in any order.
+-set(onnxruntime_EXTERNAL_DEPENDENCIES onnx_proto flatbuffers::flatbuffers)
++set(onnxruntime_EXTERNAL_DEPENDENCIES onnx_proto flatbuffers::flatbuffers_shared)
+ 
+ target_compile_definitions(onnx PUBLIC $<TARGET_PROPERTY:onnx_proto,INTERFACE_COMPILE_DEFINITIONS> PRIVATE "__ONNX_DISABLE_STATIC_REGISTRATION")
+ if (NOT onnxruntime_USE_FULL_PROTOBUF)
+diff --git a/cmake/onnxruntime_codegen_tvm.cmake b/cmake/onnxruntime_codegen_tvm.cmake
+index 7b50d8f860..77fca28b96 100644
+--- a/cmake/onnxruntime_codegen_tvm.cmake
++++ b/cmake/onnxruntime_codegen_tvm.cmake
+@@ -19,7 +19,7 @@ source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_codegen_common_sr
+ onnxruntime_add_static_library(onnxruntime_codegen_tvm ${onnxruntime_codegen_common_srcs} ${onnxruntime_codegen_tvm_srcs})
+ set_target_properties(onnxruntime_codegen_tvm PROPERTIES FOLDER "ONNXRuntime")
+ target_include_directories(onnxruntime_codegen_tvm PRIVATE ${ONNXRUNTIME_ROOT} ${TVM_INCLUDES} ${MKLML_INCLUDE_DIR} ${eigen_INCLUDE_DIRS})
+-onnxruntime_add_include_to_target(onnxruntime_codegen_tvm onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers  safeint_interface Boost::mp11)
++onnxruntime_add_include_to_target(onnxruntime_codegen_tvm onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared  safeint_interface Boost::mp11)
+ target_compile_options(onnxruntime_codegen_tvm PRIVATE ${DISABLED_WARNINGS_FOR_TVM})
+ # need onnx to build to create headers that this project includes
+ add_dependencies(onnxruntime_codegen_tvm ${onnxruntime_EXTERNAL_DEPENDENCIES})
+diff --git a/cmake/onnxruntime_flatbuffers.cmake b/cmake/onnxruntime_flatbuffers.cmake
+index 3ab4c19122..3ea653d9d0 100644
+--- a/cmake/onnxruntime_flatbuffers.cmake
++++ b/cmake/onnxruntime_flatbuffers.cmake
+@@ -9,7 +9,7 @@ file(GLOB onnxruntime_flatbuffers_srcs CONFIGURE_DEPENDS
+ source_group(TREE ${REPO_ROOT} FILES ${onnxruntime_flatbuffers_srcs})
+ 
+ onnxruntime_add_static_library(onnxruntime_flatbuffers ${onnxruntime_flatbuffers_srcs})
+-onnxruntime_add_include_to_target(onnxruntime_flatbuffers onnx flatbuffers::flatbuffers ${GSL_TARGET})
++onnxruntime_add_include_to_target(onnxruntime_flatbuffers onnx flatbuffers::flatbuffers_shared ${GSL_TARGET})
+ if(onnxruntime_ENABLE_INSTRUMENT)
+   target_compile_definitions(onnxruntime_flatbuffers PUBLIC ONNXRUNTIME_ENABLE_INSTRUMENT)
+ endif()
+diff --git a/cmake/onnxruntime_framework.cmake b/cmake/onnxruntime_framework.cmake
+index c9bf2ac5c3..9be9421fc8 100644
+--- a/cmake/onnxruntime_framework.cmake
++++ b/cmake/onnxruntime_framework.cmake
+@@ -90,7 +90,7 @@ if (onnxruntime_ENABLE_ATEN)
+   set(DLPACK_INCLUDE_DIR ${dlpack_SOURCE_DIR}/include)
+   target_include_directories(onnxruntime_framework PRIVATE ${DLPACK_INCLUDE_DIR})
+ endif()
+-onnxruntime_add_include_to_target(onnxruntime_framework onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11 nlohmann_json::nlohmann_json)
++onnxruntime_add_include_to_target(onnxruntime_framework onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared safeint_interface Boost::mp11 nlohmann_json::nlohmann_json)
+ 
+ if (onnxruntime_USE_MIMALLOC)
+     target_link_libraries(onnxruntime_framework mimalloc-static)
+diff --git a/cmake/onnxruntime_graph.cmake b/cmake/onnxruntime_graph.cmake
+index 4d51325b84..c9d077d9bf 100644
+--- a/cmake/onnxruntime_graph.cmake
++++ b/cmake/onnxruntime_graph.cmake
+@@ -95,8 +95,8 @@ if (onnxruntime_ENABLE_TRAINING_OPS)
+ endif()
+ 
+ onnxruntime_add_static_library(onnxruntime_graph ${onnxruntime_graph_src} ${orttraining_graph_src})
+-add_dependencies(onnxruntime_graph onnx_proto flatbuffers::flatbuffers)
+-onnxruntime_add_include_to_target(onnxruntime_graph onnxruntime_common ${WIL_TARGET} onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11)
++add_dependencies(onnxruntime_graph onnx_proto flatbuffers::flatbuffers_shared)
++onnxruntime_add_include_to_target(onnxruntime_graph onnxruntime_common ${WIL_TARGET} onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared safeint_interface Boost::mp11)
+ 
+ if (MSVC)
+   set(ONNX_PROTOBUF_NATVIS_FILE "onnx_protobuf.natvis")
+diff --git a/cmake/onnxruntime_language_interop_ops.cmake b/cmake/onnxruntime_language_interop_ops.cmake
+index 5d88332eb2..18389383b1 100644
+--- a/cmake/onnxruntime_language_interop_ops.cmake
++++ b/cmake/onnxruntime_language_interop_ops.cmake
+@@ -4,5 +4,5 @@ include(onnxruntime_pyop.cmake)
+ file (GLOB onnxruntime_language_interop_ops_src "${ONNXRUNTIME_ROOT}/core/language_interop_ops/language_interop_ops.cc")
+ onnxruntime_add_static_library(onnxruntime_language_interop ${onnxruntime_language_interop_ops_src})
+ add_dependencies(onnxruntime_language_interop onnxruntime_pyop)
+-onnxruntime_add_include_to_target(onnxruntime_language_interop onnxruntime_common onnxruntime_graph onnxruntime_framework onnxruntime_pyop onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11)
++onnxruntime_add_include_to_target(onnxruntime_language_interop onnxruntime_common onnxruntime_graph onnxruntime_framework onnxruntime_pyop onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared safeint_interface Boost::mp11)
+ target_include_directories(onnxruntime_language_interop PRIVATE ${ONNXRUNTIME_ROOT} ${eigen_INCLUDE_DIRS})
+\ No newline at end of file
+diff --git a/cmake/onnxruntime_opschema_lib.cmake b/cmake/onnxruntime_opschema_lib.cmake
+index 8a5b4bc907..545ff48e2b 100644
+--- a/cmake/onnxruntime_opschema_lib.cmake
++++ b/cmake/onnxruntime_opschema_lib.cmake
+@@ -27,10 +27,10 @@ target_compile_options(ort_opschema_lib PRIVATE -D_OPSCHEMA_LIB_=1)
+ if(NOT MSVC)
+   target_compile_options(ort_opschema_lib PRIVATE "-Wno-parentheses")
+ endif()
+-set (OPSCHEMA_LIB_DEPENDENCIES onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11 safeint_interface)
++set (OPSCHEMA_LIB_DEPENDENCIES onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared safeint_interface Boost::mp11 safeint_interface)
+ 
+ # ${CMAKE_CURRENT_BINARY_DIR} is so that #include "onnxruntime_config.h" is found
+ target_include_directories(ort_opschema_lib PRIVATE ${ONNXRUNTIME_ROOT} ${ORTTRAINING_ROOT} ${CMAKE_CURRENT_BINARY_DIR})
+-onnxruntime_add_include_to_target(ort_opschema_lib onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++onnxruntime_add_include_to_target(ort_opschema_lib onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+ add_dependencies(ort_opschema_lib ${OPSCHEMA_LIB_DEPENDENCIES})
+ 
+diff --git a/cmake/onnxruntime_optimizer.cmake b/cmake/onnxruntime_optimizer.cmake
+index f15d5b8dd6..6da3c012af 100644
+--- a/cmake/onnxruntime_optimizer.cmake
++++ b/cmake/onnxruntime_optimizer.cmake
+@@ -107,7 +107,7 @@ endif()
+ 
+ onnxruntime_add_static_library(onnxruntime_optimizer ${onnxruntime_optimizer_srcs})
+ 
+-onnxruntime_add_include_to_target(onnxruntime_optimizer onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++onnxruntime_add_include_to_target(onnxruntime_optimizer onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+ target_include_directories(onnxruntime_optimizer PRIVATE ${ONNXRUNTIME_ROOT})
+ if (onnxruntime_ENABLE_TRAINING)
+   target_include_directories(onnxruntime_optimizer PRIVATE ${ORTTRAINING_ROOT})
+diff --git a/cmake/onnxruntime_providers_acl.cmake b/cmake/onnxruntime_providers_acl.cmake
+index e23d289271..e75ef19802 100644
+--- a/cmake/onnxruntime_providers_acl.cmake
++++ b/cmake/onnxruntime_providers_acl.cmake
+@@ -10,7 +10,7 @@
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_acl_cc_srcs})
+   onnxruntime_add_static_library(onnxruntime_providers_acl ${onnxruntime_providers_acl_cc_srcs})
+   onnxruntime_add_include_to_target(onnxruntime_providers_acl
+-    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface
++    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface
+   )
+ 
+   target_link_libraries(onnxruntime_providers_acl -L$ENV{LD_LIBRARY_PATH})
+diff --git a/cmake/onnxruntime_providers_armnn.cmake b/cmake/onnxruntime_providers_armnn.cmake
+index 33fadb7c64..f9a14bfd2b 100644
+--- a/cmake/onnxruntime_providers_armnn.cmake
++++ b/cmake/onnxruntime_providers_armnn.cmake
+@@ -10,7 +10,7 @@
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_armnn_cc_srcs})
+   onnxruntime_add_static_library(onnxruntime_providers_armnn ${onnxruntime_providers_armnn_cc_srcs})
+   onnxruntime_add_include_to_target(onnxruntime_providers_armnn
+-    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface
++    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface
+   )
+ 
+   add_dependencies(onnxruntime_providers_armnn ${onnxruntime_EXTERNAL_DEPENDENCIES})
+diff --git a/cmake/onnxruntime_providers_azure.cmake b/cmake/onnxruntime_providers_azure.cmake
+index 1b03563848..502472598c 100644
+--- a/cmake/onnxruntime_providers_azure.cmake
++++ b/cmake/onnxruntime_providers_azure.cmake
+@@ -8,7 +8,7 @@
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_azure_src})
+   onnxruntime_add_static_library(onnxruntime_providers_azure ${onnxruntime_providers_azure_src})
+   add_dependencies(onnxruntime_providers_azure ${onnxruntime_EXTERNAL_DEPENDENCIES})
+-  onnxruntime_add_include_to_target(onnxruntime_providers_azure onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11)
++  onnxruntime_add_include_to_target(onnxruntime_providers_azure onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11)
+   target_link_libraries(onnxruntime_providers_azure PRIVATE onnx onnxruntime_common onnxruntime_framework)
+   set_target_properties(onnxruntime_providers_azure PROPERTIES FOLDER "ONNXRuntime")
+   set_target_properties(onnxruntime_providers_azure PROPERTIES LINKER_LANGUAGE CXX)
+diff --git a/cmake/onnxruntime_providers_cann.cmake b/cmake/onnxruntime_providers_cann.cmake
+index 0e26f7ee3a..4ed8dbf500 100644
+--- a/cmake/onnxruntime_providers_cann.cmake
++++ b/cmake/onnxruntime_providers_cann.cmake
+@@ -18,7 +18,7 @@
+   set(onnxruntime_providers_cann_src ${onnxruntime_providers_cann_cc_srcs} ${onnxruntime_providers_cann_shared_srcs})
+ 
+   onnxruntime_add_shared_library_module(onnxruntime_providers_cann ${onnxruntime_providers_cann_src})
+-  onnxruntime_add_include_to_target(onnxruntime_providers_cann onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_providers_cann onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+ 
+   add_dependencies(onnxruntime_providers_cann onnxruntime_providers_shared ${onnxruntime_EXTERNAL_DEPENDENCIES})
+   target_link_libraries(onnxruntime_providers_cann PRIVATE ascendcl acl_op_compiler fmk_onnx_parser nsync::nsync_cpp ${ABSEIL_LIBS} ${ONNXRUNTIME_PROVIDERS_SHARED})
+diff --git a/cmake/onnxruntime_providers_coreml.cmake b/cmake/onnxruntime_providers_coreml.cmake
+index 0aa25a221b..25608bffa2 100644
+--- a/cmake/onnxruntime_providers_coreml.cmake
++++ b/cmake/onnxruntime_providers_coreml.cmake
+@@ -162,7 +162,7 @@ onnxruntime_add_static_library(onnxruntime_providers_coreml
+ )
+ 
+ onnxruntime_add_include_to_target(onnxruntime_providers_coreml
+-  onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11
++  onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11
+   safeint_interface
+ )
+ 
+diff --git a/cmake/onnxruntime_providers_cpu.cmake b/cmake/onnxruntime_providers_cpu.cmake
+index b211c02f71..dc2ddc8763 100644
+--- a/cmake/onnxruntime_providers_cpu.cmake
++++ b/cmake/onnxruntime_providers_cpu.cmake
+@@ -165,7 +165,7 @@ if (MSVC)
+ #      target_compile_options(onnxruntime_providers PRIVATE "/wd4244")
+ #   endif()
+ endif()
+-onnxruntime_add_include_to_target(onnxruntime_providers onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++onnxruntime_add_include_to_target(onnxruntime_providers onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+ 
+ if (onnxruntime_BUILD_MS_EXPERIMENTAL_OPS)
+   target_compile_definitions(onnxruntime_providers PRIVATE BUILD_MS_EXPERIMENTAL_OPS=1)
+diff --git a/cmake/onnxruntime_providers_cuda.cmake b/cmake/onnxruntime_providers_cuda.cmake
+index 1346a9ce96..dee2a85342 100644
+--- a/cmake/onnxruntime_providers_cuda.cmake
++++ b/cmake/onnxruntime_providers_cuda.cmake
+@@ -175,7 +175,7 @@
+       endif()
+     endif()
+ 
+-    onnxruntime_add_include_to_target(${target} onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers)
++    onnxruntime_add_include_to_target(${target} onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared)
+     if (onnxruntime_ENABLE_TRAINING_OPS)
+       onnxruntime_add_include_to_target(${target} onnxruntime_training)
+       if (onnxruntime_ENABLE_TRAINING)
+diff --git a/cmake/onnxruntime_providers_dml.cmake b/cmake/onnxruntime_providers_dml.cmake
+index 439be882dc..b876bc5dfb 100644
+--- a/cmake/onnxruntime_providers_dml.cmake
++++ b/cmake/onnxruntime_providers_dml.cmake
+@@ -9,7 +9,7 @@
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_dml_cc_srcs})
+   onnxruntime_add_static_library(onnxruntime_providers_dml ${onnxruntime_providers_dml_cc_srcs})
+   onnxruntime_add_include_to_target(onnxruntime_providers_dml
+-    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface ${WIL_TARGET}
++    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface ${WIL_TARGET}
+   )
+   add_dependencies(onnxruntime_providers_dml ${onnxruntime_EXTERNAL_DEPENDENCIES})
+   target_include_directories(onnxruntime_providers_dml PRIVATE
+diff --git a/cmake/onnxruntime_providers_migraphx.cmake b/cmake/onnxruntime_providers_migraphx.cmake
+index 01c4f8b2c8..bc1f3dc5ac 100644
+--- a/cmake/onnxruntime_providers_migraphx.cmake
++++ b/cmake/onnxruntime_providers_migraphx.cmake
+@@ -39,9 +39,9 @@
+   )
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_migraphx_cc_srcs})
+   onnxruntime_add_shared_library_module(onnxruntime_providers_migraphx ${onnxruntime_providers_migraphx_cc_srcs})
+-  onnxruntime_add_include_to_target(onnxruntime_providers_migraphx onnxruntime_common onnx flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_providers_migraphx onnxruntime_common onnx flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+   add_dependencies(onnxruntime_providers_migraphx onnxruntime_providers_shared ${onnxruntime_EXTERNAL_DEPENDENCIES})
+-  target_link_libraries(onnxruntime_providers_migraphx PRIVATE ${migraphx_libs} ${ONNXRUNTIME_PROVIDERS_SHARED} onnx flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  target_link_libraries(onnxruntime_providers_migraphx PRIVATE ${migraphx_libs} ${ONNXRUNTIME_PROVIDERS_SHARED} onnx flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+   target_include_directories(onnxruntime_providers_migraphx PRIVATE ${ONNXRUNTIME_ROOT} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/amdgpu/onnxruntime)
+   set_target_properties(onnxruntime_providers_migraphx PROPERTIES LINKER_LANGUAGE CXX)
+   set_target_properties(onnxruntime_providers_migraphx PROPERTIES FOLDER "ONNXRuntime")
+diff --git a/cmake/onnxruntime_providers_nnapi.cmake b/cmake/onnxruntime_providers_nnapi.cmake
+index b718a976eb..ca0fa203a2 100644
+--- a/cmake/onnxruntime_providers_nnapi.cmake
++++ b/cmake/onnxruntime_providers_nnapi.cmake
+@@ -60,7 +60,7 @@
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_nnapi_cc_srcs})
+   onnxruntime_add_static_library(onnxruntime_providers_nnapi ${onnxruntime_providers_nnapi_cc_srcs})
+   onnxruntime_add_include_to_target(onnxruntime_providers_nnapi
+-    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface
++    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface
+   )
+   target_link_libraries(onnxruntime_providers_nnapi)
+   add_dependencies(onnxruntime_providers_nnapi onnx ${onnxruntime_EXTERNAL_DEPENDENCIES})
+diff --git a/cmake/onnxruntime_providers_qnn.cmake b/cmake/onnxruntime_providers_qnn.cmake
+index b68d84c23b..612fa6c74a 100644
+--- a/cmake/onnxruntime_providers_qnn.cmake
++++ b/cmake/onnxruntime_providers_qnn.cmake
+@@ -30,7 +30,7 @@
+ 
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_qnn_cc_srcs})
+   onnxruntime_add_static_library(onnxruntime_providers_qnn ${onnxruntime_providers_qnn_cc_srcs})
+-  onnxruntime_add_include_to_target(onnxruntime_providers_qnn onnxruntime_common onnxruntime_framework onnx onnx_proto protobuf::libprotobuf-lite flatbuffers::flatbuffers Boost::mp11)
++  onnxruntime_add_include_to_target(onnxruntime_providers_qnn onnxruntime_common onnxruntime_framework onnx onnx_proto protobuf::libprotobuf-lite flatbuffers::flatbuffers_shared Boost::mp11)
+   target_link_libraries(onnxruntime_providers_qnn)
+   add_dependencies(onnxruntime_providers_qnn onnx ${onnxruntime_EXTERNAL_DEPENDENCIES})
+   set_target_properties(onnxruntime_providers_qnn PROPERTIES CXX_STANDARD_REQUIRED ON)
+diff --git a/cmake/onnxruntime_providers_rknpu.cmake b/cmake/onnxruntime_providers_rknpu.cmake
+index 408bcfde06..16ba64acb9 100644
+--- a/cmake/onnxruntime_providers_rknpu.cmake
++++ b/cmake/onnxruntime_providers_rknpu.cmake
+@@ -24,7 +24,7 @@
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_rknpu_cc_srcs})
+   onnxruntime_add_static_library(onnxruntime_providers_rknpu ${onnxruntime_providers_rknpu_cc_srcs})
+   onnxruntime_add_include_to_target(onnxruntime_providers_rknpu
+-    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface
++    onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface
+   )
+   target_link_libraries(onnxruntime_providers_rknpu PRIVATE -lrknpu_ddk)
+   add_dependencies(onnxruntime_providers_rknpu onnx ${onnxruntime_EXTERNAL_DEPENDENCIES})
+diff --git a/cmake/onnxruntime_providers_rocm.cmake b/cmake/onnxruntime_providers_rocm.cmake
+index b662682915..37d82180b0 100644
+--- a/cmake/onnxruntime_providers_rocm.cmake
++++ b/cmake/onnxruntime_providers_rocm.cmake
+@@ -120,7 +120,7 @@
+     target_compile_options(onnxruntime_providers_rocm PRIVATE -Wno-undefined-var-template)
+   endif()
+ 
+-  onnxruntime_add_include_to_target(onnxruntime_providers_rocm onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_providers_rocm onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+   if (onnxruntime_ENABLE_TRAINING_OPS)
+     onnxruntime_add_include_to_target(onnxruntime_providers_rocm onnxruntime_training)
+     target_link_libraries(onnxruntime_providers_rocm PRIVATE onnxruntime_training)
+diff --git a/cmake/onnxruntime_providers_tensorrt.cmake b/cmake/onnxruntime_providers_tensorrt.cmake
+index e56de0c712..f15689d3d2 100644
+--- a/cmake/onnxruntime_providers_tensorrt.cmake
++++ b/cmake/onnxruntime_providers_tensorrt.cmake
+@@ -170,12 +170,12 @@
+ 
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_tensorrt_cc_srcs})
+   onnxruntime_add_shared_library_module(onnxruntime_providers_tensorrt ${onnxruntime_providers_tensorrt_cc_srcs})
+-  onnxruntime_add_include_to_target(onnxruntime_providers_tensorrt onnxruntime_common onnx flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_providers_tensorrt onnxruntime_common onnx flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+   add_dependencies(onnxruntime_providers_tensorrt onnxruntime_providers_shared ${onnxruntime_EXTERNAL_DEPENDENCIES})
+   if (onnxruntime_USE_TENSORRT_BUILTIN_PARSER)
+-    target_link_libraries(onnxruntime_providers_tensorrt PRIVATE ${trt_link_libs} ${ONNXRUNTIME_PROVIDERS_SHARED} ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface ${ABSEIL_LIBS} PUBLIC CUDA::cudart)
++    target_link_libraries(onnxruntime_providers_tensorrt PRIVATE ${trt_link_libs} ${ONNXRUNTIME_PROVIDERS_SHARED} ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface ${ABSEIL_LIBS} PUBLIC CUDA::cudart)
+   else()
+-    target_link_libraries(onnxruntime_providers_tensorrt PRIVATE ${onnxparser_link_libs} ${trt_link_libs} ${ONNXRUNTIME_PROVIDERS_SHARED} ${PROTOBUF_LIB} flatbuffers::flatbuffers ${ABSEIL_LIBS} PUBLIC CUDA::cudart)
++    target_link_libraries(onnxruntime_providers_tensorrt PRIVATE ${onnxparser_link_libs} ${trt_link_libs} ${ONNXRUNTIME_PROVIDERS_SHARED} ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared ${ABSEIL_LIBS} PUBLIC CUDA::cudart)
+   endif()
+   target_include_directories(onnxruntime_providers_tensorrt PRIVATE ${ONNXRUNTIME_ROOT} ${CMAKE_CURRENT_BINARY_DIR} ${eigen_INCLUDE_DIRS}
+     PUBLIC ${CUDAToolkit_INCLUDE_DIRS})
+diff --git a/cmake/onnxruntime_providers_tvm.cmake b/cmake/onnxruntime_providers_tvm.cmake
+index 8fd50c70dd..96eb62190e 100644
+--- a/cmake/onnxruntime_providers_tvm.cmake
++++ b/cmake/onnxruntime_providers_tvm.cmake
+@@ -28,7 +28,7 @@
+   target_include_directories(onnxruntime_providers_tvm PRIVATE
+           ${TVM_INCLUDES}
+           ${PYTHON_INCLUDE_DIRS})
+-  onnxruntime_add_include_to_target(onnxruntime_providers_tvm onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_providers_tvm onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+ 
+   add_dependencies(onnxruntime_providers_tvm ${onnxruntime_EXTERNAL_DEPENDENCIES})
+ 
+diff --git a/cmake/onnxruntime_providers_vitisai.cmake b/cmake/onnxruntime_providers_vitisai.cmake
+index 183a3e196a..64a7d1a37a 100644
+--- a/cmake/onnxruntime_providers_vitisai.cmake
++++ b/cmake/onnxruntime_providers_vitisai.cmake
+@@ -19,7 +19,7 @@
+   )
+   source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_vitisai_cc_srcs})
+   onnxruntime_add_shared_library(onnxruntime_providers_vitisai ${onnxruntime_providers_vitisai_cc_srcs})
+-  onnxruntime_add_include_to_target(onnxruntime_providers_vitisai ${ONNXRUNTIME_PROVIDERS_SHARED} nlohmann_json::nlohmann_json safeint_interface flatbuffers::flatbuffers)
++  onnxruntime_add_include_to_target(onnxruntime_providers_vitisai ${ONNXRUNTIME_PROVIDERS_SHARED} nlohmann_json::nlohmann_json safeint_interface flatbuffers::flatbuffers_shared)
+   target_link_libraries(onnxruntime_providers_vitisai PRIVATE ${ONNXRUNTIME_PROVIDERS_SHARED})
+   if(MSVC)
+     onnxruntime_add_include_to_target(onnxruntime_providers_vitisai dbghelp)
+diff --git a/cmake/onnxruntime_providers_webnn.cmake b/cmake/onnxruntime_providers_webnn.cmake
+index 05c63c2224..35648cfe80 100644
+--- a/cmake/onnxruntime_providers_webnn.cmake
++++ b/cmake/onnxruntime_providers_webnn.cmake
+@@ -18,7 +18,7 @@
+ 
+   source_group(TREE ${REPO_ROOT} FILES ${onnxruntime_providers_webnn_cc_srcs})
+   onnxruntime_add_static_library(onnxruntime_providers_webnn ${onnxruntime_providers_webnn_cc_srcs})
+-  onnxruntime_add_include_to_target(onnxruntime_providers_webnn onnxruntime_common onnx onnx_proto flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_providers_webnn onnxruntime_common onnx onnx_proto flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+ 
+   add_dependencies(onnxruntime_providers_webnn onnx ${onnxruntime_EXTERNAL_DEPENDENCIES})
+   set_target_properties(onnxruntime_providers_webnn PROPERTIES FOLDER "ONNXRuntime")
+diff --git a/cmake/onnxruntime_providers_xnnpack.cmake b/cmake/onnxruntime_providers_xnnpack.cmake
+index 796536ac9d..bbfc91eb59 100644
+--- a/cmake/onnxruntime_providers_xnnpack.cmake
++++ b/cmake/onnxruntime_providers_xnnpack.cmake
+@@ -13,7 +13,7 @@
+   onnxruntime_add_static_library(onnxruntime_providers_xnnpack ${onnxruntime_providers_xnnpack_cc_srcs})
+   onnxruntime_add_include_to_target(onnxruntime_providers_xnnpack
+     onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} XNNPACK pthreadpool
+-    flatbuffers::flatbuffers Boost::mp11 safeint_interface
++    flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface
+   )
+ 
+   # TODO fix stringop-overflow warnings
+diff --git a/cmake/onnxruntime_pyop.cmake b/cmake/onnxruntime_pyop.cmake
+index f758369094..28c698c67b 100644
+--- a/cmake/onnxruntime_pyop.cmake
++++ b/cmake/onnxruntime_pyop.cmake
+@@ -2,7 +2,7 @@
+ # Licensed under the MIT License.
+ onnxruntime_add_static_library(onnxruntime_pyop "${ONNXRUNTIME_ROOT}/core/language_interop_ops/pyop/pyop.cc")
+ add_dependencies(onnxruntime_pyop ${onnxruntime_EXTERNAL_DEPENDENCIES})
+-onnxruntime_add_include_to_target(onnxruntime_pyop onnxruntime_common onnxruntime_graph onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers ${GSL_TARGET} Boost::mp11)
++onnxruntime_add_include_to_target(onnxruntime_pyop onnxruntime_common onnxruntime_graph onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared ${GSL_TARGET} Boost::mp11)
+ target_include_directories(onnxruntime_pyop PRIVATE ${ONNXRUNTIME_ROOT} ${eigen_INCLUDE_DIRS})
+ onnxruntime_add_include_to_target(onnxruntime_pyop Python::Module Python::NumPy)
+ if (TARGET Python::Python)
+diff --git a/cmake/onnxruntime_session.cmake b/cmake/onnxruntime_session.cmake
+index 79bee3bdb6..dbbcf0d00c 100644
+--- a/cmake/onnxruntime_session.cmake
++++ b/cmake/onnxruntime_session.cmake
+@@ -30,7 +30,7 @@ endif()
+ source_group(TREE ${REPO_ROOT} FILES ${onnxruntime_session_srcs})
+ 
+ onnxruntime_add_static_library(onnxruntime_session ${onnxruntime_session_srcs})
+-onnxruntime_add_include_to_target(onnxruntime_session onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers Boost::mp11 safeint_interface nlohmann_json::nlohmann_json)
++onnxruntime_add_include_to_target(onnxruntime_session onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface nlohmann_json::nlohmann_json)
+ if(onnxruntime_ENABLE_INSTRUMENT)
+   target_compile_definitions(onnxruntime_session PUBLIC ONNXRUNTIME_ENABLE_INSTRUMENT)
+ endif()
+diff --git a/cmake/onnxruntime_snpe_provider.cmake b/cmake/onnxruntime_snpe_provider.cmake
+index b0ed688813..71edd2a08f 100644
+--- a/cmake/onnxruntime_snpe_provider.cmake
++++ b/cmake/onnxruntime_snpe_provider.cmake
+@@ -21,7 +21,7 @@ endif()
+ 
+ source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_snpe_cc_srcs})
+ onnxruntime_add_static_library(onnxruntime_providers_snpe ${onnxruntime_providers_snpe_cc_srcs})
+-onnxruntime_add_include_to_target(onnxruntime_providers_snpe onnxruntime_common onnxruntime_framework onnx onnx_proto protobuf::libprotobuf-lite flatbuffers::flatbuffers)
++onnxruntime_add_include_to_target(onnxruntime_providers_snpe onnxruntime_common onnxruntime_framework onnx onnx_proto protobuf::libprotobuf-lite flatbuffers::flatbuffers_shared)
+ link_directories(${SNPE_CMAKE_DIR}/lib/${SNPE_ARCH_ABI} ${SNPE_CMAKE_DIR}/lib/dsp)
+ add_dependencies(onnxruntime_providers_snpe onnx ${onnxruntime_EXTERNAL_DEPENDENCIES})
+ set_target_properties(onnxruntime_providers_snpe PROPERTIES CXX_STANDARD_REQUIRED ON)
+diff --git a/cmake/onnxruntime_training.cmake b/cmake/onnxruntime_training.cmake
+index f9ba2b341f..2c0b210584 100644
+--- a/cmake/onnxruntime_training.cmake
++++ b/cmake/onnxruntime_training.cmake
+@@ -30,7 +30,7 @@ list(REMOVE_ITEM onnxruntime_training_srcs ${onnxruntime_training_framework_excl
+ 
+ onnxruntime_add_static_library(onnxruntime_training ${onnxruntime_training_srcs})
+ add_dependencies(onnxruntime_training onnx tensorboard ${onnxruntime_EXTERNAL_DEPENDENCIES})
+-onnxruntime_add_include_to_target(onnxruntime_training onnxruntime_common onnx onnx_proto tensorboard ${PROTOBUF_LIB} flatbuffers::flatbuffers re2::re2 Boost::mp11 safeint_interface)
++onnxruntime_add_include_to_target(onnxruntime_training onnxruntime_common onnx onnx_proto tensorboard ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared re2::re2 Boost::mp11 safeint_interface)
+ 
+ # fix event_writer.cc 4100 warning
+ if(WIN32)
+@@ -77,7 +77,7 @@ if (onnxruntime_BUILD_UNIT_TESTS)
+     target_link_libraries(onnxruntime_training_runner PRIVATE Python::Python)
+   endif()
+ 
+-  onnxruntime_add_include_to_target(onnxruntime_training_runner onnxruntime_training onnxruntime_framework onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_training_runner onnxruntime_training onnxruntime_framework onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+ 
+   target_include_directories(onnxruntime_training_runner PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${ONNXRUNTIME_ROOT} ${ORTTRAINING_ROOT} ${eigen_INCLUDE_DIRS} PUBLIC ${onnxruntime_graph_header})
+   target_link_libraries(onnxruntime_training_runner PRIVATE nlohmann_json::nlohmann_json)
+@@ -115,7 +115,7 @@ if (onnxruntime_BUILD_UNIT_TESTS)
+       "${ORTTRAINING_SOURCE_DIR}/models/mnist/main.cc"
+   )
+   onnxruntime_add_executable(onnxruntime_training_mnist ${training_mnist_src})
+-  onnxruntime_add_include_to_target(onnxruntime_training_mnist onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_training_mnist onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+   target_include_directories(onnxruntime_training_mnist PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${ONNXRUNTIME_ROOT} ${ORTTRAINING_ROOT} ${eigen_INCLUDE_DIRS} ${CXXOPTS} ${extra_includes} ${onnxruntime_graph_header} ${onnxruntime_exec_src_dir} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/onnx onnxruntime_training_runner)
+ 
+   set(ONNXRUNTIME_LIBS
+@@ -161,7 +161,7 @@ if (onnxruntime_BUILD_UNIT_TESTS)
+       "${ORTTRAINING_SOURCE_DIR}/models/squeezenet/*.cc"
+   )
+   onnxruntime_add_executable(onnxruntime_training_squeezenet ${training_squeezene_src})
+-  onnxruntime_add_include_to_target(onnxruntime_training_squeezenet onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_training_squeezenet onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+   target_include_directories(onnxruntime_training_squeezenet PUBLIC ${ONNXRUNTIME_ROOT} ${ORTTRAINING_ROOT} ${eigen_INCLUDE_DIRS} ${extra_includes} ${onnxruntime_graph_header} ${onnxruntime_exec_src_dir} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/onnx onnxruntime_training_runner)
+ 
+   if(UNIX AND NOT APPLE)
+@@ -184,7 +184,7 @@ if (onnxruntime_BUILD_UNIT_TESTS)
+     endif()
+   endif()
+ 
+-  onnxruntime_add_include_to_target(onnxruntime_training_bert onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_training_bert onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+   target_include_directories(onnxruntime_training_bert PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${ONNXRUNTIME_ROOT} ${ORTTRAINING_ROOT} ${MPI_CXX_INCLUDE_DIRS} ${eigen_INCLUDE_DIRS} ${CXXOPTS} ${extra_includes} ${onnxruntime_graph_header} ${onnxruntime_exec_src_dir} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/onnx onnxruntime_training_runner)
+ 
+   # ROCM provider sources are generated, need to add include directory for generated headers
+@@ -208,7 +208,7 @@ if (onnxruntime_BUILD_UNIT_TESTS)
+     endif()
+   endif()
+ 
+-  onnxruntime_add_include_to_target(onnxruntime_training_pipeline_poc onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++  onnxruntime_add_include_to_target(onnxruntime_training_pipeline_poc onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} onnxruntime_training flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+   target_include_directories(onnxruntime_training_pipeline_poc PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${ONNXRUNTIME_ROOT} ${ORTTRAINING_ROOT} ${MPI_CXX_INCLUDE_DIRS} ${eigen_INCLUDE_DIRS} ${CXXOPTS} ${extra_includes} ${onnxruntime_graph_header} ${onnxruntime_exec_src_dir} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/onnx onnxruntime_training_runner)
+   if (onnxruntime_USE_NCCL)
+     target_include_directories(onnxruntime_training_pipeline_poc PRIVATE ${NCCL_INCLUDE_DIRS})
+diff --git a/cmake/onnxruntime_unittests.cmake b/cmake/onnxruntime_unittests.cmake
+index 66df1158ec..aab2a4992c 100644
+--- a/cmake/onnxruntime_unittests.cmake
++++ b/cmake/onnxruntime_unittests.cmake
+@@ -72,7 +72,7 @@ function(AddTest)
+     target_link_libraries(${_UT_TARGET} PRIVATE ${_UT_LIBS} GTest::gtest GTest::gmock ${onnxruntime_EXTERNAL_LIBRARIES})
+   endif()
+ 
+-  onnxruntime_add_include_to_target(${_UT_TARGET} date::date flatbuffers::flatbuffers)
++  onnxruntime_add_include_to_target(${_UT_TARGET} date::date flatbuffers::flatbuffers_shared)
+   target_include_directories(${_UT_TARGET} PRIVATE ${TEST_INC_DIR})
+   if (onnxruntime_USE_CUDA)
+     target_include_directories(${_UT_TARGET} PRIVATE ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${onnxruntime_CUDNN_HOME}/include)
+@@ -153,7 +153,7 @@ function(AddTest)
+     else()
+       target_link_libraries(${_UT_TARGET}_xc PRIVATE ${_UT_LIBS} GTest::gtest GTest::gmock ${onnxruntime_EXTERNAL_LIBRARIES})
+     endif()
+-    onnxruntime_add_include_to_target(${_UT_TARGET}_xc date::date flatbuffers::flatbuffers)
++    onnxruntime_add_include_to_target(${_UT_TARGET}_xc date::date flatbuffers::flatbuffers_shared)
+     target_include_directories(${_UT_TARGET}_xc PRIVATE ${TEST_INC_DIR})
+     get_target_property(${_UT_TARGET}_DEFS ${_UT_TARGET} COMPILE_DEFINITIONS)
+     target_compile_definitions(${_UT_TARGET}_xc PRIVATE ${_UT_TARGET}_DEFS)
+@@ -726,7 +726,7 @@ endif()
+ if (onnxruntime_USE_ROCM)
+   target_include_directories(onnxruntime_test_utils PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/amdgpu/onnxruntime ${CMAKE_CURRENT_BINARY_DIR}/amdgpu/orttraining)
+ endif()
+-onnxruntime_add_include_to_target(onnxruntime_test_utils onnxruntime_common onnxruntime_framework onnxruntime_session GTest::gtest GTest::gmock onnx onnx_proto flatbuffers::flatbuffers nlohmann_json::nlohmann_json Boost::mp11 safeint_interface)
++onnxruntime_add_include_to_target(onnxruntime_test_utils onnxruntime_common onnxruntime_framework onnxruntime_session GTest::gtest GTest::gmock onnx onnx_proto flatbuffers::flatbuffers_shared nlohmann_json::nlohmann_json Boost::mp11 safeint_interface)
+ 
+ 
+ 
+@@ -761,7 +761,7 @@ if(NOT IOS)
+       target_compile_options(onnx_test_runner_common PRIVATE "/wd4244")
+     endif()
+     onnxruntime_add_include_to_target(onnx_test_runner_common onnxruntime_common onnxruntime_framework
+-            onnxruntime_test_utils onnx onnx_proto re2::re2 flatbuffers::flatbuffers Boost::mp11 safeint_interface)
++            onnxruntime_test_utils onnx onnx_proto re2::re2 flatbuffers::flatbuffers_shared Boost::mp11 safeint_interface)
+ 
+     add_dependencies(onnx_test_runner_common onnx_test_data_proto ${onnxruntime_EXTERNAL_DEPENDENCIES})
+     target_include_directories(onnx_test_runner_common PRIVATE ${eigen_INCLUDE_DIRS}
+@@ -1438,7 +1438,7 @@ endif()
+     onnxruntime_add_executable(onnxruntime_test_trainer ${training_api_test_trainer_src})
+ 
+     onnxruntime_add_include_to_target(onnxruntime_test_trainer onnxruntime_session
+-      onnxruntime_framework onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers)
++      onnxruntime_framework onnxruntime_common onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared)
+ 
+     set(CXXOPTS ${cxxopts_SOURCE_DIR}/include)
+     target_include_directories(onnxruntime_test_trainer PRIVATE
+diff --git a/cmake/winml.cmake b/cmake/winml.cmake
+index d74250b962..066233e3f1 100644
+--- a/cmake/winml.cmake
++++ b/cmake/winml.cmake
+@@ -321,7 +321,7 @@ set_target_properties(winml_adapter PROPERTIES CXX_STANDARD 17)
+ set_target_properties(winml_adapter PROPERTIES CXX_STANDARD_REQUIRED ON)
+ 
+ # Compiler definitions
+-onnxruntime_add_include_to_target(winml_adapter onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11)
++onnxruntime_add_include_to_target(winml_adapter onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared safeint_interface Boost::mp11)
+ target_include_directories(winml_adapter PRIVATE ${ONNXRUNTIME_ROOT} ${eigen_INCLUDE_DIRS})
+ add_dependencies(winml_adapter ${onnxruntime_EXTERNAL_DEPENDENCIES})
+ 
+@@ -405,7 +405,7 @@ target_include_directories(winml_lib_image PRIVATE ${winml_lib_api_image_dir})
+ target_include_directories(winml_lib_image PRIVATE ${winml_lib_common_dir}/inc)
+ target_include_directories(winml_lib_image PRIVATE ${ONNXRUNTIME_ROOT})
+ target_include_directories(winml_lib_image PRIVATE ${ONNXRUNTIME_INCLUDE_DIR})                                                        # for status.h
+-onnxruntime_add_include_to_target(winml_lib_image onnx onnx_proto ${PROTOBUF_LIB} re2::re2 flatbuffers::flatbuffers Boost::mp11)
++onnxruntime_add_include_to_target(winml_lib_image onnx onnx_proto ${PROTOBUF_LIB} re2::re2 flatbuffers::flatbuffers_shared Boost::mp11)
+ target_include_directories(winml_lib_image PRIVATE ${ONNXRUNTIME_INCLUDE_DIR}/core/platform/windows)
+ target_include_directories(winml_lib_image PRIVATE ${REPO_ROOT}/winml)
+ target_include_directories(winml_lib_image PRIVATE ${GSL_INCLUDE_DIR})
+@@ -517,7 +517,7 @@ target_include_directories(winml_lib_api PRIVATE ${ONNXRUNTIME_ROOT})
+ target_include_directories(winml_lib_api PRIVATE ${ONNXRUNTIME_ROOT}/core/graph)
+ target_include_directories(winml_lib_api PRIVATE ${REPO_ROOT}/winml)
+ target_include_directories(winml_lib_api PRIVATE ${eigen_INCLUDE_DIRS})
+-target_link_libraries(winml_lib_api PRIVATE ${GSL_TARGET} safeint_interface flatbuffers::flatbuffers Boost::mp11 onnx onnx_proto)
++target_link_libraries(winml_lib_api PRIVATE ${GSL_TARGET} safeint_interface flatbuffers::flatbuffers_shared Boost::mp11 onnx onnx_proto)
+ 
+ # Properties
+ set_target_properties(winml_lib_api
+@@ -604,7 +604,7 @@ target_include_directories(winml_lib_api_experimental PRIVATE ${ONNXRUNTIME_ROOT
+ target_include_directories(winml_lib_api_experimental PRIVATE ${ONNXRUNTIME_ROOT}/core/graph)
+ target_include_directories(winml_lib_api_experimental PRIVATE ${eigen_INCLUDE_DIRS})
+ target_include_directories(winml_lib_api_experimental PRIVATE ${REPO_ROOT}/winml)
+-onnxruntime_add_include_to_target(winml_lib_api_experimental PRIVATE ${PROTOBUF_LIB} safeint_interface flatbuffers::flatbuffers Boost::mp11 onnx onnx_proto ${GSL_TARGET})
++onnxruntime_add_include_to_target(winml_lib_api_experimental PRIVATE ${PROTOBUF_LIB} safeint_interface flatbuffers::flatbuffers_shared Boost::mp11 onnx onnx_proto ${GSL_TARGET})
+ 
+ # Properties
+ set_target_properties(winml_lib_api_experimental
+@@ -759,7 +759,7 @@ target_include_directories(winml_dll PRIVATE ${ONNXRUNTIME_ROOT}/core/graph)
+ 
+ target_include_directories(winml_dll PRIVATE ${eigen_INCLUDE_DIRS})
+ target_include_directories(winml_dll PRIVATE ${REPO_ROOT}/winml)
+-target_link_libraries(winml_dll PRIVATE onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11 ${GSL_TARGET})
++target_link_libraries(winml_dll PRIVATE onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared safeint_interface Boost::mp11 ${GSL_TARGET})
+ target_link_libraries(winml_dll PRIVATE debug Dbghelp)
+ # Properties
+ set_target_properties(winml_dll
+diff --git a/cmake/winml_unittests.cmake b/cmake/winml_unittests.cmake
+index b655e60a8a..641fa3ba46 100644
+--- a/cmake/winml_unittests.cmake
++++ b/cmake/winml_unittests.cmake
+@@ -273,7 +273,7 @@ target_include_directories(winml_test_adapter PRIVATE ${winml_lib_common_dir}/in
+ target_include_directories(winml_test_adapter PRIVATE ${ONNXRUNTIME_INCLUDE_DIR})
+ target_include_directories(winml_test_adapter PRIVATE ${ONNXRUNTIME_ROOT})
+ 
+-onnxruntime_add_include_to_target(winml_test_adapter onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers safeint_interface Boost::mp11)
++onnxruntime_add_include_to_target(winml_test_adapter onnxruntime_common onnxruntime_framework onnx onnx_proto ${PROTOBUF_LIB} flatbuffers::flatbuffers_shared safeint_interface Boost::mp11)
+ target_include_directories(winml_test_adapter PRIVATE ${ONNXRUNTIME_ROOT} ${eigen_INCLUDE_DIRS})
+ add_dependencies(winml_test_adapter ${onnxruntime_EXTERNAL_DEPENDENCIES})
+ target_include_directories(winml_test_adapter PRIVATE ${winml_adapter_dir})

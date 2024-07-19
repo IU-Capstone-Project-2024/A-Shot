@@ -1,33 +1,6 @@
-[submodule "contrib/onnxruntime"]
-	path = contrib/onnxruntime
-	url = git@github.com:ATMI/onnxruntime.git
-[submodule "contrib/sqlite"]
-	path = contrib/sqlite
-	url = git@github.com:ATMI/sqlite.git
 [submodule "utils/src/blur_filtering/ddffnet"]
 	path = utils/src/blur_filtering/ddffnet
 	url = git@github.com:ATMI/D-DFFNet.git
 [submodule "utils/src/image_grouping/SuperGlobal"]
 	path = utils/src/image_grouping/SuperGlobal
 	url = https://github.com/Shintifo/SuperGlobal
-[submodule "contrib/Little-CMS"]
-	path = contrib/Little-CMS
-	url = git@github.com:ATMI/Little-CMS.git
-[submodule "contrib/tiff"]
-	path = contrib/tiff
-	url = git@gitlab.com:libtiff/libtiff.git
-[submodule "contrib/png"]
-	path = contrib/png
-	url = git@github.com:ATMI/libpng.git
-[submodule "contrib/jpeg"]
-	path = contrib/jpeg
-	url = git@github.com:ATMI/libjpeg-turbo.git
-[submodule "contrib/raw"]
-	path = contrib/raw
-	url = git@github.com:ATMI/LibRaw.git
-[submodule "contrib/ImageMagick"]
-	path = contrib/ImageMagick
-	url = git@github.com:ATMI/ImageMagick.git
-[submodule "contrib/cpuinfo"]
-	path = contrib/cpuinfo
-	url = git@github.com:ATMI/cpuinfo.git
