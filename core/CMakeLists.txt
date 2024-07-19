@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.22)
 
 set(PRJ my_puper_lib)
 
@@ -20,7 +20,7 @@ endif ()
 # region onnxruntime
 set(ONNXRUNTIME_INSTALL "${CMAKE_CURRENT_BINARY_DIR}/onnxruntime")
 set(ONNXRUNTIME_INCLUDE "${ONNXRUNTIME_INSTALL}/include")
-set(ONNXRUNTIME_LIB "${ONNXRUNTIME_INSTALL}/lib64")
+set(ONNXRUNTIME_LIB "${ONNXRUNTIME_INSTALL}/lib")
 
 set(onnxruntime_patch "${CMAKE_CURRENT_BINARY_DIR}/onnxruntime.patch.sh")
 set(onnxruntime_build "${CMAKE_CURRENT_BINARY_DIR}/onnxruntime.build.sh")
@@ -49,28 +49,28 @@ configure_file(onnxruntime.install.sh.in "${onnxruntime_install}" FILE_PERMISSIO
 # region jpeg
 set(JPEG_INSTALL "${CMAKE_CURRENT_BINARY_DIR}/jpeg")
 set(JPEG_INCLUDE "${JPEG_INSTALL}/include")
-set(JPEG_LIB "${JPEG_INSTALL}/lib64")
+set(JPEG_LIB "${JPEG_INSTALL}/lib")
 
 ExternalProject_Add(
 		jpeg
 		GIT_REPOSITORY https://github.com/libjpeg-turbo/libjpeg-turbo.git
 		GIT_TAG "3.0.3"
 		GIT_PROGRESS True
-		CMAKE_ARGS -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_INSTALL_PREFIX=${JPEG_INSTALL}
+		CMAKE_ARGS -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_INSTALL_PREFIX=${JPEG_INSTALL} -DCMAKE_INSTALL_INCLUDEDIR=${JPEG_INCLUDE} -DCMAKE_INSTALL_LIBDIR=${JPEG_LIB}
 		INSTALL_BYPRODUCTS "${JPEG_LIB}/libjpeg.a"
 )
 # endregion jpeg
 # region png
 set(PNG_INSTALL "${CMAKE_CURRENT_BINARY_DIR}/png")
 set(PNG_INCLUDE "${PNG_INSTALL}/include")
-set(PNG_LIB "${PNG_INSTALL}/lib64")
+set(PNG_LIB "${PNG_INSTALL}/lib")
 
 ExternalProject_Add(
 		png
 		GIT_REPOSITORY https://github.com/pnggroup/libpng.git
 		GIT_TAG "v1.6.43"
 		GIT_PROGRESS True
-		CMAKE_ARGS -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_INSTALL_PREFIX=${PNG_INSTALL}
+		CMAKE_ARGS -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_INSTALL_PREFIX=${PNG_INSTALL} -DCMAKE_INSTALL_INCLUDEDIR=${PNG_INCLUDE} -DCMAKE_INSTALL_LIBDIR=${PNG_LIB}
 		INSTALL_BYPRODUCTS "${PNG_LIB}/libpng.a"
 )
 # endregion png
@@ -225,11 +225,6 @@ add_dependencies(
 
 		onnxruntime
 		imagemagick
-
-		lcms
-		jpeg
-		raw
-		png
 )
 
 target_link_libraries(
