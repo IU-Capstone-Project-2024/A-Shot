@@ -16,6 +16,20 @@ we will focus on the development of the following essential features:
    To automatically group similar images together,
    making it easy to compare and choose the best shot from each group.
 
+## System UI and Functionality
+
+### 1. Photo Grouping
+
+
+![Image showing grouped photos](https://github.com/user-attachments/assets/19241690-f169-47c1-b938-74ae583d7452)
+
+
+### 2. Choose Your Best Shot!
+
+
+![Image showing shot selection interface](https://github.com/user-attachments/assets/c083f824-5075-424c-a8db-bdcb22b1efbb)
+
+
 ## Coding Guidelines
 
 To ensure that our codebase remains clean and maintainable,
